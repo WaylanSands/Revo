@@ -162,13 +162,12 @@
 		48B6587625AD16F00043DEDF /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
-				48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */,
-				48B6587825AD171A0043DEDF /* PassThroughWindow.swift */,
 				48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */,
 				48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */,
-				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
+				48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */,
 				48B6587D25AD171A0043DEDF /* SplitScreenVC.swift */,
+				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
+				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -176,16 +175,16 @@
 		48B658A325AD18090043DEDF /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				48B658A625AD18360043DEDF /* FocusAnimationView.swift */,
-				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
-				48B658A525AD18360043DEDF /* PipModeStyleView.swift */,
-				48B658AA25AD18360043DEDF /* PreviewView.swift */,
-				48B658A725AD18360043DEDF /* RecordButtonView.swift */,
-				48B658AB25AD18360043DEDF /* RecordingOptionsView.swift */,
-				48B658AC25AD18370043DEDF /* RecordingViewCell.swift */,
-				48B658A825AD18360043DEDF /* SplitBarView.swift */,
-				48B658AD25AD18370043DEDF /* SplitModeStyleView.swift */,
 				48B658A425AD18360043DEDF /* TopPreviewOptionsView.swift */,
+				48B658AB25AD18360043DEDF /* RecordingOptionsView.swift */,
+				48B658A625AD18360043DEDF /* FocusAnimationView.swift */,
+				48B658AD25AD18370043DEDF /* SplitModeStyleView.swift */,
+				48B658AC25AD18370043DEDF /* RecordingViewCell.swift */,
+				48B658A525AD18360043DEDF /* PipModeStyleView.swift */,
+				48B658A725AD18360043DEDF /* RecordButtonView.swift */,
+				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
+				48B658A825AD18360043DEDF /* SplitBarView.swift */,
+				48B658AA25AD18360043DEDF /* PreviewView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -207,13 +206,14 @@
 			path = "Revo Constants";
 			sourceTree = "<group>";
 		};
-		48B658CB25AD18960043DEDF /* Helper methods */ = {
+		48B658CB25AD18960043DEDF /* Helper Objects */ = {
 			isa = PBXGroup;
 			children = (
+				48B658BC25AD186E0043DEDF /* RevoAssetWriter.swift */,
 				48B658CC25AD18960043DEDF /* Alert.swift */,
 				48B658CD25AD18960043DEDF /* Time.swift */,
 			);
-			path = "Helper methods";
+			path = "Helper Objects";
 			sourceTree = "<group>";
 		};
 		48B658D625AD18AD0043DEDF /* Extentions */ = {
@@ -229,13 +229,13 @@
 			path = Extentions;
 			sourceTree = "<group>";
 		};
-		48B658E625AD190B0043DEDF /* Assets */ = {
+		48B658E625AD190B0043DEDF /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				48B658E725AD191A0043DEDF /* lottie */,
 				48F72D5425AD12530064E8C8 /* Assets.xcassets */,
 			);
-			path = Assets;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		48B658E725AD191A0043DEDF /* lottie */ = {
@@ -245,6 +245,15 @@
 				48B658E925AD191A0043DEDF /* mobile_360_animation.json */,
 			);
 			path = lottie;
+			sourceTree = "<group>";
+		};
+		48C06B2A25AD62DE0044AC0C /* Supporting files */ = {
+			isa = PBXGroup;
+			children = (
+				48F72D5925AD12530064E8C8 /* Info.plist */,
+				48F72D5625AD12530064E8C8 /* LaunchScreen.storyboard */,
+			);
+			path = "Supporting files";
 			sourceTree = "<group>";
 		};
 		48F72D3F25AD12520064E8C8 = {
@@ -274,17 +283,16 @@
 			children = (
 				48F72D4B25AD12520064E8C8 /* AppDelegate.swift */,
 				48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */,
-				48B658BC25AD186E0043DEDF /* RevoAssetWriter.swift */,
+				48B6587825AD171A0043DEDF /* PassThroughWindow.swift */,
+				48C06B2A25AD62DE0044AC0C /* Supporting files */,
+				48B6587625AD16F00043DEDF /* View Controllers */,
+				48B658C325AD18840043DEDF /* Revo Constants */,
+				48B658CB25AD18960043DEDF /* Helper Objects */,
 				485EEA5B25AD5A3F00F88165 /* Error Handling */,
 				48B658D625AD18AD0043DEDF /* Extentions */,
-				48B658C325AD18840043DEDF /* Revo Constants */,
-				48B658CB25AD18960043DEDF /* Helper methods */,
+				48B658E625AD190B0043DEDF /* Resources */,
 				48B658BB25AD184F0043DEDF /* Models */,
-				48B6587625AD16F00043DEDF /* View Controllers */,
 				48B658A325AD18090043DEDF /* Views */,
-				48B658E625AD190B0043DEDF /* Assets */,
-				48F72D5625AD12530064E8C8 /* LaunchScreen.storyboard */,
-				48F72D5925AD12530064E8C8 /* Info.plist */,
 			);
 			path = Revo;
 			sourceTree = "<group>";

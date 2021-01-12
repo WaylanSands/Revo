@@ -478,8 +478,8 @@ class RecordingControlsVC: UIViewController {
 
                     DispatchQueue.main.async {
 
-                        if error != nil {
-                            print("error: \(error!.localizedDescription)")
+                        if let error = error {
+                            Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
                         } else if url != nil {
                             // Recording finished
                             self.recordingButton.isUserInteractionEnabled = true
