@@ -115,8 +115,21 @@ class LibraryVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureDelegates()
+        configureSwipeGesture()
         fetchRecordings()
         configureViews()
+    }
+    
+    func configureSwipeGesture() {
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(downSwipe))
+        swipeGesture.direction = .down
+        self.view.addGestureRecognizer(swipeGesture)
+    }
+    
+    @objc func downSwipe() {
+        if recordings.count == 0 {
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     func fetchRecordings() {

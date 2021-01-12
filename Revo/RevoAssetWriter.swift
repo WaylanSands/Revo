@@ -11,22 +11,19 @@ import ReplayKit
 
 class RevoAssetWriter {
     // For writing video
-    var videoOutputURL: URL
-    var videoWriter: AVAssetWriter?
-    var videoInput: AVAssetWriterInput?
+    private var videoOutputURL: URL
+    private var videoWriter: AVAssetWriter?
+    private var videoInput: AVAssetWriterInput?
     
     // For writing  audio
-    var audioOutputURL: URL
-    var audioWriter: AVAssetWriter?
-    var micAudioInput:AVAssetWriterInput?
+    private var audioOutputURL: URL
+    private var audioWriter: AVAssetWriter?
+    private var micAudioInput:AVAssetWriterInput?
     
-    var isVideoWritingFinished = false
-    var isAudioWritingFinished = false
-    var isPaused: Bool = false
+    private var isVideoWritingFinished = false
+    private var isAudioWritingFinished = false
     
-    var sessionStartTime: CMTime = CMTime.zero
-    var currentTime: CMTime = CMTime.zero
-    
+    private var sessionStartTime: CMTime = CMTime.zero
     var rotationAngle: CGFloat = 0
     
     init() {
@@ -36,7 +33,7 @@ class RevoAssetWriter {
         removeURLsIfNeeded()
     }
     
-    func removeURLsIfNeeded() {
+    private func removeURLsIfNeeded() {
         FileManager.removeItemWith(url:  self.videoOutputURL)
         FileManager.removeItemWith(url:  self.audioOutputURL)
     }
@@ -45,19 +42,17 @@ class RevoAssetWriter {
         removeURLsIfNeeded()
         isVideoWritingFinished = false
         isAudioWritingFinished = false
-        isPaused = false
         videoInput = nil
         videoWriter = nil
         micAudioInput = nil
         audioWriter = nil
     }
     
-    func setUpWriter() {
-        do {
-            try videoWriter = AVAssetWriter(outputURL: self.videoOutputURL, fileType: .mov)
-        } catch let writerError as NSError {
-            print("Error opening video file \(writerError)")
-        }
+    func setUpWriter() throws {
+        removeURLsIfNeeded()
+        resetWriter()
+       
+        try videoWriter = AVAssetWriter(outputURL: self.videoOutputURL, fileType: .mov)
         
         let videoSettings: [String : Any] = [
             AVVideoCodecKey : AVVideoCodecType.h264,
@@ -67,19 +62,17 @@ class RevoAssetWriter {
         ]
         
         videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+        
         if let videoInput = self.videoInput, let canAddInput = videoWriter?.canAdd(videoInput), canAddInput {
             // Video will be rotated to reflect device orientation
             videoInput.transform = CGAffineTransform(rotationAngle: rotationAngle)
             videoWriter?.add(videoInput)
         } else {
             print("couldn't add video input")
+            throw AssetWriterError.videoInputError
         }
         
-        do {
-            try audioWriter = AVAssetWriter(outputURL: self.audioOutputURL, fileType: .mov)
-        } catch let writerError as NSError {
-            print("Error opening video file \(writerError)")
-        }
+        try audioWriter = AVAssetWriter(outputURL: self.audioOutputURL, fileType: .mov)
         
         var channelLayout = AudioChannelLayout()
         channelLayout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_5_1_D
@@ -91,25 +84,20 @@ class RevoAssetWriter {
         ] as [String : Any]
         
         micAudioInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutputSettings)
-        if let micAudioInput = self.micAudioInput,
-           let canAddInput = audioWriter?.canAdd(micAudioInput),
+        if let micAudioInput = self.micAudioInput, let canAddInput = audioWriter?.canAdd(micAudioInput),
            canAddInput {
             audioWriter?.add(micAudioInput)
         } else {
             print("couldn't add mic audio input")
+            throw AssetWriterError.micInputError
         }
         
     }
     
-    func writeBuffer(_ cmSampleBuffer: CMSampleBuffer, rpSampleType: RPSampleBufferType) {
-        
-        if self.videoWriter == nil {
-            DispatchQueue.main.async {
-                self.setUpWriter()
-            }
-        }
-        
-        guard let videoWriter = self.videoWriter, let audioWriter = self.audioWriter, !isPaused else {
+    func writeBuffer(_ cmSampleBuffer: CMSampleBuffer, rpSampleType: RPSampleBufferType, completion: @escaping (AssetWriterError?) -> Void) {
+    
+        guard let videoWriter = self.videoWriter, let audioWriter = self.audioWriter else {
+            completion(AssetWriterError.videoWriterError)
             return
         }
         
@@ -119,24 +107,23 @@ class RevoAssetWriter {
         case .video:
             if videoWriter.status == .unknown {
                 if videoWriter.startWriting() {
-                    print("video writing started")
+                    print("Started writing video")
                     self.sessionStartTime = presentationTimeStamp
                     videoWriter.startSession(atSourceTime: presentationTimeStamp)
                 }
             } else if videoWriter.status == .writing {
-                if let isReadyForMoreMediaData = videoInput?.isReadyForMoreMediaData,
-                   isReadyForMoreMediaData {
-                    self.currentTime = CMTimeSubtract(presentationTimeStamp, self.sessionStartTime)
+                if let isReadyForMoreMediaData = videoInput?.isReadyForMoreMediaData, isReadyForMoreMediaData {
                     if let appendInput = videoInput?.append(cmSampleBuffer),
                        !appendInput {
-                        print("couldn't write video buffer")
+                        // Couldn't write video buffer
+                        completion(AssetWriterError.bufferError)
                     }
                 }
             }
         case .audioMic:
             if audioWriter.status == .unknown {
                 if audioWriter.startWriting() {
-                    print("audio writing started")
+                    print("Started writing audio")
                     audioWriter.startSession(atSourceTime: presentationTimeStamp)
                 }
             } else if audioWriter.status == .writing {
@@ -144,16 +131,17 @@ class RevoAssetWriter {
                    isReadyForMoreMediaData {
                     if let appendInput = micAudioInput?.append(cmSampleBuffer),
                        !appendInput {
-                        print("couldn't write mic audio buffer")
+                        print("couldn't write audio buffer")
                     }
                 }
             }
         default:
             break
         }
+        completion(nil)
     }
     
-    func finishWriting(completionHandler handler: @escaping (URL?, Error?) -> Void) {
+    func finishWriting(completionHandler handler: @escaping (URL?, AssetWriterError?) -> Void) {
        
         self.videoInput?.markAsFinished()
         self.videoWriter?.finishWriting {
@@ -178,7 +166,6 @@ class RevoAssetWriter {
             if self.isVideoWritingFinished && self.isAudioWritingFinished {
                 self.isVideoWritingFinished = false
                 self.isAudioWritingFinished = false
-                self.isPaused = false
                 self.videoInput = nil
                 self.videoWriter = nil
                 self.micAudioInput = nil
@@ -191,33 +178,22 @@ class RevoAssetWriter {
             let mergeComposition = AVMutableComposition()
             
             let videoAsset = AVAsset(url: self.videoOutputURL)
-            
-            // This is returned late or not at all when merge fails
-            // need more investigation
-            videoAsset.loadValuesAsynchronously(forKeys: ["playable", "tracks"]) {
-                print("Returned loadValuesAsynchronously")
-            }
-            
             let videoTracks = videoAsset.tracks(withMediaType: .video)
                 
             guard let firstTrack = videoTracks.first else {
-                // Todo: Figure why videoTracks is sometimes empty
-                // Create propper error handling
-                handler(nil, nil)
+                print("firstTrack fail")
+                handler(nil, AssetWriterError.emptyVideoTracks)
                 return
             }
             
-            let videoCompositionTrack = mergeComposition.addMutableTrack(withMediaType: .video,
-                                                                         preferredTrackID: kCMPersistentTrackID_Invalid)
+            let videoCompositionTrack = mergeComposition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
             do {
-                try videoCompositionTrack?.insertTimeRange(CMTimeRange(start: CMTime.zero, end: videoAsset.duration),
-                                                           of: firstTrack,
-                                                           at: CMTime.zero)
-            } catch let error {
-                self.removeURLsIfNeeded()
-                handler(nil, error)
+                try videoCompositionTrack?.insertTimeRange(CMTimeRange(start: CMTime.zero, end: videoAsset.duration),  of: firstTrack, at: CMTime.zero)
+            } catch {
+                print("videoCompositionTrack fail")
+                handler(nil, AssetWriterError.emptyVideoTracks)
             }
-            
+
             videoCompositionTrack?.preferredTransform = videoTracks.first!.preferredTransform
             
             let audioAsset = AVAsset(url: self.audioOutputURL)
@@ -240,9 +216,9 @@ class RevoAssetWriter {
             exportSession?.shouldOptimizeForNetworkUse = false
             exportSession?.outputURL = fileURL
             exportSession?.exportAsynchronously {
-                if let error = exportSession?.error {
-                    self.removeURLsIfNeeded()
-                    handler(nil, error)
+                if let _ = exportSession?.error {
+                    print("exportSession fail")
+                    handler(nil, AssetWriterError.exportError)
                 } else {
                     self.removeURLsIfNeeded()
                     handler(exportSession?.outputURL, nil)

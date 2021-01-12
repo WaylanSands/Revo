@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		314B8EA9D83B6E9EE1067792 /* Pods_Revo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A16C4FD4F333AAED0D518C1D /* Pods_Revo.framework */; };
+		485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EEA5625AD5A3500F88165 /* AssetWriterError.swift */; };
 		48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */; };
 		48B6587F25AD171A0043DEDF /* PassThroughWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587825AD171A0043DEDF /* PassThroughWindow.swift */; };
 		48B6588025AD171A0043DEDF /* MultiViewScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */; };
@@ -70,6 +71,7 @@
 		01CEC3F83AEDC3C4C54E9CF1 /* Pods-Revo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Revo.debug.xcconfig"; path = "Target Support Files/Pods-Revo/Pods-Revo.debug.xcconfig"; sourceTree = "<group>"; };
 		04B4617DA76011DDDA187351 /* Pods-Revo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Revo.release.xcconfig"; path = "Target Support Files/Pods-Revo/Pods-Revo.release.xcconfig"; sourceTree = "<group>"; };
 		2D76CBC81F009E22A641B95B /* Pods_RevoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RevoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		485EEA5625AD5A3500F88165 /* AssetWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWriterError.swift; sourceTree = "<group>"; };
 		48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingPreviewVC.swift; sourceTree = "<group>"; };
 		48B6587825AD171A0043DEDF /* PassThroughWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassThroughWindow.swift; sourceTree = "<group>"; };
 		48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiViewScreenVC.swift; sourceTree = "<group>"; };
@@ -149,6 +151,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		485EEA5B25AD5A3F00F88165 /* Error Handling */ = {
+			isa = PBXGroup;
+			children = (
+				485EEA5625AD5A3500F88165 /* AssetWriterError.swift */,
+			);
+			path = "Error Handling";
+			sourceTree = "<group>";
+		};
 		48B6587625AD16F00043DEDF /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -184,7 +194,6 @@
 			isa = PBXGroup;
 			children = (
 				48B658BD25AD186E0043DEDF /* Recording.swift */,
-				48B658BC25AD186E0043DEDF /* RevoAssetWriter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -265,6 +274,8 @@
 			children = (
 				48F72D4B25AD12520064E8C8 /* AppDelegate.swift */,
 				48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */,
+				48B658BC25AD186E0043DEDF /* RevoAssetWriter.swift */,
+				485EEA5B25AD5A3F00F88165 /* Error Handling */,
 				48B658D625AD18AD0043DEDF /* Extentions */,
 				48B658C325AD18840043DEDF /* Revo Constants */,
 				48B658CB25AD18960043DEDF /* Helper methods */,
@@ -582,6 +593,7 @@
 				48F72D4E25AD12520064E8C8 /* SceneDelegate.swift in Sources */,
 				48B658E225AD18AD0043DEDF /* URL+Ext.swift in Sources */,
 				48B658B425AD18370043DEDF /* PreviewView.swift in Sources */,
+				485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */,
 				48B6588025AD171A0043DEDF /* MultiViewScreenVC.swift in Sources */,
 				48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */,
 				48B658B725AD18370043DEDF /* SplitModeStyleView.swift in Sources */,

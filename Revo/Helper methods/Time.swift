@@ -9,7 +9,7 @@ import Foundation
 
 class Time {
     
-    class func asString(from time: Double) -> String {
+    static func asString(from time: Double) -> String {
         let hours = Int(time) / 60 % 60 % 60
         let minutes = Int(time) / 60 % 60
         let seconds = Int(time) % 60

@@ -424,16 +424,36 @@ class RecordingControlsVC: UIViewController {
 
     func startRecord() {
         screenRecorder.isMicrophoneEnabled = true
+        
+        do {
+            try assetWriter.setUpWriter()
+        } catch {
+            Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+            return
+        }
+        
         screenRecorder.startCapture(handler: { cmSampleBuffer, rpSampleBufferType, error in
+           
             if let error = error {
-                print("Error with startCapture: \(error.localizedDescription)")
+                DispatchQueue.main.sync {
+                    Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                    self.stopRecording()
+                }
             } else {
-                self.assetWriter.writeBuffer(cmSampleBuffer, rpSampleType: rpSampleBufferType)
+                self.assetWriter.writeBuffer(cmSampleBuffer, rpSampleType: rpSampleBufferType) { error in
+                    guard let error = error else { return }
+                    DispatchQueue.main.async {
+                        Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                        self.stopRecording()
+                    }
+                }
             }
         }) { error in
-            if error != nil {
-                print("Error with startCapture: \(error!.localizedDescription)")
-                // Handel
+            if let error = error  {
+                DispatchQueue.main.async {
+                    Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                    self.stopRecording()
+                }
             } else {
                 self.recordingButton.animateRecordingButton()
                 self.alertMultiViewOfRecordingStart()
@@ -449,10 +469,10 @@ class RecordingControlsVC: UIViewController {
         recordingButton.showActivitySpinner()
         print("stopCapture")
         screenRecorder.stopCapture { error in
-            print("returned from stop")
 
-            if error != nil {
-                print("Error: \(error!.localizedDescription)")
+            if let error = error {
+                print(error.localizedDescription)
+                Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
             } else {
                 self.assetWriter.finishWriting(completionHandler: { url, error in
 
@@ -461,17 +481,11 @@ class RecordingControlsVC: UIViewController {
                         if error != nil {
                             print("error: \(error!.localizedDescription)")
                         } else if url != nil {
-                            print("Recording finished")
+                            // Recording finished
                             self.recordingButton.isUserInteractionEnabled = true
                             self.libraryButton.isUserInteractionEnabled = true
                             self.recordingButton.hideActivitySpinner()
                             self.updateLibraryButtonThumbnail()
-                        } else {
-                            print("Saved crash")
-                            self.recordingButton.isUserInteractionEnabled = true
-                            self.libraryButton.isUserInteractionEnabled = true
-                            self.recordingButton.hideActivitySpinner()
-                            self.assetWriter.resetWriter()
                         }
                     }
                 })
@@ -601,7 +615,7 @@ class RecordingControlsVC: UIViewController {
         let alert = UIAlertController(title: "Switch Mode", message: """
                 Switch mode allows you to record footage while seamlessly switching to the front and back camera.
 
-                Both camera's settings may be adjusted independently.
+                To toggle between other modes select the icon to the right of the recording button.
                 """, preferredStyle: .alert)
         let action = UIAlertAction(title: "Got it", style: .default, handler: nil)
         alert.addAction(action)

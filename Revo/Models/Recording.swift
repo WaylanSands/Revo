@@ -12,17 +12,16 @@ import AVFoundation
 class Recording {
     
     var fileURL: URL
-    var thumbnail: UIImage?
-    var duration: String?
     var isImage = false
+    var duration: String?
+    var thumbnail: UIImage?
     
     init(fileURL: URL) {
         self.fileURL = fileURL
         
-        // Check that the file is a movie
         if fileURL.pathExtension != "mov" {
-            isImage = true
             thumbnail = UIImage(contentsOfFile: fileURL.absoluteString)
+            isImage = true
         } else {
             let asset = AVAsset(url: fileURL)
             duration = Time.asString(from: asset.duration.seconds)

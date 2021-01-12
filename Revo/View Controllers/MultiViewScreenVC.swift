@@ -153,13 +153,11 @@ class MultiViewScreenVC: UIViewController {
     }
 
     // check the app's authorisation status and start cam session if authorised.
-    // If rejected appropriate error messages will be displayed via a UIAlertController.
     func checkAuthorizationStatusForVideo() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized: // The user has previously granted access to the camera.
+        case .authorized:
             self.setupCaptureSession()
-        case .notDetermined:  // The user has not yet been asked for camera access.
-            // Proceed by requesting access
+        case .notDetermined:  // App has not requested access for video
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 if granted && AVCaptureMultiCamSession.isMultiCamSupported {
                     self.setupCaptureSession()
@@ -170,19 +168,16 @@ class MultiViewScreenVC: UIViewController {
                     self.sendToSettingToAllowCameraAccess()
                 }
             }
-        case .denied: // User previously denied camera access
+        case .denied:
             self.sendToSettingToAllowCameraAccess()
-        case .restricted: // The user can't grant access due to restrictions.
+        case .restricted:
             Alert.showBlockingAlert(title: "Restricted access", message: "Your device's camera access is restricted please change it before proceeding.", vc: self)
-        default: // Access unknown
-        // Handel appropriately
-            print("Access unknown")
+        default:
             sendToSettingToAllowCameraAccess()
         }
     }
     
     func sendToSettingToAllowCameraAccess() {
-        // Run on the main thread
         DispatchQueue.main.async {
         let message = "In order for revo to function camera access is needed. To allow camera access please toggle the switch within the app's settings"
         let alertController = UIAlertController(title: "Camera access needed", message: message, preferredStyle: .alert)
@@ -208,40 +203,36 @@ class MultiViewScreenVC: UIViewController {
     func setupMultiCamSession() {
         captureSession.beginConfiguration()
         currentRearDevice = rearCamera()
-        
         let frontDevice = frontCamera()
         
-        guard let rearDeviceInput = try? AVCaptureDeviceInput(device: currentRearDevice!) else {
-            print("Error")
-            // Add error alert
-            return
-        }
-                        
-        guard let frontDeviceInput = try? AVCaptureDeviceInput(device: frontDevice!) else {
-            // Add error alert
-            return
-        }
+        do  {
+            let  rearDeviceInput = try AVCaptureDeviceInput(device: currentRearDevice!)
+            let frontDeviceInput = try AVCaptureDeviceInput(device: frontDevice!)
+            
+            for each in captureSession.inputs {
+                captureSession.removeInput(each)
+            }
+            
+            activeRearPreviewLayerLayer.session = nil
+            activeFrontPreviewLayerLayer.session = nil
 
-        for each in captureSession.inputs {
-            captureSession.removeInput(each)
-        }
+            if captureSession.canAddInput(rearDeviceInput) {
+               captureSession.addInput(rearDeviceInput)
+            }
+            
+            if captureSession.canAddInput(frontDeviceInput) {
+                captureSession.addInput(frontDeviceInput)
+            }
+
+            activeRearPreviewLayerLayer.session = captureSession
+            activeFrontPreviewLayerLayer.session = captureSession
+           
+            captureSession.commitConfiguration()
+            captureSession.startRunning()
         
-        activeRearPreviewLayerLayer.session = nil
-        activeFrontPreviewLayerLayer.session = nil
-
-        if captureSession.canAddInput(rearDeviceInput) {
-           captureSession.addInput(rearDeviceInput)
+        } catch {
+            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
-        
-        if captureSession.canAddInput(frontDeviceInput) {
-            captureSession.addInput(frontDeviceInput)
-        }
-
-        activeRearPreviewLayerLayer.session = captureSession
-        activeFrontPreviewLayerLayer.session = captureSession
-       
-        captureSession.commitConfiguration()
-        captureSession.startRunning()
     }
     
     // MARK: - Configure for new Presentation Mode
@@ -297,7 +288,7 @@ class MultiViewScreenVC: UIViewController {
             device.videoZoomFactor = 1
             device.unlockForConfiguration()
         } catch {
-            print("ERROR: Could not lock camera device for configuration")
+            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
     }
     
@@ -305,21 +296,20 @@ class MultiViewScreenVC: UIViewController {
         captureSession.beginConfiguration()
         currentRearDevice = rearCamera()
         
-        guard let backDeviceInput = try? AVCaptureDeviceInput(device: currentRearDevice!) else {
-            print("Error")
-            // Add error alert
-            return
+        do {
+            let backDeviceInput = try AVCaptureDeviceInput(device: currentRearDevice!)
+            captureSession.addInput(backDeviceInput)
+            
+            rearPreviewView.videoPreviewLayer.session = captureSession
+            frontFloatingPreviewView.isHidden = true
+                
+            captureSession.commitConfiguration()
+            captureSession.startRunning()
+        } catch {
+            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
         
-        captureSession.addInput(backDeviceInput)
-        
-        rearPreviewView.videoPreviewLayer.session = captureSession
-        frontFloatingPreviewView.isHidden = true
-            
-        captureSession.commitConfiguration()
-        captureSession.startRunning()
     }
-    
     
     // Used to dynamically setup camera button options from RecordingControlsVC
     var trippleCameras = ["1", "0.5", "1.5"]
@@ -339,20 +329,19 @@ class MultiViewScreenVC: UIViewController {
             topWindowRecordingControlsVC.devicesAvailable = duelCameras
             return device
         } else {
+            // Missing expected rear camera device
             topWindowRecordingControlsVC.devicesAvailable = singleCamera
-            print("Missing expected back camera device.")
-            // Handle
+            Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your rear camera. If the device is not compromised try quitting the app and trying again.", vc: self)
             return nil
         }
     }
     
     func frontCamera() -> AVCaptureDevice? {
-        
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
             currentFrontDevice = device
             return device
         } else {
-            print("Missing expected front camera device.")
+            Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your front camera. If the device is not compromised try quitting the app and trying again.", vc: self)
             return nil
         }
     }
@@ -434,8 +423,8 @@ class MultiViewScreenVC: UIViewController {
             
             device.unlockForConfiguration()
             
-            // Do not add a FocusAnimationView if recording
             if currentlyRecording {
+                // Don't add animation
                 return
             }
             
@@ -453,9 +442,8 @@ class MultiViewScreenVC: UIViewController {
             default:
                 break
             }
-        }
-        catch {
-            print("rearPreviewLongPress ISSUE")
+        } catch {
+            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
         
     }
@@ -571,7 +559,7 @@ extension MultiViewScreenVC: ControlsDelegate {
             
             device.unlockForConfiguration()
         } catch {
-            print("ERROR: Could not lock device for configuration")
+            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
     }
     
@@ -634,12 +622,11 @@ extension MultiViewScreenVC: ControlsDelegate {
         if currentRearDevice.hasTorch {
             do {
                 try currentRearDevice.lockForConfiguration()
+                currentRearDevice.torchMode = torchMode
+                currentRearDevice.unlockForConfiguration()
             } catch {
-                print("ERROR: Could not lock camera device for configuration")
-                return
+                Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
             }
-            currentRearDevice.torchMode = torchMode
-            currentRearDevice.unlockForConfiguration()
         }
     }
     
@@ -649,6 +636,5 @@ extension MultiViewScreenVC: ControlsDelegate {
         topWindowRecordingControlsVC.cameraSettingSlider.isHidden = true
         topWindowRecordingControlsVC.cameraSettingSlider.value = 0
     }
-
 
 }
