@@ -16,45 +16,45 @@ protocol SplitModeStyleDelegate: class {
 /// A view which allows the user to style the SplitBarView when in splitScreen mode
 class SplitModeStyleView: UIView {
     
-    var currentColor: UIColor = .black
-    var selectedColor: UIColor = .black
+    private var currentColor: UIColor = .black
+    private var selectedColor: UIColor = .black
     
-    var currentLineHeight: CGFloat = 4.0
-    var selectedLineHeight: CGFloat = 4.0
+    private var currentLineHeight: CGFloat = 4.0
+    private var selectedLineHeight: CGFloat = 4.0
     
-    var currentLineHeightButton: UIButton!
-    var selectedLineHeightButton: UIButton!
+    private var currentLineHeightButton: UIButton!
+    private var selectedLineHeightButton: UIButton!
     
-    var currentColorButton: UIButton!
-    var selectedColorButton: UIButton!
+    private var currentColorButton: UIButton!
+    private var selectedColorButton: UIButton!
     
-    var lineHeightButtons = [UIButton]()
-    var colorButtons = [UIButton]()
+    private var lineHeightButtons = [UIButton]()
+    private var colorButtons = [UIButton]()
     
     weak var styleDelegate: SplitModeStyleDelegate?
     
-    let lineHeightLabel: UILabel = {
+    private let lineHeightLabel: UILabel = {
         let label = UILabel()
         label.text = "Line Height"
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
-    let backgroundColorLabel: UILabel = {
+    private let backgroundColorLabel: UILabel = {
         let label = UILabel()
         label.text = "Line Color"
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
-    let optionsPanelView: UIView = {
+    private let optionsPanelView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 15
         return view
     }()
     
-    let saveButton: UIButton = {
+    private let saveButton: UIButton = {
         let button = UIButton()
         button.setTitle("Save", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -64,13 +64,13 @@ class SplitModeStyleView: UIView {
         return button
     }()
     
-    let lineHeightStackView: UIStackView = {
+    private let lineHeightStackView: UIStackView = {
         let view = UIStackView()
         view.distribution = .equalSpacing
         return view
     }()
     
-    let mainBackgroundColorStackView: UIStackView = {
+    private let mainBackgroundColorStackView: UIStackView = {
         let view = UIStackView()
         view.distribution = .equalSpacing
         return view
@@ -87,18 +87,14 @@ class SplitModeStyleView: UIView {
         super.init(coder: coder)
     }
     
-    deinit {
-        print("Gone")
-    }
-    
-    func configureViews() {
+    private func configureViews() {
         self.addSubview(optionsPanelView)
         optionsPanelView.translatesAutoresizingMaskIntoConstraints = false
         optionsPanelView.heightAnchor.constraint(equalToConstant: 390).isActive = true
         optionsPanelView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         optionsPanelView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20).isActive = true
         optionsPanelView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20).isActive = true
-
+        
         self.addSubview(lineHeightLabel)
         lineHeightLabel.translatesAutoresizingMaskIntoConstraints = false
         lineHeightLabel.topAnchor.constraint(equalTo: optionsPanelView.topAnchor, constant: 30).isActive = true
@@ -133,7 +129,7 @@ class SplitModeStyleView: UIView {
         saveButton.trailingAnchor.constraint(equalTo: optionsPanelView.trailingAnchor, constant: -20).isActive = true
     }
     
-    func addHeightButtons() {
+    private func addHeightButtons() {
         var buttonIndex = 0
         for _ in 0...4 {
             let button = lineHeightButton()
@@ -150,13 +146,13 @@ class SplitModeStyleView: UIView {
         }
     }
     
-    @objc func heightSelection(sender: UIButton) {
+    @objc private func heightSelection(sender: UIButton) {
         selectedLineHeightButton = sender
         updateHeightFrom(button: sender)
         updateSelectedLineHeightButtonStyle()
     }
     
-    func updateSelectedLineHeightButtonStyle() {
+    private func updateSelectedLineHeightButtonStyle() {
         for eachButton in lineHeightStackView.arrangedSubviews as! [UIButton] {
             if eachButton != selectedLineHeightButton {
                 eachButton.backgroundColor = UIColor.fromHex(code: "#EEEEEE")
@@ -168,7 +164,7 @@ class SplitModeStyleView: UIView {
         }
     }
     
-    func lineHeightButton() -> UIButton {
+    private func lineHeightButton() -> UIButton {
         let button = UIButton()
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(heightSelection), for: .touchUpInside)
@@ -182,7 +178,7 @@ class SplitModeStyleView: UIView {
         return button
     }
     
-    func addColorButtons() {
+    private func addColorButtons() {
         for eachSet in RevoColor.colorOptions {
             let stackView = verticalStackView()
             for eachColor in eachSet {
@@ -194,7 +190,7 @@ class SplitModeStyleView: UIView {
         }
     }
     
-    func backgroundColorButtonWith(color: UIColor) -> UIButton {
+    private func backgroundColorButtonWith(color: UIColor) -> UIButton {
         let button = UIButton()
         button.addTarget(self, action: #selector(colorSelection), for: .touchUpInside)
         button.layer.borderColor = RevoColor.colorButtonSelectionColor
@@ -207,7 +203,7 @@ class SplitModeStyleView: UIView {
         return button
     }
     
-    func addStyleIfWhite(button: UIButton) {
+    private func addStyleIfWhite(button: UIButton) {
         if button.backgroundColor == .white {
             button.layer.shadowColor = UIColor.black.cgColor
             button.layer.shadowOpacity = 0.2
@@ -219,13 +215,13 @@ class SplitModeStyleView: UIView {
         }
     }
     
-    @objc func colorSelection(sender: UIButton) {
+    @objc private func colorSelection(sender: UIButton) {
         selectedColor = sender.backgroundColor!
         selectedColorButton = sender
         updateColorSelectionStyle()
     }
     
-    func updateColorSelectionStyle() {
+    private func updateColorSelectionStyle() {
         for eachButton in colorButtons {
             if eachButton != selectedColorButton {
                 eachButton.layer.borderWidth = 0
@@ -235,7 +231,7 @@ class SplitModeStyleView: UIView {
         }
     }
     
-    func verticalStackView() -> UIStackView {
+    private func verticalStackView() -> UIStackView {
         let view = UIStackView()
         view.distribution = .equalSpacing
         view.axis = .vertical
@@ -243,7 +239,7 @@ class SplitModeStyleView: UIView {
         return view
     }
     
-    func updateHeightFrom(button: UIButton) {
+    private func updateHeightFrom(button: UIButton) {
         switch button.titleLabel?.text {
         case "0pt":
             selectedLineHeight = 0
@@ -261,12 +257,12 @@ class SplitModeStyleView: UIView {
         
     }
     
-    func resetSelection() {
+    private func resetSelection() {
         self.updateSelectedLineHeightButtonStyle()
         self.updateColorSelectionStyle()
     }
     
-    @objc func saveButtonPress() {
+    @objc private func saveButtonPress() {
         self.styleDelegate?.updateStyleWith(lineHeight: selectedLineHeight, color: selectedColor)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "savedStyle"), object: nil)
         currentLineHeightButton = selectedLineHeightButton

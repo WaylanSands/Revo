@@ -20,11 +20,11 @@ class RecordingPreviewVC: UIViewController {
         case invisible
     }
     
-    var recordingURL: URL?
+    private var recordingURL: URL?
     
-    var controlState: ControlState = .invisible
+    private var controlState: ControlState = .invisible
     
-    lazy var player = AVPlayer(url: recordingURL!)
+    private lazy var player = AVPlayer(url: recordingURL!)
     
     weak var deletionDelegate: RecordingPreviewDelegate?
             
@@ -35,14 +35,14 @@ class RecordingPreviewVC: UIViewController {
         return view
     }()
     
-    let topBarView: TopPreviewOptionsView = {
+    private let topBarView: TopPreviewOptionsView = {
         let view = TopPreviewOptionsView()
         view.backButton.addTarget(self, action: #selector(backButtonPress), for: .touchUpInside)
         view.audioButton.addTarget(self, action: #selector(audioButtonPress), for: .touchUpInside)
         return view
     }()
        
-    lazy var playerViewController: AVPlayerViewController = {
+    private lazy var playerViewController: AVPlayerViewController = {
         let playerView = AVPlayerViewController()
         playerView.videoGravity = .resizeAspect
         playerView.showsPlaybackControls = false
@@ -71,7 +71,7 @@ class RecordingPreviewVC: UIViewController {
         super.init(coder: aDecoder)
     }
     
-    func configureViews() {
+    private func configureViews() {
         view.addSubview(playerViewController.view)
         playerViewController.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playerLayerTap)))
         playerViewController.view.frame = view.bounds
@@ -85,7 +85,7 @@ class RecordingPreviewVC: UIViewController {
         topBarView.frame = CGRect(x: 0, y: -80, width: UIScreen.main.bounds.width, height: 80)
     }
     
-    @objc func playerLayerTap(sender: UITapGestureRecognizer) {
+    @objc private func playerLayerTap(sender: UITapGestureRecognizer) {
         switch controlState {
         case .visible:
             recordingOptionsView.updatePositionTo(state: .inactive)
@@ -100,17 +100,16 @@ class RecordingPreviewVC: UIViewController {
         
     }
     
-    func addFileCreationDate() {
+    private func addFileCreationDate() {
         guard let date = recordingURL!.creationDate else { return }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMM y"
         let dateString = dateFormatter.string(from: date)
-        print("should")
         topBarView.dateLabel.text = dateString
     }
     
     // Check to see if user really wants to delete recordings
-    @objc func deleteRecording() {
+    @objc private func deleteRecording() {
         let alert = UIAlertController(title: "Are you sure?", message: """
                 Recordings are removed permanently once deleted.
                 """, preferredStyle: .alert)
@@ -123,30 +122,30 @@ class RecordingPreviewVC: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func deleteRecordings() {
+    private func deleteRecordings() {
         deletionDelegate?.removeRecordingWith(url: recordingURL!)
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func shareRecording() {
+    @objc private func shareRecording() {
         let activityVC = UIActivityViewController(activityItems: [recordingURL!], applicationActivities: nil)
         DispatchQueue.main.async {
             self.present(activityVC, animated: true)
         }
     }
     
-    @objc func replayRecording() {
+    @objc private func replayRecording() {
     
     }
     
-    @objc func backButtonPress() {
+    @objc private func backButtonPress() {
         recordingOptionsView.isHidden = true
         topBarView.isHidden = true
         dismiss(animated: false, completion: nil)
     }
     
     // Toggles the player's audio on or off
-    @objc func audioButtonPress() {
+    @objc private func audioButtonPress() {
         if player.isMuted {
             player.isMuted = false
             topBarView.setAudioButtonTo(muted: false)

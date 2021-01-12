@@ -15,18 +15,18 @@ enum FrameStyle {
 }
 
 class FrontPreviewView: UIView {
-
-    lazy var lastYPosition: CGFloat = self.center.y - 100
-    lazy var lastXPosition: CGFloat = self.center.x - 100
-        
-    var lastSize: CGFloat = 200
     
     enum EditingMode {
-        case ready
         case editing
+        case ready
     }
+
+    private lazy var lastYPosition: CGFloat = self.center.y - 100
+    private lazy var lastXPosition: CGFloat = self.center.x - 100
+        
+    private var lastSize: CGFloat = 200
     
-    var frameStyle: FrameStyle = .square {
+    private  var frameStyle: FrameStyle = .square {
         didSet {
             if frameStyle == .circular {
                 self.layer.cornerRadius = self.frame.width / 2
@@ -61,7 +61,7 @@ class FrontPreviewView: UIView {
         return layer as! AVCaptureVideoPreviewLayer
     }
     
-    @objc func editFramePreview() {
+    @objc private func editFramePreview() {
         switch editingMode {
         case .ready:
             editingMode = .editing
@@ -70,7 +70,7 @@ class FrontPreviewView: UIView {
         }
     }
     
-    @objc func trackPanning(gestureRecognizer: UIPanGestureRecognizer) {
+    @objc private func trackPanning(gestureRecognizer: UIPanGestureRecognizer) {
                 
         let position = gestureRecognizer.translation(in: superview)
     
@@ -94,18 +94,27 @@ class FrontPreviewView: UIView {
         
     }
     
-    func checkIfOutOfView() {
-        if lastYPosition < -(self.frame.width / 2) {
-            UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: backBack, completion: nil)
+    // Check if the view's frame is outside of MainRecordingVC's view if so
+    // it will bump it back into frame via an animation.
+    private func checkIfOutOfView() {
+        if lastYPosition < 0 {
+            UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: bumpDown, completion: nil)
+        } else if lastYPosition > UIScreen.main.bounds.height - self.frame.height {
+            UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: bumpUp, completion: nil)
         }
     }
     
-    func backBack() {
-        self.frame.origin.y = -(self.frame.width / 2)
+    private func bumpDown() {
+        self.frame.origin.y = 90
         lastYPosition = self.frame.origin.y
     }
     
-    @objc func pinching(gestureRecognizer: UIPinchGestureRecognizer) {
+    private func bumpUp() {
+        self.frame.origin.y = UIScreen.main.bounds.height - 30 - self.frame.height
+        lastYPosition = self.frame.origin.y
+    }
+    
+    @objc private func pinching(gestureRecognizer: UIPinchGestureRecognizer) {
         
         let scale = gestureRecognizer.scale
         self.frame.size = CGSize(width: lastSize * scale, height: lastSize * scale)

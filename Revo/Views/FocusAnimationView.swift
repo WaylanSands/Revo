@@ -10,9 +10,9 @@ import UIKit
 
 class FocusAnimationView: UIView {
     
-    var animationView: AnimationView!
-    let startFrame = AnimationFrameTime(50)
-    let endFrame = AnimationFrameTime(130)
+    private var animationView: AnimationView!
+    private let startFrame = AnimationFrameTime(50)
+    private let endFrame = AnimationFrameTime(130)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -23,7 +23,7 @@ class FocusAnimationView: UIView {
         super.init(coder: coder)
     }
     
-    func configureView() {
+    private func configureView() {
         animationView = AnimationView(name: "focus_animation")
         animationView.loopMode = .playOnce
 

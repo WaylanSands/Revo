@@ -11,7 +11,7 @@
 		485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EEA5625AD5A3500F88165 /* AssetWriterError.swift */; };
 		48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */; };
 		48B6587F25AD171A0043DEDF /* PassThroughWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587825AD171A0043DEDF /* PassThroughWindow.swift */; };
-		48B6588025AD171A0043DEDF /* MultiViewScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */; };
+		48B6588025AD171A0043DEDF /* MainRecordingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587925AD171A0043DEDF /* MainRecordingVC.swift */; };
 		48B6588125AD171A0043DEDF /* RecordingControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */; };
 		48B6588225AD171A0043DEDF /* LibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587B25AD171A0043DEDF /* LibraryVC.swift */; };
 		48B6588325AD171A0043DEDF /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587C25AD171A0043DEDF /* SettingsVC.swift */; };
@@ -74,7 +74,7 @@
 		485EEA5625AD5A3500F88165 /* AssetWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWriterError.swift; sourceTree = "<group>"; };
 		48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingPreviewVC.swift; sourceTree = "<group>"; };
 		48B6587825AD171A0043DEDF /* PassThroughWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassThroughWindow.swift; sourceTree = "<group>"; };
-		48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiViewScreenVC.swift; sourceTree = "<group>"; };
+		48B6587925AD171A0043DEDF /* MainRecordingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainRecordingVC.swift; sourceTree = "<group>"; };
 		48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingControlsVC.swift; sourceTree = "<group>"; };
 		48B6587B25AD171A0043DEDF /* LibraryVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryVC.swift; sourceTree = "<group>"; };
 		48B6587C25AD171A0043DEDF /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
@@ -164,7 +164,7 @@
 			children = (
 				48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */,
 				48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */,
-				48B6587925AD171A0043DEDF /* MultiViewScreenVC.swift */,
+				48B6587925AD171A0043DEDF /* MainRecordingVC.swift */,
 				48B6587D25AD171A0043DEDF /* SplitScreenVC.swift */,
 				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
 				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
@@ -247,15 +247,6 @@
 			path = lottie;
 			sourceTree = "<group>";
 		};
-		48C06B2A25AD62DE0044AC0C /* Supporting files */ = {
-			isa = PBXGroup;
-			children = (
-				48F72D5925AD12530064E8C8 /* Info.plist */,
-				48F72D5625AD12530064E8C8 /* LaunchScreen.storyboard */,
-			);
-			path = "Supporting files";
-			sourceTree = "<group>";
-		};
 		48F72D3F25AD12520064E8C8 = {
 			isa = PBXGroup;
 			children = (
@@ -284,7 +275,8 @@
 				48F72D4B25AD12520064E8C8 /* AppDelegate.swift */,
 				48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */,
 				48B6587825AD171A0043DEDF /* PassThroughWindow.swift */,
-				48C06B2A25AD62DE0044AC0C /* Supporting files */,
+				48F72D5625AD12530064E8C8 /* LaunchScreen.storyboard */,
+				48F72D5925AD12530064E8C8 /* Info.plist */,
 				48B6587625AD16F00043DEDF /* View Controllers */,
 				48B658C325AD18840043DEDF /* Revo Constants */,
 				48B658CB25AD18960043DEDF /* Helper Objects */,
@@ -602,7 +594,7 @@
 				48B658E225AD18AD0043DEDF /* URL+Ext.swift in Sources */,
 				48B658B425AD18370043DEDF /* PreviewView.swift in Sources */,
 				485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */,
-				48B6588025AD171A0043DEDF /* MultiViewScreenVC.swift in Sources */,
+				48B6588025AD171A0043DEDF /* MainRecordingVC.swift in Sources */,
 				48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */,
 				48B658B725AD18370043DEDF /* SplitModeStyleView.swift in Sources */,
 				48B658B525AD18370043DEDF /* RecordingOptionsView.swift in Sources */,
@@ -777,6 +769,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Revo/Revo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PMDTSY5PZ6;
 				INFOPLIST_FILE = Revo/Info.plist;
@@ -784,7 +777,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.Revo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -797,6 +790,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Revo/Revo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PMDTSY5PZ6;
 				INFOPLIST_FILE = Revo/Info.plist;
@@ -804,7 +798,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.Revo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

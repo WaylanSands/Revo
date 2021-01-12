@@ -17,12 +17,12 @@ enum SelectionState {
 
 class LibraryVC: UIViewController {
     
-    var recordings = [Recording]()
-    var selectedRecordingsURLs = [URL]()
+    private var recordings = [Recording]()
+    private var selectedRecordingsURLs = [URL]()
     
-    var selectionState: SelectionState = .inactive
+    private var selectionState: SelectionState = .inactive
         
-    lazy var layOut: UICollectionViewFlowLayout = {
+    private lazy var layOut: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         let cellWidth = (view.frame.width / 2) - 21.5
         layout.itemSize = CGSize(width: cellWidth, height: cellWidth * 1.5 )
@@ -32,21 +32,21 @@ class LibraryVC: UIViewController {
         return layout
     }()
     
-    lazy var libraryCollectionView: UICollectionView = {
+    private lazy var libraryCollectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: layOut)
         view.register(RecordingViewCell.self, forCellWithReuseIdentifier: "RecordingViewCell")
         view.backgroundColor = .white
         return view
     }()
     
-    let downArrowButton: UIButton = {
+    private let downArrowButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.blackDownArrow, for: .normal)
         button.addTarget(self, action: #selector(downArrowPress), for: .touchUpInside)
         return button
     }()
     
-    lazy var gradientLayer: CAGradientLayer = {
+    private lazy var gradientLayer: CAGradientLayer = {
         let topColor =  UIColor.black.cgColor
         let bottomColor =  UIColor.black.withAlphaComponent(0).cgColor
         let gradientLayer = CAGradientLayer()
@@ -55,14 +55,14 @@ class LibraryVC: UIViewController {
         return gradientLayer
     }()
     
-    lazy var topGradientView: UIView = {
+    private lazy var topGradientView: UIView = {
         let gradientView = UIView()
         gradientView.layer.addSublayer(gradientLayer)
         gradientView.alpha = 0.0
         return gradientView
     }()
     
-    let selectButton: UIButton = {
+    private let selectButton: UIButton = {
         let button = UIButton()
         button.setTitle("Select", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -75,7 +75,7 @@ class LibraryVC: UIViewController {
         return button
     }()
     
-    let appLogoLabel: UILabel = {
+    private let appLogoLabel: UILabel = {
         let label = UILabel()
         label.text = "revo"
         label.textColor = RevoColor.blackText
@@ -83,19 +83,19 @@ class LibraryVC: UIViewController {
         return label
     }()
     
-    let recordingOptionsView: RecordingOptionsView = {
+    private let recordingOptionsView: RecordingOptionsView = {
         let view = RecordingOptionsView()
         view.shareButton.addTarget(self, action: #selector(shareRecordings), for: .touchUpInside)
         view.deleteButton.addTarget(self, action: #selector(deletePress), for: .touchUpInside)
         return view
     }()
     
-    let animatingCellThumbnail: UIView = {
+    private let animatingCellThumbnail: UIView = {
         let view = UIView()
         return view
     }()
     
-    let emptyCollectionAnimation: AnimationView = {
+    private let emptyCollectionAnimation: AnimationView = {
        let animationView = AnimationView(name: "mobile_360_animation")
         animationView.contentMode = .scaleAspectFit
         animationView.loopMode = .loop
@@ -103,7 +103,7 @@ class LibraryVC: UIViewController {
         return animationView
     }()
     
-    lazy var emptyCollectionLabel: UILabel = {
+    private lazy var emptyCollectionLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.textColor = RevoColor.blackText
@@ -120,19 +120,19 @@ class LibraryVC: UIViewController {
         configureViews()
     }
     
-    func configureSwipeGesture() {
+    private func configureSwipeGesture() {
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(downSwipe))
         swipeGesture.direction = .down
         self.view.addGestureRecognizer(swipeGesture)
     }
     
-    @objc func downSwipe() {
+    @objc private func downSwipe() {
         if recordings.count == 0 {
             dismiss(animated: true, completion: nil)
         }
     }
     
-    func fetchRecordings() {
+    private func fetchRecordings() {
         guard let fileURLs = FileManager.getFileURLsFromDocumentsDirectory() else {
             return
         }
@@ -149,12 +149,12 @@ class LibraryVC: UIViewController {
         }
     }
     
-    func configureDelegates() {
+    private func configureDelegates() {
         libraryCollectionView.dataSource = self
         libraryCollectionView.delegate = self
     }
     
-    func configureViews() {
+    private func configureViews() {
         view.backgroundColor = .white
         
         view.addSubview(libraryCollectionView)
@@ -205,11 +205,11 @@ class LibraryVC: UIViewController {
 
     }
     
-    @objc func downArrowPress() {
+    @objc private func downArrowPress() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func selectPress() {
+    @objc private func selectPress() {
         switch selectionState {
         case .inactive:
             selectionState = .active
@@ -230,21 +230,21 @@ class LibraryVC: UIViewController {
     
     // MARK: - Selection Options
     
-    @objc func shareRecordings() {
+    @objc private func shareRecordings() {
         let activityVC = UIActivityViewController(activityItems: selectedRecordingsURLs, applicationActivities: nil)
         DispatchQueue.main.async {
             self.present(activityVC, animated: true)
         }
     }
     
-    @objc func saveToCameraRoll() {
+    @objc private func saveToCameraRoll() {
         for eachURL in selectedRecordingsURLs {
             UISaveVideoAtPathToSavedPhotosAlbum(eachURL.path, nil, nil, nil)
         }
     }
     
     // Check to see if user really wants to delete recordings
-    @objc func deletePress() {
+    @objc private func deletePress() {
         let alert = UIAlertController(title: "Are you sure?", message: """
                 Recordings are removed permanently once deleted.
                 """, preferredStyle: .alert)
@@ -257,7 +257,7 @@ class LibraryVC: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func deleteRecordings() {
+    private func deleteRecordings() {
         for eachURL in selectedRecordingsURLs {
             FileManager.removeItemWith(url: eachURL)
             recordings.removeAll(where: {$0.fileURL == eachURL})
@@ -271,7 +271,7 @@ class LibraryVC: UIViewController {
         libraryCollectionView.reloadData()
     }
     
-    func configureIfLibraryIsEmpty() {
+    private func configureIfLibraryIsEmpty() {
         if recordings.isEmpty {
             emptyCollectionAnimation.isHidden = false
             emptyCollectionAnimation.play()
@@ -285,7 +285,7 @@ class LibraryVC: UIViewController {
         }
     }
     
-    func updateEmptyCollectionLabelText() {
+    private func updateEmptyCollectionLabelText() {
         if UserDefaults.standard.bool(forKey: "visitedLibraryWithRecording") {
             // This is a returning user
             emptyCollectionLabel.text = "Library currently empty"

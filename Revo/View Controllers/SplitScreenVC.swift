@@ -11,23 +11,23 @@ import AVFoundation
 class SplitScreenVC: UIViewController {
     
     // View which divides the videoPreviewLayers
-    let splitBarView = SplitBarView()
+    private let splitBarView = SplitBarView()
     
     // These are interchanged when user switches previews
     var bottomPreviewView = PreviewView()
     var topPreviewView = PreviewView()
     
-    lazy var lastPosition: CGFloat = view.center.y
+    private lazy var lastPosition: CGFloat = view.center.y
     
-    let captureSession = AVCaptureSession()
-    var backCameraDataOutput = AVCaptureVideoDataOutput()
+    private let captureSession = AVCaptureSession()
+    private var backCameraDataOutput = AVCaptureVideoDataOutput()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViews()
     }
     
-    func configureViews() {
+    private func configureViews() {
         view.addSubview(topPreviewView)
         topPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
         topPreviewView.videoPreviewLayer.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height / 2)
@@ -44,7 +44,7 @@ class SplitScreenVC: UIViewController {
     }
         
     // Allows the user to change the height of the videoPreviewLayers by panning the splitBarView.
-    @objc func splitViewSlide(gestureRecognizer: UIPanGestureRecognizer)  {
+    @objc private func splitViewSlide(gestureRecognizer: UIPanGestureRecognizer)  {
         let bottomHeight = view.frame.height - splitBarView.frame.origin.y
         let position = gestureRecognizer.translation(in: view)
         splitBarView.frame.origin.y = position.y + (lastPosition - 2)

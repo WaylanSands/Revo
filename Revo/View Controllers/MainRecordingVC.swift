@@ -10,71 +10,71 @@ import Photos
 import ReplayKit
 import AVFoundation
 
-// The main UIViewController for screen recording. MultiViewScreenVC adds a SplitScreenVC as a child view controller
-// so SplitScreenVC can handle it's own video PreviewViews. MultiViewScreenVC also adds a PassThroughWindow (a subclass of UIWindow
+// This is the main UIViewController for screen recording. MainRecordingVC adds a SplitScreenVC as a child view controller
+// so SplitScreenVC can handle it's own video PreviewViews. MainRecordingVC also adds a PassThroughWindow (a subclass of UIWindow
 // which allows touches to fall to lower UIWindows) as the key window and sets a RecordingControlsVC as the PassThroughWindow's
 // rootViewController. This is done so the RecordingControlsVC's RPScreenRecorder will record views on the lower UIWindow which
-// MultiViewScreenVC is contained while ignoring all views of the RecordingControlsVC.
+// MainRecordingVC is contained while ignoring all views of the RecordingControlsVC.
 
-class MultiViewScreenVC: UIViewController {
-
-    var topWindow: PassThroughWindow?
-    let topWindowRecordingControlsVC = RecordingControlsVC()
-
+class MainRecordingVC: UIViewController {
+    
+    private var topWindow: PassThroughWindow?
+    private let topWindowRecordingControlsVC = RecordingControlsVC()
+    
     // Used when in pip mode
-    var frontFloatingPreviewView = FrontPreviewView()
-    var rearPreviewView = PreviewView()
+    private var frontFloatingPreviewView = FrontPreviewView()
+    private var rearPreviewView = PreviewView()
     
     // Front PreviewView used in switchCam mode
-    let frontFullScreenPreviewView = PreviewView()
+    private let frontFullScreenPreviewView = PreviewView()
     
     // Views for editing different presentation modes
-    let splitStyleView = SplitModeStyleView()
-    let pipStyleView = PipModeStyleView()
-            
-    var currentlyRecording = false
-    var pipIsFrontCamera = true
-    var rearDeviceISO: CGFloat?
+    private let splitStyleView = SplitModeStyleView()
+    private let pipStyleView = PipModeStyleView()
     
-    var currentRearDevice: AVCaptureDevice!
-    var currentFrontDevice: AVCaptureDevice!
-
-    var selectedRearDevice: AVCaptureDevice?
-    let captureSession = AVCaptureMultiCamSession()
-            
+    private var currentlyRecording = false
+    private var pipIsFrontCamera = true
+    private var rearDeviceISO: CGFloat?
+    
+    private var currentRearDevice: AVCaptureDevice!
+    private var currentFrontDevice: AVCaptureDevice!
+    
+    private let captureSession = AVCaptureMultiCamSession()
+    private var selectedRearDevice: AVCaptureDevice?
+    
     // What are the available built in devices - Duel, Triple or Single
-    var devicesAvailable: DevicesAvailable?
+    private var devicesAvailable: DevicesAvailable?
     
     // Preview modes such as pip or split screen
-    var presentationMode: PresentationMode = .switchCam
+    private var presentationMode: PresentationMode = .switchCam
     
     // splitScreenVC holds its own previewLayers which manages gestures
-    let splitScreenVC = SplitScreenVC()
+    private let splitScreenVC = SplitScreenVC()
     
     // AVCaptureVideoPreviewLayers change when switching recordingMode etc split screen
-    lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
-    lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
+    private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
+    private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
     
     
-    let appLogo: UILabel = {
-       let label = UILabel()
+    private let appLogo: UILabel = {
+        let label = UILabel()
         label.text = "revo"
         label.textColor = .white
         label.font = UIFont.systemFont(ofSize: 30, weight: .black)
         label.alpha = 0
         return label
     }()
-
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }
     
     //MARK: - View did load
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureForegroundObserver()
         configureGestureRecognisers()
+        checkAuthStatusForVideo()
         configurePreviewLayers()
         configureSubController()
         configureTopWindow()
@@ -83,7 +83,15 @@ class MultiViewScreenVC: UIViewController {
         configureViews()
     }
     
-    func configureClosures() {
+    override func viewDidAppear(_ animated: Bool) {
+        configureForegroundObserver()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        removeForegroundObserver()
+    }
+    
+    private func configureClosures() {
         // topWindowRecordingControlsVC requests the latest camera values when adjusting exposure and zoom
         topWindowRecordingControlsVC.currentCameraExposureTargetBiasMinMax = self.currentCameraExposureTargetBiasMinToMax
         topWindowRecordingControlsVC.currentCameraExposureTargetBias = self.currentCameraExposureTargetBias
@@ -93,12 +101,12 @@ class MultiViewScreenVC: UIViewController {
         topWindowRecordingControlsVC.alertMultiViewOfRecordingEnd = self.endRecording
     }
     
-    func configureDelegates() {
+    private func configureDelegates() {
         pipStyleView.styleDelegate = frontFloatingPreviewView
         splitStyleView.styleDelegate = splitScreenVC
     }
     
-    func  configureTopWindow() {
+    private func configureTopWindow() {
         if let currentWindowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             topWindow = PassThroughWindow(windowScene: currentWindowScene)
             topWindowRecordingControlsVC.delegate = self
@@ -109,29 +117,34 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func configureSubController() {
+    private func configureSubController() {
         self.addChild(splitScreenVC)
         self.view.addSubview(splitScreenVC.view)
         splitScreenVC.view.frame = self.view.bounds
         splitScreenVC.didMove(toParent: self)
     }
     
-    func configureGestureRecognisers() {
+    private func configureGestureRecognisers() {
         view.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(rearPreviewLongPress)))
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(rearPreviewTapped)))
     }
     
     // Observes app moving to foreground so app can check the apps authorisation when user starts or returns to the app.
-    func configureForegroundObserver() {
+    private func configureForegroundObserver() {
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appEnteredForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
-    @objc func appEnteredForeground() {
-        checkAuthorizationStatusForVideo()
+    private func removeForegroundObserver() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
-    func configureViews() {
+    @objc private func appEnteredForeground() {
+        checkAuthStatusForVideo()
+    }
+    
+    private  func configureViews() {
         // Rear camera preview layer
         view.addSubview(rearPreviewView)
         rearPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
@@ -151,9 +164,9 @@ class MultiViewScreenVC: UIViewController {
         appLogo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
         appLogo.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
     }
-
+    
     // check the app's authorisation status and start cam session if authorised.
-    func checkAuthorizationStatusForVideo() {
+    private func checkAuthStatusForVideo() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             self.setupCaptureSession()
@@ -177,22 +190,22 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func sendToSettingToAllowCameraAccess() {
+    private func sendToSettingToAllowCameraAccess() {
         DispatchQueue.main.async {
-        let message = "In order for revo to function camera access is needed. To allow camera access please toggle the switch within the app's settings"
-        let alertController = UIAlertController(title: "Camera access needed", message: message, preferredStyle: .alert)
-        let visitSettingsAction = UIAlertAction(title: "Visit settings", style: .default) { _ in
-            let url = URL(string:UIApplication.openSettingsURLString)
-            if UIApplication.shared.canOpenURL(url!){
-                UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+            let message = "In order for revo to function camera access is needed. To allow camera access please toggle the switch within the app's settings"
+            let alertController = UIAlertController(title: "Camera access needed", message: message, preferredStyle: .alert)
+            let visitSettingsAction = UIAlertAction(title: "Visit settings", style: .default) { _ in
+                let url = URL(string:UIApplication.openSettingsURLString)
+                if UIApplication.shared.canOpenURL(url!){
+                    UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+                }
             }
-        }
-        alertController.addAction(visitSettingsAction)
+            alertController.addAction(visitSettingsAction)
             self.present(alertController, animated: true, completion: nil)
         }
     }
     
-    func setupCaptureSession() {
+    private func setupCaptureSession() {
         if AVCaptureMultiCamSession.isMultiCamSupported {
             self.setupMultiCamSession()
         } else{
@@ -200,7 +213,7 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func setupMultiCamSession() {
+    private func setupMultiCamSession() {
         captureSession.beginConfiguration()
         currentRearDevice = rearCamera()
         let frontDevice = frontCamera()
@@ -215,21 +228,21 @@ class MultiViewScreenVC: UIViewController {
             
             activeRearPreviewLayerLayer.session = nil
             activeFrontPreviewLayerLayer.session = nil
-
+            
             if captureSession.canAddInput(rearDeviceInput) {
-               captureSession.addInput(rearDeviceInput)
+                captureSession.addInput(rearDeviceInput)
             }
             
             if captureSession.canAddInput(frontDeviceInput) {
                 captureSession.addInput(frontDeviceInput)
             }
-
+            
             activeRearPreviewLayerLayer.session = captureSession
             activeFrontPreviewLayerLayer.session = captureSession
-           
+            
             captureSession.commitConfiguration()
             captureSession.startRunning()
-        
+            
         } catch {
             Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
@@ -237,7 +250,7 @@ class MultiViewScreenVC: UIViewController {
     
     // MARK: - Configure for new Presentation Mode
     
-    func configurePreviewLayers() {
+    private func configurePreviewLayers() {
         captureSession.beginConfiguration()
         
         activeRearPreviewLayerLayer.session = nil
@@ -277,7 +290,7 @@ class MultiViewScreenVC: UIViewController {
     /// Version 1 of revo does not allow front device's setting to be changed out
     /// of switchCam mode. Therefore front device should revert to normal when
     /// mode is changed from switchCam.
-    func revertFrontDeviceSettings() {
+    private func revertFrontDeviceSettings() {
         guard let device = currentFrontDevice else {
             return
         }
@@ -292,7 +305,7 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func setupSingleCamSession() {
+    private func setupSingleCamSession() {
         captureSession.beginConfiguration()
         currentRearDevice = rearCamera()
         
@@ -302,21 +315,20 @@ class MultiViewScreenVC: UIViewController {
             
             rearPreviewView.videoPreviewLayer.session = captureSession
             frontFloatingPreviewView.isHidden = true
-                
+            
             captureSession.commitConfiguration()
             captureSession.startRunning()
         } catch {
             Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
-        
     }
     
     // Used to dynamically setup camera button options from RecordingControlsVC
-    var trippleCameras = ["1", "0.5", "1.5"]
-    var duelCameras = ["1", "0.5",]
-    var singleCamera = ["1"]
+    private var trippleCameras = ["1", "0.5", "1.5"]
+    private var duelCameras = ["1", "0.5",]
+    private var singleCamera = ["1"]
     
-    func rearCamera() -> AVCaptureDevice? {
+    private func rearCamera() -> AVCaptureDevice? {
         
         if selectedRearDevice != nil {
             return selectedRearDevice
@@ -336,7 +348,7 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func frontCamera() -> AVCaptureDevice? {
+    private func frontCamera() -> AVCaptureDevice? {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
             currentFrontDevice = device
             return device
@@ -346,7 +358,7 @@ class MultiViewScreenVC: UIViewController {
         }
     }
     
-    func removeFocusViewIfAnimating() {
+    private func removeFocusViewIfAnimating() {
         for each in view.subviews {
             if let focusView = each as? FocusAnimationView {
                 focusView.removeFromSuperview()
@@ -356,7 +368,7 @@ class MultiViewScreenVC: UIViewController {
     
     //MARK: - Focusing Gesture Recognisers
     
-    @objc func rearPreviewTapped(sender: UITapGestureRecognizer) {
+    @objc private func rearPreviewTapped(sender: UITapGestureRecognizer) {
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
         let device = primaryDevice()
@@ -374,14 +386,14 @@ class MultiViewScreenVC: UIViewController {
                 device.exposureMode = .continuousAutoExposure
                 resetExposureSettings()
             }
-
+            
             device.unlockForConfiguration()
             
             // Do not add a FocusAnimationView if recording
             if currentlyRecording {
                 return
             }
-                
+            
             // If a focus animation is already a subview it will be removed
             removeFocusViewIfAnimating()
             
@@ -396,12 +408,11 @@ class MultiViewScreenVC: UIViewController {
                 break
             }
         } catch {
-            print("ERROR: Could not lock camera device for configuration")
-            return
+            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
     }
     
-    @objc func rearPreviewLongPress(sender: UILongPressGestureRecognizer) {
+    @objc private func rearPreviewLongPress(sender: UILongPressGestureRecognizer) {
         
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
@@ -447,14 +458,14 @@ class MultiViewScreenVC: UIViewController {
         }
         
     }
-        
     
-    @objc func visitLibraryVC() {
+    
+    @objc private func visitLibraryVC() {
         topWindowRecordingControlsVC.visitLibraryVC()
     }
-
     
-    func currentCameraExposureTargetBiasMinToMax() -> ([Float]) {
+    
+    private func currentCameraExposureTargetBiasMinToMax() -> ([Float]) {
         var exposureTargetBias = [Float]()
         let device = primaryDevice()
         
@@ -463,17 +474,17 @@ class MultiViewScreenVC: UIViewController {
         return exposureTargetBias
     }
     
-    func currentCameraExposureTargetBias() -> Float {
+    private func currentCameraExposureTargetBias() -> Float {
         let device = primaryDevice()
         return device.exposureTargetBias
     }
     
-    func currentCameraMaxZoomFactor() -> CGFloat {
+    private func currentCameraMaxZoomFactor() -> CGFloat {
         let device = primaryDevice()
         return device.activeFormat.videoMaxZoomFactor
     }
     
-    func currentCameraZoomFactor() -> CGFloat {
+    private func currentCameraZoomFactor() -> CGFloat {
         let device = primaryDevice()
         return device.videoZoomFactor
     }
@@ -481,7 +492,7 @@ class MultiViewScreenVC: UIViewController {
     /// The primary device is the device which consumes the full-screen during pip and switchCam modes.
     /// The currentRearDevice is always the primary device unless frontFullScreenPreviewView isn't hidden and
     /// the presentationMode is set to switchCam.
-    func primaryDevice() -> AVCaptureDevice {
+    private func primaryDevice() -> AVCaptureDevice {
         if presentationMode == .switchCam && !frontFullScreenPreviewView.isHidden {
             return currentFrontDevice
         } else {
@@ -490,17 +501,17 @@ class MultiViewScreenVC: UIViewController {
     }
     
     //MARK: - Begin a recoding session
-    func beginRecording() {
+    private func beginRecording() {
         currentlyRecording = true
         checkToAddWatermark()
     }
     
-    func endRecording() {
+    private func endRecording() {
         currentlyRecording = false
         appLogo.alpha = 0
     }
     
-    func checkToAddWatermark() {
+    private func checkToAddWatermark() {
         // Check if user has left an App Store review from app's settings
         let leftAppStoreReview = UserDefaults.standard.bool(forKey: "leftAppStoreReview")
         let userLikesWaterMark = UserDefaults.standard.bool(forKey: "wantsWatermarkShown")
@@ -511,11 +522,11 @@ class MultiViewScreenVC: UIViewController {
             }, completion: nil)
         }
     }
-
+    
 }
 
 
-extension MultiViewScreenVC: ControlsDelegate {
+extension MainRecordingVC: ControlsDelegate {
     
     
     func switchPreviewsFor(mode: PresentationMode) {
@@ -603,7 +614,7 @@ extension MultiViewScreenVC: ControlsDelegate {
         }
     }
     
-
+    
     
     func changePresentationTo(mode: PresentationMode) {
         presentationMode = mode
@@ -616,7 +627,7 @@ extension MultiViewScreenVC: ControlsDelegate {
         case .off:
             torchMode = .off
         case .on:
-        torchMode = .on
+            torchMode = .on
         }
         
         if currentRearDevice.hasTorch {
@@ -636,5 +647,5 @@ extension MultiViewScreenVC: ControlsDelegate {
         topWindowRecordingControlsVC.cameraSettingSlider.isHidden = true
         topWindowRecordingControlsVC.cameraSettingSlider.value = 0
     }
-
+    
 }

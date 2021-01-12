@@ -11,14 +11,14 @@ import MessageUI
 
 class SettingsVC: UIViewController {
     
-    let downArrowButton: UIButton = {
+   private let downArrowButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.blackDownArrow, for: .normal)
         button.addTarget(self, action: #selector(downArrowPress), for: .touchUpInside)
         return button
     }()
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Settings"
         label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
@@ -27,7 +27,7 @@ class SettingsVC: UIViewController {
         return label
     }()
     
-    lazy var supportButton: UIButton = {
+    private lazy var supportButton: UIButton = {
        let button = UIButton()
         button.setTitle("Get Support", for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
@@ -39,7 +39,7 @@ class SettingsVC: UIViewController {
         return button
     }()
     
-    let watermarkButton: UIButton = {
+    private let watermarkButton: UIButton = {
        let button = UIButton()
         button.setTitle("Remove watermark", for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
@@ -49,14 +49,14 @@ class SettingsVC: UIViewController {
         return button
     }()
     
-    let removeWatermarkSwitch: UISwitch = {
+    private let removeWatermarkSwitch: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = .black
         toggle.addTarget(self, action: #selector(watermarkToggled), for: .valueChanged)
         return toggle
     }()
     
-    lazy var shareButton: UIButton = {
+    private lazy var shareButton: UIButton = {
        let button = UIButton()
         button.setTitle("Share the app", for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
@@ -68,7 +68,7 @@ class SettingsVC: UIViewController {
         return button
     }()
     
-    lazy var aboutButton: UIButton = {
+    private lazy var aboutButton: UIButton = {
        let button = UIButton()
         button.setTitle("About revo", for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
@@ -80,7 +80,7 @@ class SettingsVC: UIViewController {
         return button
     }()
     
-    let versionLabel: UILabel = {
+    private let versionLabel: UILabel = {
         let label = UILabel()
         label.text = "Version 1.0.1"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -106,7 +106,7 @@ class SettingsVC: UIViewController {
         }
     }
     
-    func configureViews() {
+    private func configureViews() {
         view.backgroundColor = .white
         
         view.addSubview(titleLabel)
@@ -176,7 +176,7 @@ class SettingsVC: UIViewController {
         versionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
     }
     
-    @objc func getSupport() {
+    @objc private func getSupport() {
             if MFMailComposeViewController.canSendMail() {
                 let mail = MFMailComposeViewController()
                 mail.mailComposeDelegate = self
@@ -197,7 +197,7 @@ class SettingsVC: UIViewController {
             }
     }
     
-    @objc func watermarkToggled(watermarkSwitch: UISwitch) {
+    @objc private func watermarkToggled(watermarkSwitch: UISwitch) {
         let leftAppStoreReview = UserDefaults.standard.bool(forKey: "leftAppStoreReview")
 
         if watermarkSwitch.isOn && !leftAppStoreReview {
@@ -233,7 +233,7 @@ class SettingsVC: UIViewController {
         }
     }
     
-    @objc func aboutRevo() {
+    @objc private func aboutRevo() {
             let alert = UIAlertController(title: "About Revo", message: """
                 Revo was created as an educational project to further explore Apple's AVFoundation framework.
 
@@ -243,17 +243,18 @@ class SettingsVC: UIViewController {
                 """, preferredStyle: .alert)
         let deleteAction = UIAlertAction(title: "Dismiss", style: .default)
             alert.addAction(deleteAction)
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
     }
     
-    @objc func downArrowPress() {
+    @objc private func downArrowPress() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func shareApp() {
+    @objc private func shareApp() {
         let items: [Any] = ["Take a look at this neat video app, you can switch between cameras while recording!", URL(string: "https://apps.apple.com/app/id1499893273")!]
-        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        present(ac, animated: true)
+        let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        activityVC.excludedActivityTypes = [.copyToPasteboard, .addToReadingList]
+        present(activityVC, animated: true)
     }
     
 }

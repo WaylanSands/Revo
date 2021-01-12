@@ -38,7 +38,7 @@ class TopPreviewOptionsView: UIView {
         super.init(coder: coder)
     }
     
-    func configureViews() {
+    private func configureViews() {
         self.addSubview(backButton)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -15).isActive = true

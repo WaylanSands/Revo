@@ -39,7 +39,7 @@ class RecordingOptionsView: UIView {
         super.init(coder: coder)
     }
     
-    func configureViews() {
+    private func configureViews() {
         self.addSubview(shareButton)
         shareButton.translatesAutoresizingMaskIntoConstraints = false
         shareButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 20).isActive = true
