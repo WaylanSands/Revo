@@ -17,7 +17,6 @@ class RecordButtonView: UIView {
     let innerCircleView: UIView = {
         let view = UIView()
         view.backgroundColor = RevoColor.recordingRed
-        view.backgroundColor = .white
         view.layer.cornerRadius = 30
         return view
     }()

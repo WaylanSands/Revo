@@ -333,7 +333,6 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
     }
     
     
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
 
