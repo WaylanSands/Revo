@@ -8,7 +8,7 @@ Revo - Reverse Video, is a soon to be released iOS app that allows users to reco
   <li><strong>SplitScreen Mode</strong> presents two resizable AVCaptureVideoPreviewLayers which take up the top and bottom half of the display.</li>
   <li><strong>PiP Mode</strong> taken from Apple's PiP, PiP mode presents a mobile, styleable, resizable AVCaptureVideoPreviewLayer.</li>
   <li><strong>Live Broadcasting</strong> using ReplayKit users may live broadcast from with any recording mode.</li>
-  <li><strong>Library</strong> recordings are saved to the users gallary, which they can share, save, delete or watch.</li>
+  <li><strong>Library</strong> recordings are saved to the users gallary, which they can share, save, delete or play.</li>
 </ul>
 
  ### Requirements
@@ -19,7 +19,7 @@ Revo - Reverse Video, is a soon to be released iOS app that allows users to reco
 
   
 ### CocoaPods
-Dune uses the AirBnb's vector animation library [lottie-ios](https://github.com/airbnb/lottie-ios/blob/master/README.md)
+Dune uses AirBnb's vector animation library [lottie-ios](https://github.com/airbnb/lottie-ios/blob/master/README.md)
 
 Add the pod to your Podfile:
 ```ruby
