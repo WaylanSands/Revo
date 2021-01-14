@@ -45,10 +45,10 @@ enum CameraSetting {
 }
 
 enum DevicesAvailable {
-    case areMissing
+    case builtInDualWideCamera
+    case builtInTripleCamera
+    case builtInDualCamera
     case single
-    case dual
-    case triple
 }
 
 enum EditingState {
@@ -127,9 +127,9 @@ class RecordingControlsVC: UIViewController {
     
     private let recordingModeButton: UIButton = {
         let button = UIButton()
-        button.tintColor = .white
         button.addTarget(self, action: #selector(recordingModePress), for: .touchUpInside)
         button.setImage(RevoImages.cameraIcon(), for: .normal)
+        button.tintColor = .white
         return button
     }()
     
@@ -162,7 +162,7 @@ class RecordingControlsVC: UIViewController {
         return button
     }()
     
-    private let cameraSelectionButton: UIButton = {
+    let cameraSelectionButton: UIButton = {
         let button = UIButton()
         button.setTitle("1", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .bold)
@@ -228,6 +228,12 @@ class RecordingControlsVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         updateLibraryButtonThumbnail()
+        
+        // Hide the presentationButton button to limit the user's options for
+        // toggling features which use AVCaptureMultiCamSession.
+        if !AVCaptureMultiCamSession.isMultiCamSupported {
+            presentationButton.isHidden = true
+        }
     }
     
     private func configureNotificationObservers() {
@@ -339,7 +345,7 @@ class RecordingControlsVC: UIViewController {
         view.addSubview(recordingModeButton)
         recordingModeButton.translatesAutoresizingMaskIntoConstraints = false
         recordingModeButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        recordingModeButton.leadingAnchor.constraint(equalTo: libraryButton.trailingAnchor, constant: 30).isActive = true
+        recordingModeButton.leadingAnchor.constraint(equalTo: libraryButton.trailingAnchor, constant: 25).isActive = true
         recordingModeButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
         view.addSubview(presentationButton)
@@ -608,12 +614,33 @@ class RecordingControlsVC: UIViewController {
         view.bringSubviewToFront(editPreviewStyleButton)
     }
     
-    @objc private func infoButtonPress() {
-        let alert = UIAlertController(title: "Switch Mode", message: """
+    private let regularSwitchCamTitle = "Switch Mode"
+    private let regularSwitchCamMessage = """
                 Switch mode allows you to record footage while seamlessly switching to the front and back camera.
 
                 To toggle between other modes select the icon to the right of the recording button.
-                """, preferredStyle: .alert)
+                """
+    
+    private let unSupportedTitle = "Device Unsupported"
+    private let unSupportedMessage = """
+                Unfortunately this app is currently only supports devices XS, XS Max, XR and later running on iOS 14.
+
+                You are able to use the app though many of the features that make this app unique will not be available.
+                """
+    
+    @objc private func infoButtonPress() {
+        var title: String
+        var message: String
+        
+        if AVCaptureMultiCamSession.isMultiCamSupported {
+            title = regularSwitchCamTitle
+            message = regularSwitchCamMessage
+        } else {
+            title = unSupportedTitle
+            message = unSupportedMessage
+        }
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "Got it", style: .default, handler: nil)
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
@@ -627,8 +654,11 @@ class RecordingControlsVC: UIViewController {
     
     
     @objc private func cameraSelectionPress(sender: UIButton) {
-        // This will check which current camera is selected then toggle to the next available from the devicesAvailable array
-        let currentIndex = devicesAvailable.firstIndex(of: sender.titleLabel!.text!)!
+        // This will check which current camera is selected then toggle to
+        // the next available from the devicesAvailable array
+        
+        let zoomFactorString = sender.titleLabel!.text!
+        let currentIndex = devicesAvailable.firstIndex(of: zoomFactorString)!
         var newIndex = currentIndex + 1
         
         if newIndex != devicesAvailable.count {
@@ -639,12 +669,14 @@ class RecordingControlsVC: UIViewController {
             newIndex = 0
         }
         
-        switch newIndex {
-        case 0:
-            delegate?.cameraSelectionOf(selection: .wide)
-        case 1:
+        let newZoomFactor = devicesAvailable[newIndex]
+        
+        switch newZoomFactor {
+        case "0.5":
             delegate?.cameraSelectionOf(selection: .ultraWide)
-        case 2:
+        case "1":
+            delegate?.cameraSelectionOf(selection: .wide)
+        case "1.5":
             delegate?.cameraSelectionOf(selection: .telephoto)
         default:
             break

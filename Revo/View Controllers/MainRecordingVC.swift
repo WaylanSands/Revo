@@ -39,8 +39,17 @@ class MainRecordingVC: UIViewController {
     private var currentRearDevice: AVCaptureDevice!
     private var currentFrontDevice: AVCaptureDevice!
     
-    private let captureSession = AVCaptureMultiCamSession()
+    private let multiCamSession = AVCaptureMultiCamSession()
+    private let singleCamSession = AVCaptureSession()
     private var selectedRearDevice: AVCaptureDevice?
+    
+    enum ActiveSingleCamera {
+        case front
+        case rear
+    }
+    
+    // Set when device does not support AVCaptureMultiCamSession
+    private var activeSingleCam: ActiveSingleCamera?
     
     // What are the available built in devices - Duel, Triple or Single
     private var devicesAvailable: DevicesAvailable?
@@ -54,7 +63,6 @@ class MainRecordingVC: UIViewController {
     // AVCaptureVideoPreviewLayers change when switching recordingMode etc split screen
     private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
     private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
-    
     
     private let appLogo: UILabel = {
         let label = UILabel()
@@ -80,6 +88,7 @@ class MainRecordingVC: UIViewController {
         configureTopWindow()
         configureDelegates()
         configureClosures()
+        discoverDevices()
         configureViews()
     }
     
@@ -155,10 +164,16 @@ class MainRecordingVC: UIViewController {
         frontFullScreenPreviewView.videoPreviewLayer.frame = view.bounds
         frontFullScreenPreviewView.isHidden = true
         
+        // Needs to be set as true because frontFullScreenPreviewView is hidden.
+        // configurePreviewLayers() is ran before configureViews which would of set it to false
+        topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
+        
         // Front camera preview layer
         view.addSubview(frontFloatingPreviewView)
         frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
         
+        // appLogo will animate alpha during recording if remove the
+        // watermark switch is off in settings.
         view.addSubview(appLogo)
         appLogo.translatesAutoresizingMaskIntoConstraints = false
         appLogo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
@@ -170,11 +185,9 @@ class MainRecordingVC: UIViewController {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             self.setupCaptureSession()
-        case .notDetermined:  // App has not requested access for video
+        case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { granted in
-                if granted && AVCaptureMultiCamSession.isMultiCamSupported {
-                    self.setupCaptureSession()
-                } else if granted && !AVCaptureMultiCamSession.isMultiCamSupported {
+                if granted {
                     self.setupCaptureSession()
                 } else {
                     // User selected "Don't allow camera access"
@@ -205,44 +218,120 @@ class MainRecordingVC: UIViewController {
         }
     }
     
+    // Check to see if a AVCaptureMultiCamSession is supported by the device
+    // if not a regular AVCaptureSession will be ran. The topWindowRecordingControlsVC
+    // will also check if isMultiCamSupported and hide any buttons which expose
+    // multi-cam features.
     private func setupCaptureSession() {
-        if AVCaptureMultiCamSession.isMultiCamSupported {
-            self.setupMultiCamSession()
-        } else{
-            self.setupSingleCamSession()
+        DispatchQueue.main.async {
+            if AVCaptureMultiCamSession.isMultiCamSupported {
+                self.setupMultiCamSession()
+            } else{
+                self.setupSingleCamSessionFor(cameraPosition: .back)
+            }
         }
     }
     
+    
+    private func discoverDevices() {
+        // The correct array is passed to the topWindowRecordingControlsVC so that
+        // the topWindowRecordingControlsVC can display the right set of camera options
+        let tripleCameras = ["1", "0.5", "1.5"]
+        let duelWideCameras = ["1", "0.5"]
+        let duelTeleCameras = ["1", "1.5"]
+        let singleCamera = ["1"]
+        
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTripleCamera, .builtInDualCamera,.builtInDualWideCamera],
+                                                                mediaType: .video, position: .back)
+        
+        if discoverySession.devices.isEmpty {
+            topWindowRecordingControlsVC.cameraSelectionButton.isHidden = true
+            topWindowRecordingControlsVC.devicesAvailable = singleCamera
+        }
+        
+        discoverySession.devices.forEach { (device) in
+            switch device.deviceType {
+            case .builtInTripleCamera:
+                topWindowRecordingControlsVC.devicesAvailable = tripleCameras
+            case .builtInDualWideCamera:
+                topWindowRecordingControlsVC.devicesAvailable = duelWideCameras
+            case .builtInDualCamera:
+                topWindowRecordingControlsVC.devicesAvailable = duelTeleCameras
+            default:
+                break
+            }
+        }
+        
+    }
+    
+    //MARK: - Set up multi-cam capture session
+    
     private func setupMultiCamSession() {
-        captureSession.beginConfiguration()
+        multiCamSession.beginConfiguration()
+        currentFrontDevice = frontCamera()
         currentRearDevice = rearCamera()
-        let frontDevice = frontCamera()
         
         do  {
-            let  rearDeviceInput = try AVCaptureDeviceInput(device: currentRearDevice!)
-            let frontDeviceInput = try AVCaptureDeviceInput(device: frontDevice!)
+            let rearDeviceInput = try AVCaptureDeviceInput(device: currentRearDevice!)
+            let frontDeviceInput = try AVCaptureDeviceInput(device: currentFrontDevice!)
             
-            for each in captureSession.inputs {
-                captureSession.removeInput(each)
+            for each in multiCamSession.inputs {
+                multiCamSession.removeInput(each)
             }
             
             activeRearPreviewLayerLayer.session = nil
             activeFrontPreviewLayerLayer.session = nil
             
-            if captureSession.canAddInput(rearDeviceInput) {
-                captureSession.addInput(rearDeviceInput)
+            if multiCamSession.canAddInput(rearDeviceInput) {
+                multiCamSession.addInput(rearDeviceInput)
             }
             
-            if captureSession.canAddInput(frontDeviceInput) {
-                captureSession.addInput(frontDeviceInput)
+            if multiCamSession.canAddInput(frontDeviceInput) {
+                multiCamSession.addInput(frontDeviceInput)
             }
             
-            activeRearPreviewLayerLayer.session = captureSession
-            activeFrontPreviewLayerLayer.session = captureSession
+            activeRearPreviewLayerLayer.session = multiCamSession
+            activeFrontPreviewLayerLayer.session = multiCamSession
             
-            captureSession.commitConfiguration()
-            captureSession.startRunning()
+            multiCamSession.commitConfiguration()
+            multiCamSession.startRunning()
             
+        } catch {
+            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+        }
+    }
+    
+    //MARK: - Set up single-cam capture session
+    
+    private func setupSingleCamSessionFor(cameraPosition: AVCaptureDevice.Position) {
+        singleCamSession.beginConfiguration()
+        var device: AVCaptureDevice!
+        
+        if cameraPosition == .back {
+            device = rearCamera()
+            currentRearDevice = device
+            activeSingleCam = .rear
+        } else {
+            device = frontCamera()
+            currentFrontDevice = device
+            activeSingleCam = .front
+        }
+        
+        do {
+            let deviceInput = try AVCaptureDeviceInput(device: device)
+            
+            for each in singleCamSession.inputs {
+                singleCamSession.removeInput(each)
+            }
+            
+            singleCamSession.addInput(deviceInput)
+            activeRearPreviewLayerLayer.session = nil
+            
+            rearPreviewView.videoPreviewLayer.session = singleCamSession
+            frontFloatingPreviewView.isHidden = true
+            
+            singleCamSession.commitConfiguration()
+            singleCamSession.startRunning()
         } catch {
             Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
         }
@@ -251,40 +340,48 @@ class MainRecordingVC: UIViewController {
     // MARK: - Configure for new Presentation Mode
     
     private func configurePreviewLayers() {
-        captureSession.beginConfiguration()
+        multiCamSession.beginConfiguration()
         
         activeRearPreviewLayerLayer.session = nil
         activeFrontPreviewLayerLayer.session = nil
         
         switch presentationMode {
         case .switchCam:
-            rearPreviewView.videoPreviewLayer.session = captureSession
-            frontFullScreenPreviewView.videoPreviewLayer.session = captureSession
+            rearPreviewView.videoPreviewLayer.session = multiCamSession
+            frontFullScreenPreviewView.videoPreviewLayer.session = multiCamSession
             activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
             activeFrontPreviewLayerLayer = frontFullScreenPreviewView.videoPreviewLayer
             frontFullScreenPreviewView.isUserInteractionEnabled = true
             frontFloatingPreviewView.isHidden = true
             rearPreviewView.isHidden = false
+            // Stop cameraSelectionButton from interaction if returning to switchCam with
+            // frontFullScreenPreviewView showing.
+            if  !frontFullScreenPreviewView.isHidden {
+                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
+            }
         case .pip:
-            rearPreviewView.videoPreviewLayer.session = captureSession
-            frontFloatingPreviewView.videoPreviewLayer.session = captureSession
+            rearPreviewView.videoPreviewLayer.session = multiCamSession
+            frontFloatingPreviewView.videoPreviewLayer.session = multiCamSession
             activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
             activeFrontPreviewLayerLayer = frontFloatingPreviewView.videoPreviewLayer
+            // cameraSelectionButton is re-enabled when switching modes incase it was left off during switchCam
+            topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
             frontFloatingPreviewView.isHidden = false
             rearPreviewView.isHidden = false
             revertFrontDeviceSettings()
         case .splitScreen:
-            splitScreenVC.topPreviewView.videoPreviewLayer.session = captureSession
-            splitScreenVC.bottomPreviewView.videoPreviewLayer.session = captureSession
+            splitScreenVC.topPreviewView.videoPreviewLayer.session = multiCamSession
+            splitScreenVC.bottomPreviewView.videoPreviewLayer.session = multiCamSession
             activeRearPreviewLayerLayer = splitScreenVC.topPreviewView.videoPreviewLayer
             activeFrontPreviewLayerLayer = splitScreenVC.bottomPreviewView.videoPreviewLayer
             // frontFullScreenPreviewView needs to be marked as isUserInteractionEnabled false
             // to allow touches to the splitScreenVC
+            topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
             frontFullScreenPreviewView.isUserInteractionEnabled = false
             frontFloatingPreviewView.isHidden = true
             rearPreviewView.isHidden = true
         }
-        captureSession.commitConfiguration()
+        multiCamSession.commitConfiguration()
     }
     
     /// Version 1 of revo does not allow front device's setting to be changed out
@@ -305,44 +402,15 @@ class MainRecordingVC: UIViewController {
         }
     }
     
-    private func setupSingleCamSession() {
-        captureSession.beginConfiguration()
-        currentRearDevice = rearCamera()
-        
-        do {
-            let backDeviceInput = try AVCaptureDeviceInput(device: currentRearDevice!)
-            captureSession.addInput(backDeviceInput)
-            
-            rearPreviewView.videoPreviewLayer.session = captureSession
-            frontFloatingPreviewView.isHidden = true
-            
-            captureSession.commitConfiguration()
-            captureSession.startRunning()
-        } catch {
-            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
-        }
-    }
-    
-    // Used to dynamically setup camera button options from RecordingControlsVC
-    private var trippleCameras = ["1", "0.5", "1.5"]
-    private var duelCameras = ["1", "0.5",]
-    private var singleCamera = ["1"]
-    
     private func rearCamera() -> AVCaptureDevice? {
-        
         if selectedRearDevice != nil {
             return selectedRearDevice
         }
         
-        if let device = AVCaptureDevice.default(.builtInTripleCamera, for: .video, position: .back) {
-            topWindowRecordingControlsVC.devicesAvailable = trippleCameras
-            return device
-        } else if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
-            topWindowRecordingControlsVC.devicesAvailable = duelCameras
+        if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
             return device
         } else {
-            // Missing expected rear camera device
-            topWindowRecordingControlsVC.devicesAvailable = singleCamera
+            // Missing expected rear device
             Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your rear camera. If the device is not compromised try quitting the app and trying again.", vc: self)
             return nil
         }
@@ -350,9 +418,9 @@ class MainRecordingVC: UIViewController {
     
     private func frontCamera() -> AVCaptureDevice? {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
-            currentFrontDevice = device
             return device
         } else {
+            // Missing expected front device
             Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your front camera. If the device is not compromised try quitting the app and trying again.", vc: self)
             return nil
         }
@@ -413,7 +481,6 @@ class MainRecordingVC: UIViewController {
     }
     
     @objc private func rearPreviewLongPress(sender: UILongPressGestureRecognizer) {
-        
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
         let device = primaryDevice()
@@ -489,14 +556,24 @@ class MainRecordingVC: UIViewController {
         return device.videoZoomFactor
     }
     
-    /// The primary device is the device which consumes the full-screen during pip and switchCam modes.
-    /// The currentRearDevice is always the primary device unless frontFullScreenPreviewView isn't hidden and
-    /// the presentationMode is set to switchCam.
+    /// The primary device is used to determine which device to modify when the
+    /// user chooses to change camera settings such as exposure or zoom.
+    /// The device which consumes the screen during pip and switchCam modes when
+    /// running a multi-cam session is the primary device.
+    /// When running a single-cam session we need to check the activeSingleCam
+    /// to help determine which camera the user is using.
     private func primaryDevice() -> AVCaptureDevice {
         if presentationMode == .switchCam && !frontFullScreenPreviewView.isHidden {
             return currentFrontDevice
+        } else if singleCamSession.isRunning && activeSingleCam == .rear {
+            return currentRearDevice
+        } else if singleCamSession.isRunning && activeSingleCam == .front {
+            return currentFrontDevice
         } else {
             return currentRearDevice
+            // When none of these conditions is met we return the currentRearDevice.
+            // This limits the user to only being able to zoom and change exposure of
+            // the rear camera when not in switchCam mode. This may be updated in future versions.
         }
     }
     
@@ -538,19 +615,31 @@ extension MainRecordingVC: ControlsDelegate {
             activeFrontPreviewLayerLayer.session = nil
             
             if pipIsFrontCamera {
-                activeFrontPreviewLayerLayer.session = captureSession
-                activeRearPreviewLayerLayer.session = captureSession
+                activeFrontPreviewLayerLayer.session = multiCamSession
+                activeRearPreviewLayerLayer.session = multiCamSession
                 pipIsFrontCamera = false
             } else {
-                activeRearPreviewLayerLayer.session = captureSession
-                activeFrontPreviewLayerLayer.session = captureSession
+                activeRearPreviewLayerLayer.session = multiCamSession
+                activeFrontPreviewLayerLayer.session = multiCamSession
                 pipIsFrontCamera = true
             }
         case .switchCam:
-            if frontFullScreenPreviewView.isHidden {
+            // Toggling cameras while running multiCamSession is just a matter of
+            // showing and hiding the frontFullScreenPreviewView.
+            // Toggling cameras while in singleCamSession requires the correct
+            // single-cam session to be set up.
+            if frontFullScreenPreviewView.isHidden && multiCamSession.isRunning {
+                // cameraSelectionButton is disabled as the user can not toggle front facing cameras
+                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
                 frontFullScreenPreviewView.isHidden = false
-            } else {
+            } else if !frontFullScreenPreviewView.isHidden && multiCamSession.isRunning {
+                // cameraSelectionButton is reenabled when switching to the rear camera
+                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
                 frontFullScreenPreviewView.isHidden = true
+            } else if singleCamSession.isRunning && activeSingleCam == .front {
+                setupSingleCamSessionFor(cameraPosition: .back)
+            } else if singleCamSession.isRunning && activeSingleCam == .rear {
+                setupSingleCamSessionFor(cameraPosition: .front)
             }
         }
     }
@@ -577,16 +666,19 @@ extension MainRecordingVC: ControlsDelegate {
     func cameraSelectionOf(selection: CameraSelection) {
         switch selection {
         case .wide:
-            print("Add Wide")
             selectedRearDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
         case .ultraWide:
-            print("Add ultraWide")
             selectedRearDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
         case .telephoto:
-            print("Add telephoto")
             selectedRearDevice = AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
         }
-        setupCaptureSession()
+        
+        if AVCaptureMultiCamSession.isMultiCamSupported {
+            setupCaptureSession()
+        } else {
+            setupSingleCamSessionFor(cameraPosition: .back)
+        }
+
     }
     
     // Checks to see which preview user would like to re-style &
@@ -594,7 +686,6 @@ extension MainRecordingVC: ControlsDelegate {
     // previewStyleView is visible it will remove it from the
     // superview as the user had canceled their selection.
     func editPreviewStyleFor(mode: PresentationMode) {
-        
         if presentationMode == .pip {
             if topWindowRecordingControlsVC.view.subviews.contains(pipStyleView) {
                 pipStyleView.cancelButtonPress()
@@ -613,8 +704,6 @@ extension MainRecordingVC: ControlsDelegate {
             }
         }
     }
-    
-    
     
     func changePresentationTo(mode: PresentationMode) {
         presentationMode = mode

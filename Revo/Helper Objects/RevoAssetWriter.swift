@@ -75,13 +75,14 @@ class RevoAssetWriter {
         try audioWriter = AVAssetWriter(outputURL: self.audioOutputURL, fileType: .mov)
         
         var channelLayout = AudioChannelLayout()
-        channelLayout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_5_1_D
-        let audioOutputSettings = [
-            AVNumberOfChannelsKey : 6,
+        channelLayout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_2_0
+        
+        let audioOutputSettings: [String : Any] = [
+            AVNumberOfChannelsKey : 2,
             AVFormatIDKey : kAudioFormatMPEG4AAC_HE,
             AVSampleRateKey : 44100,
             AVChannelLayoutKey : NSData(bytes: &channelLayout, length: MemoryLayout.size(ofValue: channelLayout))
-        ] as [String : Any]
+        ]
         
         micAudioInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutputSettings)
         if let micAudioInput = self.micAudioInput, let canAddInput = audioWriter?.canAdd(micAudioInput),

@@ -24,6 +24,7 @@ struct RevoImages {
     static let zoomIcon = UIImage(named: "zoom_icon")
     static let infoIcon = UIImage(named: "info_icon")
     static let isoIcon = UIImage(named: "iso_icon")
+        
     
     // SF Symbols
     static func cameraIcon() -> UIImage? {
