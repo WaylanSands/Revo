@@ -30,3 +30,7 @@ And then run:
 ```ruby
 pod install
 ```
+
+<p align="center" style="background-color: black">
+  <img src="https://i.imgur.com/IL9ojDc.png" width="70%">
+</p>
