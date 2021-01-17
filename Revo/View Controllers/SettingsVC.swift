@@ -251,7 +251,7 @@ class SettingsVC: UIViewController {
     }
     
     @objc private func shareApp() {
-        let items: [Any] = ["Take a look at this neat video app, you can switch between cameras while recording!", URL(string: "https://apps.apple.com/app/id1499893273")!]
+        let items: [Any] = ["Take a look at this neat video app, you can switch between cameras while recording!", URL(string: "https://apps.apple.com/us/app/revo-reverse-video/id1547580951")!]
         let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
         activityVC.excludedActivityTypes = [.copyToPasteboard, .addToReadingList]
         present(activityVC, animated: true)
