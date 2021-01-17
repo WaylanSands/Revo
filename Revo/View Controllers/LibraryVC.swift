@@ -352,7 +352,6 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
             animateGradientAlphaTo(value: 0.0)
             appLogoLabel.textColor = .black
         }
-
     }
     
     func animateGradientAlphaTo(value: CGFloat) {
