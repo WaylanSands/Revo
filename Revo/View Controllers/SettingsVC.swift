@@ -203,9 +203,9 @@ class SettingsVC: UIViewController {
         if watermarkSwitch.isOn && !leftAppStoreReview {
             // User has switched on the switch indicating to remove the watermark.
             let alert = UIAlertController(title: "Remove Watermark", message: """
-                Revo relies on an honour based system where we ask you to leave a short review on the Appstore.
+                The Revo watermark will be removed from future recordings.
 
-                After leaving a review the watermark will no longer be present when recording 🤘🏼
+                As a reminder, if you're enjoying the app please leave a review on the App Store. It goes a long way.
                 """, preferredStyle: .alert)
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
                 // Incase anyone does not want to leave a review.
