@@ -568,9 +568,23 @@ class RecordingControlsVC: UIViewController {
             recordingButton.recordingMode = .video
             recordingMode = .video
         case .video:
+            checkIfUserIsAwareOfLiveMode()
             recordingModeButton.setImage(RevoImages.liveButtonIcon, for: .normal)
             recordingButton.recordingMode = .live
             recordingMode = .live
+        }
+    }
+    
+    private func checkIfUserIsAwareOfLiveMode() {
+        let userIsAware = UserDefaults.standard.bool(forKey: "userIsAwareOfLiveMode")
+        // Make sure that the user has not seen this message before
+        if !userIsAware {
+            Alert.showBasicAlert(title: "Live Broadcasting", message: """
+                                 When shooting in Live Mode you are required to select an app which you would like to broadcast to.
+
+                                 If you do not wish to start a live broadcast select the button again to toggle back.
+                                 """, vc: self)
+            UserDefaults.standard.setValue(true, forKey: "userIsAwareOfLiveMode")
         }
     }
     

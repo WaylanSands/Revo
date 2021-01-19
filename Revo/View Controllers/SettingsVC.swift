@@ -212,7 +212,7 @@ class SettingsVC: UIViewController {
             let reviewAction = UIAlertAction(title: "Leave Review", style: .default) { _ in
                 // User has selected to leave a review
                 // Take user to the revo app on the App Store
-                if let writeReviewURL = URL(string: "https://apps.apple.com/app/id1499893273?action=write-review") {
+                if let writeReviewURL = URL(string: "https://apps.apple.com/app/id1547580951?action=write-review") {
                     UIApplication.shared.open(writeReviewURL, options: [:])
                 }
             }
