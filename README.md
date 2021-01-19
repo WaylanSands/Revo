@@ -19,7 +19,7 @@ Revo - Reverse Video, is a soon to be released iOS app that allows users to reco
 
   
 ### CocoaPods
-Dune uses AirBnb's vector animation library [lottie-ios](https://github.com/airbnb/lottie-ios/blob/master/README.md)
+Revo uses AirBnb's vector animation library [lottie-ios](https://github.com/airbnb/lottie-ios/blob/master/README.md)
 
 Add the pod to your Podfile:
 ```ruby
