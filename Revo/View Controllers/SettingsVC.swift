@@ -96,12 +96,10 @@ class SettingsVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let leftAppStoreReview = UserDefaults.standard.bool(forKey: "leftAppStoreReview")
-        let userLikesWaterMark = UserDefaults.standard.bool(forKey: "wantsWatermarkShown")
+        let watermarkIsHidden = UserDefaults.standard.bool(forKey: "watermarkIsHidden")
         
-        // Checking whether to toggle on the remove watermark switch for a returning
-        // user if they both don't like the watermark and have left a review.
-        if !userLikesWaterMark && leftAppStoreReview  {
+        // Checking whether to toggle on the remove watermark switch for a returning user.
+        if watermarkIsHidden {
             removeWatermarkSwitch.isOn = true
         }
     }
@@ -198,38 +196,35 @@ class SettingsVC: UIViewController {
     }
     
     @objc private func watermarkToggled(watermarkSwitch: UISwitch) {
-        let leftAppStoreReview = UserDefaults.standard.bool(forKey: "leftAppStoreReview")
+        let promptedToLeaveReview = UserDefaults.standard.bool(forKey: "promptedToLeaveReview")
 
-        if watermarkSwitch.isOn && !leftAppStoreReview {
+        if watermarkSwitch.isOn && !promptedToLeaveReview {
             // User has switched on the switch indicating to remove the watermark.
+            UserDefaults.standard.setValue(true, forKey: "promptedToLeaveReview")
+            UserDefaults.standard.setValue(true, forKey: "watermarkIsHidden")
+            
             let alert = UIAlertController(title: "Remove Watermark", message: """
                 The Revo watermark will be removed from future recordings.
 
                 As a reminder, if you're enjoying the app please leave a review on the App Store. It goes a long way.
                 """, preferredStyle: .alert)
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
-                // Incase anyone does not want to leave a review.
-                watermarkSwitch.isOn = false
-            }
+            let cancelAction = UIAlertAction(title: "Dismiss", style: .cancel)
             let reviewAction = UIAlertAction(title: "Leave Review", style: .default) { _ in
                 // User has selected to leave a review
+                // Take user to the revo app on the App Store
                 if let writeReviewURL = URL(string: "https://apps.apple.com/app/id1499893273?action=write-review") {
-                    UIApplication.shared.open(writeReviewURL, options: [:]) { success in
-                        // Track that user has been successful in landing on the leave review page
-                        // The watermark will be no longer be present if successful.
-                        UserDefaults.standard.setValue(success, forKey: "leftAppStoreReview")
-                    }
+                    UIApplication.shared.open(writeReviewURL, options: [:])
                 }
             }
             alert.addAction(cancelAction)
             alert.addAction(reviewAction)
             self.present(alert, animated: true, completion: nil)
-        } else if !watermarkSwitch.isOn && leftAppStoreReview {
-            // The switch has been turned off after leaving a review
-            UserDefaults.standard.setValue(true, forKey: "wantsWatermarkShown")
-        } else if watermarkSwitch.isOn && leftAppStoreReview {
-            // The switch has been turned back on after leaving a review and turning it off
-            UserDefaults.standard.setValue(false, forKey: "wantsWatermarkShown")
+        } else if !watermarkSwitch.isOn {
+            // The switch has been turned off after being prompted to leave a review
+            UserDefaults.standard.setValue(false, forKey: "watermarkIsHidden")
+        } else if watermarkSwitch.isOn {
+            // The switch has been turned back on after being prompted to leave a review
+            UserDefaults.standard.setValue(true, forKey: "watermarkIsHidden")
         }
     }
     

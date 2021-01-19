@@ -589,11 +589,9 @@ class MainRecordingVC: UIViewController {
     }
     
     private func checkToAddWatermark() {
-        // Check if user has left an App Store review from app's settings
-        let leftAppStoreReview = UserDefaults.standard.bool(forKey: "leftAppStoreReview")
-        let userLikesWaterMark = UserDefaults.standard.bool(forKey: "wantsWatermarkShown")
+        let watermarkIsHidden = UserDefaults.standard.bool(forKey: "watermarkIsHidden")
         
-        if !leftAppStoreReview || userLikesWaterMark {
+        if !watermarkIsHidden {
             UIView.animate(withDuration: 1, delay: 0.2, options: .curveEaseInOut, animations: {
                 self.appLogo.alpha = 1
             }, completion: nil)
