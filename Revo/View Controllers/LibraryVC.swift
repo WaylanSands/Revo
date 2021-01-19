@@ -374,7 +374,6 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
 }
 
 extension LibraryVC: RecordingViewCellDelegate {
-   
     
     func appendSelectedRecordingWith(fileURL: URL) {
         selectedRecordingsURLs.append(fileURL)
