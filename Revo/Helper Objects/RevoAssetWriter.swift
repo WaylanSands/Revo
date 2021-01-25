@@ -66,6 +66,12 @@ class RevoAssetWriter {
         if let videoInput = self.videoInput, let canAddInput = videoWriter?.canAdd(videoInput), canAddInput {
             // Video will be rotated to reflect device orientation
             videoInput.transform = CGAffineTransform(rotationAngle: rotationAngle)
+         
+           // Log rotation to Firebase Analytics
+            if rotationAngle != 0 {
+                RevoAnalytics.logLandscapeVideo()
+            }
+            
             videoWriter?.add(videoInput)
         } else {
             print("couldn't add video input")

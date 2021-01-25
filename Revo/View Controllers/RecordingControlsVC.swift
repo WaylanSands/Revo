@@ -7,6 +7,7 @@
 
 import UIKit
 import ReplayKit
+import FirebaseAnalytics
 
 protocol ControlsDelegate: class {
     func updateCapture(setting: CameraSetting, with slider: UISlider)
@@ -234,6 +235,7 @@ class RecordingControlsVC: UIViewController {
         if !AVCaptureMultiCamSession.isMultiCamSupported {
             presentationButton.isHidden = true
         }
+    
     }
     
     private func configureNotificationObservers() {
@@ -316,42 +318,42 @@ class RecordingControlsVC: UIViewController {
         view.addSubview(settingsButton)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor, constant: 0).isActive = true
-        settingsButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        settingsButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         
         view.addSubview(editPreviewStyleButton)
         editPreviewStyleButton.translatesAutoresizingMaskIntoConstraints = false
         editPreviewStyleButton.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor, constant: 0).isActive = true
-        editPreviewStyleButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        editPreviewStyleButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         
         view.addSubview(switchCamInfoButton)
         switchCamInfoButton.translatesAutoresizingMaskIntoConstraints = false
         switchCamInfoButton.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor, constant: 0).isActive = true
-        switchCamInfoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        switchCamInfoButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         
         view.addSubview(libraryButton)
         libraryButton.translatesAutoresizingMaskIntoConstraints = false
         libraryButton.centerYAnchor.constraint(equalTo: view.bottomAnchor, constant: -80).isActive = true
-        libraryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        libraryButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         libraryButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         view.addSubview(cameraSelectionButton)
         cameraSelectionButton.translatesAutoresizingMaskIntoConstraints = false
         cameraSelectionButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        cameraSelectionButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        cameraSelectionButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         cameraSelectionButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         cameraSelectionButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(recordingModeButton)
         recordingModeButton.translatesAutoresizingMaskIntoConstraints = false
         recordingModeButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        recordingModeButton.leadingAnchor.constraint(equalTo: libraryButton.trailingAnchor, constant: 25).isActive = true
+        recordingModeButton.leftAnchor.constraint(equalTo: libraryButton.rightAnchor, constant: 25).isActive = true
         recordingModeButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
         view.addSubview(presentationButton)
         presentationButton.translatesAutoresizingMaskIntoConstraints = false
         presentationButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        presentationButton.trailingAnchor.constraint(equalTo: cameraSelectionButton.leadingAnchor, constant: -30).isActive = true
+        presentationButton.rightAnchor.constraint(equalTo: cameraSelectionButton.leftAnchor, constant: -30).isActive = true
         presentationButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
         view.addSubview(recordingButton)
@@ -364,28 +366,28 @@ class RecordingControlsVC: UIViewController {
         view.addSubview(switchButton)
         switchButton.translatesAutoresizingMaskIntoConstraints = false
         switchButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:  -30).isActive = true
-        switchButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        switchButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         switchButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         switchButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(flashButton)
         flashButton.translatesAutoresizingMaskIntoConstraints = false
         flashButton.bottomAnchor.constraint(equalTo: switchButton.topAnchor, constant: -20).isActive = true
-        flashButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        flashButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         flashButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         flashButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(exposureButton)
         exposureButton.translatesAutoresizingMaskIntoConstraints = false
         exposureButton.topAnchor.constraint(equalTo: switchButton.bottomAnchor, constant: 20).isActive = true
-        exposureButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        exposureButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         exposureButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         exposureButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(zoomButton)
         zoomButton.translatesAutoresizingMaskIntoConstraints = false
         zoomButton.topAnchor.constraint(equalTo: exposureButton.bottomAnchor, constant: 20).isActive = true
-        zoomButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        zoomButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         zoomButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         zoomButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         
@@ -397,11 +399,10 @@ class RecordingControlsVC: UIViewController {
         let rotatedHeight: CGFloat = 250
         
         cameraSettingSlider.topAnchor.constraint(equalTo: switchButton.bottomAnchor, constant: 20).isActive = true
-        cameraSettingSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: (rotatedHeight / 2) - 30).isActive = true
+        cameraSettingSlider.rightAnchor.constraint(equalTo: view.rightAnchor, constant: (rotatedHeight / 2) - 30).isActive = true
         // Rotated the width will act as the sliders height and height as width
         cameraSettingSlider.widthAnchor.constraint(equalToConstant: rotatedHeight).isActive = true
         cameraSettingSlider.heightAnchor.constraint(equalToConstant: 20).isActive = true
-        //        isoSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
     }
     
     //MARK: - Record Screen
@@ -432,7 +433,7 @@ class RecordingControlsVC: UIViewController {
         do {
             try assetWriter.setUpWriter()
         } catch {
-            Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+            Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
             return
         }
         screenRecorder.isMicrophoneEnabled = true
@@ -440,14 +441,14 @@ class RecordingControlsVC: UIViewController {
             
             if let error = error {
                 DispatchQueue.main.sync {
-                    Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                    Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
                     self.stopRecording()
                 }
             } else {
                 self.assetWriter.writeBuffer(cmSampleBuffer, rpSampleType: rpSampleBufferType) { error in
                     guard let error = error else { return }
                     DispatchQueue.main.async {
-                        Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                        Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
                         self.stopRecording()
                     }
                 }
@@ -455,7 +456,7 @@ class RecordingControlsVC: UIViewController {
         }) { error in
             if let error = error  {
                 DispatchQueue.main.async {
-                    Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                    Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
                     self.stopRecording()
                 }
             } else {
@@ -468,22 +469,24 @@ class RecordingControlsVC: UIViewController {
     }
     
     private func stopRecording() {
+        // Log the event to Firebase Analytics
+        RevoAnalytics.logRecordingEvent(in: recordingMode, using: presentationMode)
         recordingButton.isUserInteractionEnabled = false
         libraryButton.isUserInteractionEnabled = false
         recordingButton.showActivitySpinner()
-        print("stopCapture")
+                
         screenRecorder.stopCapture { error in
             
             if let error = error {
                 print(error.localizedDescription)
-                Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
             } else {
                 self.assetWriter.finishWriting(completionHandler: { url, error in
                     
                     DispatchQueue.main.async {
                         
                         if let error = error {
-                            Alert.showBasicAlert(title: "Recording Error", message: error.localizedDescription, vc: self)
+                            Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
                         } else if url != nil {
                             // Recording finished
                             self.recordingButton.isUserInteractionEnabled = true
@@ -516,7 +519,7 @@ class RecordingControlsVC: UIViewController {
     private func stopBroadcast() {
         broadcastVC.finishBroadcast { error in
             if error == nil {
-                print("Broadcast ended")
+                // Broadcast finished
                 DispatchQueue.main.async {
                     self.recordingButton.animateRecordingButton()
                     self.alertMultiViewOfRecordingEnd()
@@ -579,11 +582,7 @@ class RecordingControlsVC: UIViewController {
         let userIsAware = UserDefaults.standard.bool(forKey: "userIsAwareOfLiveMode")
         // Make sure that the user has not seen this message before
         if !userIsAware {
-            Alert.showBasicAlert(title: "Live Broadcasting", message: """
-                                 When shooting in Live Mode you are required to select an app which you would like to broadcast to.
-
-                                 If you do not wish to start a live broadcast select the button again to toggle back.
-                                 """, vc: self)
+            Alert.showBasicAlert(title: "Live Broadcasting".localized, message: "live_broadcasting_message".localized, vc: self)
             UserDefaults.standard.setValue(true, forKey: "userIsAwareOfLiveMode")
         }
     }
@@ -628,19 +627,10 @@ class RecordingControlsVC: UIViewController {
         view.bringSubviewToFront(editPreviewStyleButton)
     }
     
-    private let regularSwitchCamTitle = "Switch Mode"
-    private let regularSwitchCamMessage = """
-                Switch mode allows you to record footage while seamlessly switching to the front and back camera.
-
-                To toggle between other modes select the icon to the right of the recording button.
-                """
-    
-    private let unSupportedTitle = "Device Unsupported"
-    private let unSupportedMessage = """
-                Unfortunately this app is currently only supports devices XS, XS Max, XR and later running on iOS 14.
-
-                You are able to use the app though many of the features that make this app unique will not be available.
-                """
+    private let regularSwitchCamTitle = "Switch Mode".localized
+    private let unSupportedTitle = "Device Unsupported".localized
+    private let regularSwitchCamMessage = "switchMode_message".localized
+    private let unSupportedMessage = "device_unsupported_message".localized
     
     @objc private func infoButtonPress() {
         var title: String
@@ -655,7 +645,7 @@ class RecordingControlsVC: UIViewController {
         }
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "Got it", style: .default, handler: nil)
+        let action = UIAlertAction(title: "Got it".localized, style: .default, handler: nil)
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
         
@@ -787,7 +777,7 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
         }
         
         guard let broadcastController = broadcastController else {
-            print("cancel")
+            // Cancel
             return
         }
         

@@ -20,45 +20,45 @@ class PipModeStyleView: UIView {
     private var currentColor: UIColor = .white
     private var selectedColor: UIColor = .white
     
-    private var currentBoarderWidth: CGFloat = 4.0
-    private var selectedBoarderWidth: CGFloat = 4.0
+    private var currentBorderWidth: CGFloat = 4.0
+    private var selectedBorderWidth: CGFloat = 4.0
     
-    private var currentBoarderWidthButton: UIButton!
-    private var selectedBoarderWidthButton: UIButton!
+    private var currentBorderWidthButton: UIButton!
+    private var selectedBorderWidthButton: UIButton!
     
-    private var currentBoarderColorButton: UIButton!
-    private var selectedBoarderColorButton: UIButton!
+    private var currentBorderColorButton: UIButton!
+    private var selectedBorderColorButton: UIButton!
     
-    private var boarderWidthButtons = [UIButton]()
-    private var boarderColorButtons = [UIButton]()
+    private var borderWidthButtons = [UIButton]()
+    private var borderColorButtons = [UIButton]()
     
     weak var styleDelegate: PipModeStyleDelegate?
     
     private let frameStyleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Frame Style"
+        label.text = "Frame Style".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
     private let frameStyleControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["Square", "Circle"])
+        let control = UISegmentedControl(items: ["Square".localized, "Circle".localized])
         control.addTarget(self, action: #selector(frameStyleChanged), for: .valueChanged)
         control.selectedSegmentIndex = 0
         return control
     }()
     
-    private let boarderWidthLabel: UILabel = {
+    private let borderWidthLabel: UILabel = {
         let label = UILabel()
-        label.text = "Boarder Width"
+        label.text = "Border Width".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
     
-    private let boarderColorLabel: UILabel = {
+    private let borderColorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Boarder Color"
+        label.text = "Border Color".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -73,7 +73,7 @@ class PipModeStyleView: UIView {
     
     private let saveButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Save", for: .normal)
+        button.setTitle("Save".localized, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(saveButtonPress), for: .touchUpInside)
         button.backgroundColor = .black
@@ -81,7 +81,7 @@ class PipModeStyleView: UIView {
         return button
     }()
     
-    private let boarderWidthStackView: UIStackView = {
+    private let borderWidthStackView: UIStackView = {
         let view = UIStackView()
         view.distribution = .equalSpacing
         return view
@@ -123,31 +123,31 @@ class PipModeStyleView: UIView {
         frameStyleControl.leadingAnchor.constraint(equalTo: optionsPanelView.leadingAnchor, constant: 20).isActive = true
         frameStyleControl.trailingAnchor.constraint(equalTo: optionsPanelView.trailingAnchor, constant: -20).isActive = true
         
-        self.addSubview(boarderWidthLabel)
-        boarderWidthLabel.translatesAutoresizingMaskIntoConstraints = false
-        boarderWidthLabel.topAnchor.constraint(equalTo: frameStyleControl.bottomAnchor, constant: 30).isActive = true
-        boarderWidthLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        self.addSubview(borderWidthLabel)
+        borderWidthLabel.translatesAutoresizingMaskIntoConstraints = false
+        borderWidthLabel.topAnchor.constraint(equalTo: frameStyleControl.bottomAnchor, constant: 30).isActive = true
+        borderWidthLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         
-        self.addSubview(boarderWidthStackView)
-        boarderWidthStackView.translatesAutoresizingMaskIntoConstraints = false
-        boarderWidthStackView.heightAnchor.constraint(equalToConstant: 38).isActive = true
-        boarderWidthStackView.topAnchor.constraint(equalTo: boarderWidthLabel.bottomAnchor, constant: 15).isActive = true
-        boarderWidthStackView.leadingAnchor.constraint(equalTo: optionsPanelView.leadingAnchor, constant: 20).isActive = true
-        boarderWidthStackView.trailingAnchor.constraint(equalTo: optionsPanelView.trailingAnchor, constant: -20).isActive = true
+        self.addSubview(borderWidthStackView)
+        borderWidthStackView.translatesAutoresizingMaskIntoConstraints = false
+        borderWidthStackView.heightAnchor.constraint(equalToConstant: 38).isActive = true
+        borderWidthStackView.topAnchor.constraint(equalTo: borderWidthLabel.bottomAnchor, constant: 15).isActive = true
+        borderWidthStackView.leadingAnchor.constraint(equalTo: optionsPanelView.leadingAnchor, constant: 20).isActive = true
+        borderWidthStackView.trailingAnchor.constraint(equalTo: optionsPanelView.trailingAnchor, constant: -20).isActive = true
         addStrokeButtons()
         
-        self.addSubview(boarderColorLabel)
-        boarderColorLabel.translatesAutoresizingMaskIntoConstraints = false
-        boarderColorLabel.topAnchor.constraint(equalTo: boarderWidthStackView.bottomAnchor, constant: 30).isActive = true
-        boarderColorLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        self.addSubview(borderColorLabel)
+        borderColorLabel.translatesAutoresizingMaskIntoConstraints = false
+        borderColorLabel.topAnchor.constraint(equalTo: borderWidthStackView.bottomAnchor, constant: 30).isActive = true
+        borderColorLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
         
         
         self.addSubview(mainStrokeColorStackView)
         mainStrokeColorStackView.translatesAutoresizingMaskIntoConstraints = false
-        mainStrokeColorStackView.topAnchor.constraint(equalTo: boarderColorLabel.bottomAnchor, constant: 15).isActive = true
+        mainStrokeColorStackView.topAnchor.constraint(equalTo: borderColorLabel.bottomAnchor, constant: 15).isActive = true
         mainStrokeColorStackView.leadingAnchor.constraint(equalTo: optionsPanelView.leadingAnchor, constant: 20).isActive = true
         mainStrokeColorStackView.trailingAnchor.constraint(equalTo: optionsPanelView.trailingAnchor, constant: -20).isActive = true
-        addBoarderColorButtons()
+        addBorderColorButtons()
         
         self.addSubview(saveButton)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
@@ -162,27 +162,27 @@ class PipModeStyleView: UIView {
         for _ in 0...4 {
             let button = strokeWidthButton()
             button.setTitle("\(buttonIndex * 2)pt", for: .normal)
-            boarderWidthStackView.addArrangedSubview(button)
-            boarderWidthButtons.append(button)
+            borderWidthStackView.addArrangedSubview(button)
+            borderWidthButtons.append(button)
             
             if buttonIndex * 2 == 4 { // This is the default selection
                 button.setTitleColor(.white, for: .normal)
-                currentBoarderWidthButton = button
+                currentBorderWidthButton = button
                 button.backgroundColor = .black
             }
             buttonIndex += 1
         }
     }
     
-    @objc private func boarderSelection(sender: UIButton) {
-        selectedBoarderWidthButton = sender
+    @objc private func borderSelection(sender: UIButton) {
+        selectedBorderWidthButton = sender
         updateWidthFrom(button: sender)
-        updateSelectedBoarderWidthButtonStyle()
+        updateSelectedBorderWidthButtonStyle()
     }
     
-    private func updateSelectedBoarderWidthButtonStyle() {
-        for eachButton in boarderWidthStackView.arrangedSubviews as! [UIButton] {
-            if eachButton != selectedBoarderWidthButton {
+    private func updateSelectedBorderWidthButtonStyle() {
+        for eachButton in borderWidthStackView.arrangedSubviews as! [UIButton] {
+            if eachButton != selectedBorderWidthButton {
                 eachButton.backgroundColor = UIColor.fromHex(code: "#EEEEEE")
                 eachButton.setTitleColor(UIColor.fromHex(code: "#303030"), for: .normal)
             } else {
@@ -195,7 +195,7 @@ class PipModeStyleView: UIView {
     private func strokeWidthButton() -> UIButton {
         let button = UIButton()
         button.setTitleColor(.white, for: .normal)
-        button.addTarget(self, action: #selector(boarderSelection), for: .touchUpInside)
+        button.addTarget(self, action: #selector(borderSelection), for: .touchUpInside)
         button.setTitleColor(UIColor.fromHex(code: "#303030"), for: .normal)
         button.backgroundColor = UIColor.fromHex(code: "#EEEEEE")
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
@@ -206,21 +206,21 @@ class PipModeStyleView: UIView {
         return button
     }
     
-    private func addBoarderColorButtons() {
+    private func addBorderColorButtons() {
         for eachSet in RevoColor.colorOptions {
             let stackView = verticalStackView()
             for eachColor in eachSet {
-                let button = boarderColorButtonWith(color: eachColor)
+                let button = borderColorButtonWith(color: eachColor)
                 stackView.addArrangedSubview(button)
-                boarderColorButtons.append(button)
+                borderColorButtons.append(button)
             }
             mainStrokeColorStackView.addArrangedSubview(stackView)
         }
     }
     
-    private func boarderColorButtonWith(color: UIColor) -> UIButton {
+    private func borderColorButtonWith(color: UIColor) -> UIButton {
         let button = UIButton()
-        button.addTarget(self, action: #selector(boarderColorSelection), for: .touchUpInside)
+        button.addTarget(self, action: #selector(borderColorSelection), for: .touchUpInside)
         button.layer.borderColor = RevoColor.colorButtonSelectionColor
         button.translatesAutoresizingMaskIntoConstraints = false
         button.widthAnchor.constraint(equalToConstant: 37).isActive = true
@@ -233,7 +233,7 @@ class PipModeStyleView: UIView {
     
     private func addStyleIfWhite(button: UIButton) {
         if button.backgroundColor == .white {
-            currentBoarderColorButton = button
+            currentBorderColorButton = button
             button.layer.shadowColor = UIColor.black.cgColor
             button.layer.shadowOpacity = 0.2
             button.layer.shadowOffset = .zero
@@ -242,15 +242,15 @@ class PipModeStyleView: UIView {
         }
     }
     
-    @objc private func boarderColorSelection(sender: UIButton) {
+    @objc private func borderColorSelection(sender: UIButton) {
         selectedColor = sender.backgroundColor!
-        selectedBoarderColorButton = sender
-        updateBoarderColorSelectionStyle()
+        selectedBorderColorButton = sender
+        updateBorderColorSelectionStyle()
     }
     
-    private func updateBoarderColorSelectionStyle() {
-        for eachButton in boarderColorButtons {
-            if eachButton != selectedBoarderColorButton {
+    private func updateBorderColorSelectionStyle() {
+        for eachButton in borderColorButtons {
+            if eachButton != selectedBorderColorButton {
                 eachButton.layer.borderWidth = 0
             } else {
                 eachButton.layer.borderWidth = 2
@@ -270,31 +270,28 @@ class PipModeStyleView: UIView {
         let selectedIndex = control.selectedSegmentIndex
         let selectedSegment = control.titleForSegment(at: selectedIndex)
         switch selectedSegment {
-        case "Circle" :
-            print("Circle")
+        case "Circle".localized:
             selectedFrameStyle = .circular
-        case "Square":
-            print("Square")
+        case "Square".localized:
             selectedFrameStyle = .square
         default:
             break
         }
-        
     }
     
     
     private func updateWidthFrom(button: UIButton) {
         switch button.titleLabel?.text {
         case "0pt":
-            selectedBoarderWidth = 0
+            selectedBorderWidth = 0
         case "2pt":
-            selectedBoarderWidth = 2
+            selectedBorderWidth = 2
         case "4pt":
-            selectedBoarderWidth = 4
+            selectedBorderWidth = 4
         case "6pt":
-            selectedBoarderWidth = 6
+            selectedBorderWidth = 6
         case "8pt":
-            selectedBoarderWidth = 8
+            selectedBorderWidth = 8
         default:
             break
         }
@@ -311,26 +308,29 @@ class PipModeStyleView: UIView {
     }
     
     private func resetSelection() {
-        self.updateSelectedBoarderWidthButtonStyle()
-        self.updateBoarderColorSelectionStyle()
+        self.updateSelectedBorderWidthButtonStyle()
+        self.updateBorderColorSelectionStyle()
         self.resetFrameControl()
     }
     
     @objc private func saveButtonPress() {
-        self.styleDelegate?.updateStyleWith(style: selectedFrameStyle, borderWidth: selectedBoarderWidth, color: selectedColor)
+        self.styleDelegate?.updateStyleWith(style: selectedFrameStyle, borderWidth: selectedBorderWidth, color: selectedColor)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "savedStyle"), object: nil)
-        currentBoarderWidthButton = selectedBoarderWidthButton
-        currentBoarderColorButton = selectedBoarderColorButton
-        currentBoarderWidth = selectedBoarderWidth
+        currentBorderWidthButton = selectedBorderWidthButton
+        currentBorderColorButton = selectedBorderColorButton
+        currentBorderWidth = selectedBorderWidth
         currentColor = selectedColor
         currentFrameStyle = selectedFrameStyle
         self.removeFromSuperview()
+        
+        // Log event to Firebase Analytics
+        RevoAnalytics.editedPipStyle()
     }
     
     func cancelButtonPress() {
-        selectedBoarderWidthButton = currentBoarderWidthButton
-        selectedBoarderColorButton = currentBoarderColorButton
-        selectedBoarderWidth = currentBoarderWidth
+        selectedBorderWidthButton = currentBorderWidthButton
+        selectedBorderColorButton = currentBorderColorButton
+        selectedBorderWidth = currentBorderWidth
         selectedColor = currentColor
         selectedFrameStyle = currentFrameStyle
         self.removeFromSuperview()

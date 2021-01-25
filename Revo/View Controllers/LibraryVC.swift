@@ -64,7 +64,7 @@ class LibraryVC: UIViewController {
     
     private let selectButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Select", for: .normal)
+        button.setTitle("Select".localized, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 15)
@@ -111,6 +111,8 @@ class LibraryVC: UIViewController {
         label.isHidden = true
         return label
     }()
+    
+    //MARK: View did load
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -118,6 +120,10 @@ class LibraryVC: UIViewController {
         configureSwipeGesture()
         fetchRecordings()
         configureViews()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        RevoAnalytics.logScreenView(for: "Library Screen", ofClass: "LibraryVC")
     }
     
     private func configureSwipeGesture() {
@@ -213,11 +219,11 @@ class LibraryVC: UIViewController {
         switch selectionState {
         case .inactive:
             selectionState = .active
-            selectButton.setTitle("Cancel", for: .normal)
+            selectButton.setTitle("Cancel".localized, for: .normal)
         case .active:
             selectionState = .inactive
             makeAllCellsInactive()
-            selectButton.setTitle("Select", for: .normal)
+            selectButton.setTitle("Select".localized, for: .normal)
         }
     }
     
@@ -232,6 +238,20 @@ class LibraryVC: UIViewController {
     
     @objc private func shareRecordings() {
         let activityVC = UIActivityViewController(activityItems: selectedRecordingsURLs, applicationActivities: nil)
+        
+        activityVC.completionWithItemsHandler = { activity, success, items, error in
+          
+            if !success {
+                // Cancelled by the user
+                return
+            }
+            
+            guard let activity = activity else { return }
+            RevoAnalytics.videoActivityCompletedWith(activity: activity)
+
+        }
+
+        
         DispatchQueue.main.async {
             self.present(activityVC, animated: true)
         }
@@ -245,13 +265,11 @@ class LibraryVC: UIViewController {
     
     // Check to see if user really wants to delete recordings
     @objc private func deletePress() {
-        let alert = UIAlertController(title: "Are you sure?", message: """
-                Recordings are removed permanently once deleted.
-                """, preferredStyle: .alert)
-        let deleteAction = UIAlertAction(title: "Delete", style: .default) { action in
+        let alert = UIAlertController(title: "Are you sure?".localized, message: "delete_recording_message".localized, preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Delete".localized, style: .default) { action in
             self.deleteRecordings()
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: "Cancel".localized, style: .cancel)
         alert.addAction(deleteAction)
         alert.addAction(cancelAction)
         self.present(alert, animated: true, completion: nil)
@@ -263,7 +281,7 @@ class LibraryVC: UIViewController {
             recordings.removeAll(where: {$0.fileURL == eachURL})
         }
         recordingOptionsView.updatePositionTo(state: .inactive)
-        selectButton.setTitle("Select", for: .normal)
+        selectButton.setTitle("Select".localized, for: .normal)
         selectionState = .inactive
         
         configureIfLibraryIsEmpty()
@@ -288,9 +306,9 @@ class LibraryVC: UIViewController {
     private func updateEmptyCollectionLabelText() {
         if UserDefaults.standard.bool(forKey: "visitedLibraryWithRecording") {
             // This is a returning user
-            emptyCollectionLabel.text = "Library currently empty"
+            emptyCollectionLabel.text = "Library currently empty".localized
         } else {
-            emptyCollectionLabel.text = "Recordings will appear here"
+            emptyCollectionLabel.text = "Recordings will appear here".localized
         }
     }
 
@@ -377,13 +395,13 @@ extension LibraryVC: RecordingViewCellDelegate {
     
     func appendSelectedRecordingWith(fileURL: URL) {
         selectedRecordingsURLs.append(fileURL)
-        recordingOptionsView.optionsLabel.text = "\(selectedRecordingsURLs.count)  selected"
+        recordingOptionsView.optionsLabel.text = "\(selectedRecordingsURLs.count)  \("selected".localized)"
         recordingOptionsView.optionsLabel.isHidden = false
     }
     
     func removeSelectedRecordingWith(fileURL: URL) {
         selectedRecordingsURLs.removeAll(where: {$0 == fileURL})
-        recordingOptionsView.optionsLabel.text = "\(selectedRecordingsURLs.count)  selected"
+        recordingOptionsView.optionsLabel.text = "\(selectedRecordingsURLs.count)  \("selected".localized)"
         
         if selectedRecordingsURLs.isEmpty {
             recordingOptionsView.updatePositionTo(state: .inactive)

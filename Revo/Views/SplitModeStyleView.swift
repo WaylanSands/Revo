@@ -35,14 +35,14 @@ class SplitModeStyleView: UIView {
     
     private let lineHeightLabel: UILabel = {
         let label = UILabel()
-        label.text = "Line Height"
+        label.text = "Line Height".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
     private let backgroundColorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Line Color"
+        label.text = "Line Color".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -56,7 +56,7 @@ class SplitModeStyleView: UIView {
     
     private let saveButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Save", for: .normal)
+        button.setTitle("Save".localized, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.addTarget(self, action: #selector(saveButtonPress), for: .touchUpInside)
         button.backgroundColor = .black
@@ -270,6 +270,9 @@ class SplitModeStyleView: UIView {
         currentLineHeight = selectedLineHeight
         currentColor = selectedColor
         self.removeFromSuperview()
+        
+        // Log event to Firebase Analytics
+        RevoAnalytics.editedSplitScreenStyle()
     }
     
     func cancelButtonPress() {

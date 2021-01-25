@@ -93,6 +93,7 @@ class MainRecordingVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        RevoAnalytics.logScreenView(for: "Main recording Screen", ofClass: "MainRecordingVC")
         configureForegroundObserver()
     }
     
@@ -176,7 +177,7 @@ class MainRecordingVC: UIViewController {
         // watermark switch is off in settings.
         view.addSubview(appLogo)
         appLogo.translatesAutoresizingMaskIntoConstraints = false
-        appLogo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
+        appLogo.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).isActive = true
         appLogo.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
     }
     
@@ -197,7 +198,7 @@ class MainRecordingVC: UIViewController {
         case .denied:
             self.sendToSettingToAllowCameraAccess()
         case .restricted:
-            Alert.showBlockingAlert(title: "Restricted access", message: "Your device's camera access is restricted please change it before proceeding.", vc: self)
+            Alert.showBlockingAlert(title: "Restricted Access".localized, message: "restricted_access_message".localized, vc: self)
         default:
             sendToSettingToAllowCameraAccess()
         }
@@ -205,9 +206,9 @@ class MainRecordingVC: UIViewController {
     
     private func sendToSettingToAllowCameraAccess() {
         DispatchQueue.main.async {
-            let message = "In order for revo to function camera access is needed. To allow camera access please toggle the switch within the app's settings"
-            let alertController = UIAlertController(title: "Camera access needed", message: message, preferredStyle: .alert)
-            let visitSettingsAction = UIAlertAction(title: "Visit settings", style: .default) { _ in
+            let message = "send_to_settings_message".localized
+            let alertController = UIAlertController(title: "Camera access needed".localized, message: message, preferredStyle: .alert)
+            let visitSettingsAction = UIAlertAction(title: "Visit settings".localized, style: .default) { _ in
                 let url = URL(string:UIApplication.openSettingsURLString)
                 if UIApplication.shared.canOpenURL(url!){
                     UIApplication.shared.open(url!, options: [:], completionHandler: nil)
@@ -297,7 +298,7 @@ class MainRecordingVC: UIViewController {
             multiCamSession.startRunning()
             
         } catch {
-            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBlockingAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
     }
     
@@ -333,7 +334,7 @@ class MainRecordingVC: UIViewController {
             singleCamSession.commitConfiguration()
             singleCamSession.startRunning()
         } catch {
-            Alert.showBlockingAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBlockingAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
     }
     
@@ -398,7 +399,7 @@ class MainRecordingVC: UIViewController {
             device.videoZoomFactor = 1
             device.unlockForConfiguration()
         } catch {
-            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
     }
     
@@ -411,7 +412,7 @@ class MainRecordingVC: UIViewController {
             return device
         } else {
             // Missing expected rear device
-            Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your rear camera. If the device is not compromised try quitting the app and trying again.", vc: self)
+            Alert.showBlockingAlert(title: "Device Error".localized, message: "cant_find_rear_camera".localized, vc: self)
             return nil
         }
     }
@@ -421,7 +422,7 @@ class MainRecordingVC: UIViewController {
             return device
         } else {
             // Missing expected front device
-            Alert.showBlockingAlert(title: "Device Error", message: "Revo can not find your front camera. If the device is not compromised try quitting the app and trying again.", vc: self)
+            Alert.showBlockingAlert(title: "Device Error".localized, message: "cant_find_front_camera".localized, vc: self)
             return nil
         }
     }
@@ -476,7 +477,7 @@ class MainRecordingVC: UIViewController {
                 break
             }
         } catch {
-            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
     }
     
@@ -521,7 +522,7 @@ class MainRecordingVC: UIViewController {
                 break
             }
         } catch {
-            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
         
     }
@@ -657,7 +658,7 @@ extension MainRecordingVC: ControlsDelegate {
             
             device.unlockForConfiguration()
         } catch {
-            Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
     }
     
@@ -723,7 +724,7 @@ extension MainRecordingVC: ControlsDelegate {
                 currentRearDevice.torchMode = torchMode
                 currentRearDevice.unlockForConfiguration()
             } catch {
-                Alert.showBasicAlert(title: "Device Error", message: error.localizedDescription, vc: self)
+                Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
             }
         }
     }

@@ -1,0 +1,136 @@
+/* 
+ Localizable.strings
+ Revo
+ 
+ Created by Waylan Sands on 24/1/21.
+ 
+ */
+
+// MARK: - Errors
+"Recording Error" = "Chyba záznamu";
+
+"Device Error" = "Chyba zařízení";
+
+"cant_find_rear_camera" = "Společnost Revo nemůže najít zadní kameru. Pokud zařízení není ohroženo, zkuste aplikaci ukončit a zkusit to znovu.";
+
+"cant_find_front_camera" = "Společnost Revo nemůže najít přední kameru. Pokud zařízení není ohroženo, zkuste aplikaci ukončit a zkusit to znovu.";
+
+
+//MARK: - Settings Screen
+
+"Settings" = "Nastavení";
+
+"Get support" = "Dostat podporu";
+
+"Remove watermark" = "Odstraňte vodoznak";
+
+"Share the app" = "Sdílejte aplikaci";
+
+"About Revo" = "O společnosti Revo";
+
+// Alerts
+
+// Support
+"Revo Support" = "Podpora Revo";
+
+"mail_not_configured" = "Vypadá to, že váš e-mailový účet není nakonfigurován pro odesílání pošty z aplikace.
+
+Pokud máte nějaké dotazy ohledně podpory, zastřelte je na waylansands@gmail.com";
+
+// Watermark
+"Remove Watermark" = "Odebrat vodoznak";
+
+"watermark_removal_message" = "Vodoznak Revo bude z budoucích nahrávek odstraněn. Připomínáme, že pokud vás aplikace baví, zanechte prosím recenzi v App Storu. Je to dlouhá cesta.";
+
+"Leave Review" = "Zanechat recenzi";
+
+"Dismiss" = "Zavrhnout";
+
+// About
+"about_revo_message" = "Revo bylo vytvořeno jako vzdělávací projekt k dalšímu prozkoumání rámce AVFoundation společnosti Apple.
+
+Jelikož aplikace používá relativně nové komponenty, je podporována pouze na zařízeních XS, XS Max, XR a později spuštěných na iOS 14.
+
+Pokud vás aplikace baví nebo byste chtěli nabídnout zpětnou vazbu, zanechte prosím recenzi v App Storu.";
+
+
+// MARK: - Recording Controls
+
+"Live Broadcasting" = "Živé vysílání";
+
+"live_broadcasting_message" = "Při fotografování v živém režimu musíte vybrat aplikaci, do které chcete vysílat.
+
+Pokud si nepřejete zahájit živé vysílání, přepněte jej opětovným stisknutím tlačítka.";
+
+"OK" = "OK";
+
+//Switch Mode
+
+"Switch Mode" = "Přepnout Režim";
+
+"switchMode_message" = "Přepínací režim umožňuje nahrávat záběry a plynule přepínat na přední a zadní kameru.
+
+Chcete-li přepínat mezi ostatními režimy, vyberte ikonu napravo od tlačítka nahrávání.";
+
+"Got it" = "Mám to";
+
+"Device Unsupported" = "Zařízení není podporováno";
+
+"device_unsupported_message" = "Tato aplikace bohužel v současné době podporuje pouze zařízení XS, XS Max, XR a později běžící na iOS 14.
+
+Aplikaci můžete používat, i když mnoho funkcí, díky nimž je tato aplikace jedinečná, nebude k dispozici.";
+
+
+// MARK: - Main Recording Screen
+
+"Restricted Access" = "Omezený přístup";
+
+"restricted_access_message" = "Přístup fotoaparátu k vašemu zařízení je omezen. Než budete pokračovat, změňte jej.";
+
+"Camera access needed" = "Je nutný přístup k fotoaparátu";
+
+"Visit settings"  = "Navštivte nastavení";
+
+"send_to_settings_message" = "Aby funkce Revo fungovala, je nutný přístup ke kameře. Chcete-li povolit přístup k fotoaparátu, přepněte přepínač v rámci nastavení aplikace.";
+
+// MARK: - Library
+
+"Select" = "Vybrat";
+
+"Cancel" = "zrušení";
+
+"Delete" = "Vymazat";
+
+"Are you sure?" = "Jsi si jistá?";
+
+"delete_recording_message" = "Po smazání jsou záznamy trvale odstraněny.";
+
+"Library currently empty" = "Knihovna je aktuálně prázdná";
+
+"Recordings will appear here" = "Zde se zobrazí nahrávky";
+
+"selected" = "vybraný";
+
+//MARK: - Split Mode Style
+
+"Line Height" = "Výška čáry";
+
+"Line Color" = "Barva čáry";
+
+"Save" = "Uložit";
+
+
+//MARK: - PIP Mode Style
+
+"Frame Style" = "Styl rámu";
+
+"Border Width" = "Šířka ohraničení";
+
+"Border Color" = "Barva ohraničení";
+
+"Square" = "Náměstí";
+
+"Circle" = "Kruh";
+
+
+

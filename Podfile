@@ -8,6 +8,7 @@ target 'Revo' do
   # Pods for Revo
 
    pod 'lottie-ios'
+   pod 'Firebase/Analytics'
 
   target 'RevoTests' do
     inherit! :search_paths

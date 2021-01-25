@@ -62,6 +62,10 @@ class RecordingPreviewVC: UIViewController {
         player.play()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        RevoAnalytics.logScreenView(for: "Recording Preview Screen", ofClass: "RecordingPreviewVC")
+    }
+    
     init(recordingURL: URL) {
         self.recordingURL = recordingURL
         super.init(nibName: nil, bundle: nil)
@@ -134,9 +138,9 @@ class RecordingPreviewVC: UIViewController {
         }
     }
     
-    @objc private func replayRecording() {
-    
-    }
+//    @objc private func replayRecording() {
+//    
+//    }
     
     @objc private func backButtonPress() {
         recordingOptionsView.isHidden = true

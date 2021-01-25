@@ -43,12 +43,12 @@ class RecordingOptionsView: UIView {
         self.addSubview(shareButton)
         shareButton.translatesAutoresizingMaskIntoConstraints = false
         shareButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 20).isActive = true
-        shareButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20).isActive = true
+        shareButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 20).isActive = true
         
         self.addSubview(deleteButton)
         deleteButton.translatesAutoresizingMaskIntoConstraints = false
         deleteButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 20).isActive = true
-        deleteButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20).isActive = true
+        deleteButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -20).isActive = true
         
         
         self.addSubview(optionsLabel)

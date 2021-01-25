@@ -1,0 +1,136 @@
+/* 
+ Localizable.strings
+ Revo
+ 
+ Created by Waylan Sands on 24/1/21.
+ 
+ */
+
+// MARK: - Errors
+"Recording Error" = "Aufnahmefehler";
+
+"Device Error" = "Gerätefehler";
+
+"cant_find_rear_camera" = "Revo kann Ihre Rückfahrkamera nicht finden. Wenn das Gerät nicht gefährdet ist, beenden Sie die App und versuchen Sie es erneut.";
+
+"cant_find_front_camera" = "Revo kann Ihre Frontkamera nicht finden. Wenn das Gerät nicht gefährdet ist, beenden Sie die App und versuchen Sie es erneut.";
+
+
+//MARK: - Settings Screen
+
+"Settings" = "die Einstellungen";
+
+"Get support" = "Hole dir Unterstützung";
+
+"Remove watermark" = "Wasserzeichen entfernen";
+
+"Share the app" = "Teile die App" ;
+
+"About Revo" = "Über Revo";
+
+// Alerts
+
+// Support
+"Revo Support" = "Revo-Unterstützung";
+
+"mail_not_configured" = "Es sieht so aus, als ob Ihr E-Mail-Konto nicht zum Senden von E-Mails über die App konfiguriert ist.
+
+Wenn Sie Supportanfragen haben, wenden Sie sich bitte an waylansands@gmail.com";
+
+// Watermark
+"Remove Watermark" = "Wasserzeichen entfernen";
+
+"watermark_removal_message" = "Das Revo-Wasserzeichen wird aus zukünftigen Aufnahmen entfernt. Zur Erinnerung: Wenn Ihnen die App gefällt, hinterlassen Sie bitte eine Bewertung im App Store. Es geht ein langer Weg.";
+
+"Leave Review" = "Eine Rezension hinterlassen";
+
+"Dismiss" = "Entlassen";
+
+// About
+"about_revo_message" = "Revo wurde als Bildungsprojekt entwickelt, um das AVFoundation-Framework von Apple weiter zu erforschen.
+
+Da die App relativ neue Komponenten verwendet, wird sie nur auf Geräten XS, XS Max, XR und höher unter iOS 14 unterstützt.
+
+Wenn Ihnen die App gefällt oder Sie Feedback geben möchten, hinterlassen Sie bitte eine Bewertung im App Store.";
+
+
+// MARK: - Recording Controls
+
+"Live Broadcasting" = "Live-Übertragung";
+
+"live_broadcasting_message" = "Wenn Sie im Live-Modus aufnehmen, müssen Sie eine App auswählen, an die Sie senden möchten.
+
+Wenn Sie keine Live-Übertragung starten möchten, klicken Sie erneut auf die Schaltfläche, um zurückzuschalten.";
+
+"OK" = "in Ordnung";
+
+//Switch Mode
+
+"Switch Mode" = "Wechselmodus";
+
+"switchMode_message" = "Im Umschaltmodus können Sie Filmmaterial aufnehmen und gleichzeitig nahtlos zur vorderen und hinteren Kamera wechseln.
+
+Um zwischen anderen Modi zu wechseln, wählen Sie das Symbol rechts neben der Aufnahmetaste.";
+
+"Got it" = "Ich habs";
+
+"Device Unsupported" = "Gerät nicht unterstützt";
+
+"device_unsupported_message" = "Leider unterstützt diese App derzeit nur Geräte XS, XS Max, XR und höher, die unter iOS 14 ausgeführt werden.
+
+Sie können die App verwenden, obwohl viele der Funktionen, die diese App einzigartig machen, nicht verfügbar sind.";
+
+
+// MARK: - Main Recording Screen
+
+"Restricted Access" = "Eingeschränkter Zugang";
+
+"restricted_access_message" = "Der Kamerazugriff Ihres Geräts ist eingeschränkt. Bitte ändern Sie ihn, bevor Sie fortfahren.";
+
+"Camera access needed" = "Kamerazugriff erforderlich";
+
+"Visit settings"  = "Besuchen Sie die Einstellungen";
+
+"send_to_settings_message" = "Damit Revo funktioniert, ist ein Kamerazugriff erforderlich. Um den Zugriff auf die Kamera zu ermöglichen, schalten Sie den Schalter in den Einstellungen der App um";
+
+// MARK: - Library
+
+"Select" = "Wählen";
+
+"Cancel" = "Stornieren";
+
+"Delete" = "Löschen";
+
+"Are you sure?" = "Bist du sicher?";
+
+"delete_recording_message" = "Aufnahmen werden nach dem Löschen dauerhaft entfernt.";
+
+"Library currently empty" = "Bibliothek derzeit leer";
+
+"Recordings will appear here" = "Aufnahmen erscheinen hier";
+
+"selected" = "ausgewählt";
+
+//MARK: - Split Mode Style
+
+"Line Height" = "Zeilenhöhe";
+
+"Line Color" = "Linienfarbe";
+
+"Save" = "Sparen";
+
+
+//MARK: - PIP Mode Style
+
+"Frame Style" = "Rahmenstil";
+
+"Border Width" = "Rahmenbreite";
+
+"Border Color" = "Randfarbe";
+
+"Square" = "Quadrat";
+
+"Circle" = "Kreis";
+
+
+

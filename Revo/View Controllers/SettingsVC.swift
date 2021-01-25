@@ -20,7 +20,7 @@ class SettingsVC: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Settings"
+        label.text = "Settings".localized
         label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         label.textColor = RevoColor.blackText
         label.textAlignment = .center
@@ -29,23 +29,23 @@ class SettingsVC: UIViewController {
     
     private lazy var supportButton: UIButton = {
        let button = UIButton()
-        button.setTitle("Get Support", for: .normal)
+        button.setTitle("Get support".localized, for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: view.frame.width - 40, bottom: 0, right: 0)
+        button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(getSupport), for: .touchUpInside)
         button.setImage(RevoImages.mailIcon, for: .normal)
-        button.contentHorizontalAlignment = .left
+        button.contentHorizontalAlignment = .leading
         return button
     }()
     
     private let watermarkButton: UIButton = {
        let button = UIButton()
-        button.setTitle("Remove watermark", for: .normal)
+        button.setTitle("Remove watermark".localized, for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
-        button.contentHorizontalAlignment = .left
+        button.contentEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0)
+        button.contentHorizontalAlignment = .leading
         return button
     }()
     
@@ -58,31 +58,32 @@ class SettingsVC: UIViewController {
     
     private lazy var shareButton: UIButton = {
        let button = UIButton()
-        button.setTitle("Share the app", for: .normal)
+        button.setTitle("Share the app".localized, for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: view.frame.width - 40, bottom: 0, right: 0)
+        button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(shareApp), for: .touchUpInside)
         button.setImage(RevoImages.blackShareIcon, for: .normal)
-        button.contentHorizontalAlignment = .left
+        button.contentHorizontalAlignment = .leading
         return button
     }()
     
     private lazy var aboutButton: UIButton = {
        let button = UIButton()
-        button.setTitle("About revo", for: .normal)
+        button.setTitle("About Revo".localized, for: .normal)
         button.setTitleColor(RevoColor.blackText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: view.frame.width - 40, bottom: 0, right: 0)
-        button.setImage(RevoImages.blackAppIcon, for: .normal)
-        button.contentHorizontalAlignment = .left
+        button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(aboutRevo), for: .touchUpInside)
+        button.setImage(RevoImages.blackAppIcon, for: .normal)
+        button.contentHorizontalAlignment = .leading
+
         return button
     }()
     
     private let versionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Version 1.0.1"
+        label.text = "Version 1.0.2"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.black.withAlphaComponent(0.3)
         label.textAlignment = .center
@@ -96,6 +97,8 @@ class SettingsVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        RevoAnalytics.logScreenView(for: "Settings Screen", ofClass: "SettingsVC")
+
         let watermarkIsHidden = UserDefaults.standard.bool(forKey: "watermarkIsHidden")
         
         // Checking whether to toggle on the remove watermark switch for a returning user.
@@ -184,12 +187,8 @@ class SettingsVC: UIViewController {
                 present(mail, animated: true)
             } else {
                 // Mail is not setup for user
-                let alert = UIAlertController(title: "Revo Support", message: """
-                    It looks like your mail account isn't configured to send mail from the app.
-
-                    If you have any support enquires please shoot them through to waylansands@gmail.com"
-                    """, preferredStyle: .alert)
-                let dismissAction = UIAlertAction(title: "Dimiss", style: .default)
+                let alert = UIAlertController(title: "Revo Support".localized, message: "mail_not_configured".localized, preferredStyle: .alert)
+                let dismissAction = UIAlertAction(title: "Dimiss".localized, style: .default)
                 alert.addAction(dismissAction)
                 self.present(alert, animated: true, completion: nil)
             }
@@ -203,17 +202,16 @@ class SettingsVC: UIViewController {
             UserDefaults.standard.setValue(true, forKey: "promptedToLeaveReview")
             UserDefaults.standard.setValue(true, forKey: "watermarkIsHidden")
             
-            let alert = UIAlertController(title: "Remove Watermark", message: """
-                The Revo watermark will be removed from future recordings.
-
-                As a reminder, if you're enjoying the app please leave a review on the App Store. It goes a long way.
-                """, preferredStyle: .alert)
-            let cancelAction = UIAlertAction(title: "Dismiss", style: .cancel)
-            let reviewAction = UIAlertAction(title: "Leave Review", style: .default) { _ in
+            RevoAnalytics.logWatermarkRemoval()
+            
+            let alert = UIAlertController(title: "Remove Watermark".localized, message: "watermark_removal_message".localized, preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "Dismiss".localized, style: .cancel)
+            let reviewAction = UIAlertAction(title: "Leave Review".localized, style: .default) { _ in
                 // User has selected to leave a review
                 // Take user to the revo app on the App Store
                 if let writeReviewURL = URL(string: "https://apps.apple.com/app/id1547580951?action=write-review") {
                     UIApplication.shared.open(writeReviewURL, options: [:])
+                    RevoAnalytics.logAppStoreReview()
                 }
             }
             alert.addAction(cancelAction)
@@ -229,14 +227,8 @@ class SettingsVC: UIViewController {
     }
     
     @objc private func aboutRevo() {
-            let alert = UIAlertController(title: "About Revo", message: """
-                Revo was created as an educational project to further explore Apple's AVFoundation framework.
-
-                As the app uses relatively new components it is only supported on devices XS, XS Max, XR and later running on iOS 14.
-                
-                If you enjoy the app or would like to offer any feedback please leave a review on the Appstore.
-                """, preferredStyle: .alert)
-        let deleteAction = UIAlertAction(title: "Dismiss", style: .default)
+        let alert = UIAlertController(title: "About Revo".localized, message: "about_revo_message".localized, preferredStyle: .alert)
+        let deleteAction = UIAlertAction(title: "Dismiss".localized, style: .default)
             alert.addAction(deleteAction)
             present(alert, animated: true, completion: nil)
     }
@@ -249,6 +241,17 @@ class SettingsVC: UIViewController {
         let items: [Any] = ["Take a look at this neat video app, you can switch between cameras while recording!", URL(string: "https://apps.apple.com/us/app/revo-reverse-video/id1547580951")!]
         let activityVC = UIActivityViewController(activityItems: items, applicationActivities: nil)
         activityVC.excludedActivityTypes = [.copyToPasteboard, .addToReadingList]
+        
+        activityVC.completionWithItemsHandler = { activity, success, items, error in
+            if !success {
+                // Cancelled by the user
+                return
+            }
+            
+            guard let activity = activity else { return }
+            RevoAnalytics.linkActivityCompletedWith(activity: activity)
+        }
+        
         present(activityVC, animated: true)
     }
     

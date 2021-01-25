@@ -1,0 +1,136 @@
+/* 
+ Localizable.strings
+ Revo
+ 
+ Created by Waylan Sands on 24/1/21.
+ 
+ */
+
+// MARK: - Errors
+"Recording Error" = "记录错误";
+
+"Device Error" = "设备错误";
+
+"cant_find_rear_camera" = "Revo找不到您的后置摄像头。如果设备没有受到破坏，请尝试退出该应用，然后重试.";
+
+"cant_find_front_camera" = "Revo找不到您的前置摄像头。如果设备没有受到损坏，请尝试退出该应用，然后重试。";
+
+
+//MARK: - Settings Screen
+
+"Settings" = "设定值";
+
+"Get support" = "得到支持";
+
+"Remove watermark" = "删除水印";
+
+"Share the app" = "分享应用";
+
+"About Revo" = "关于雷沃";
+
+// Alerts
+
+// Support
+"Revo Support" = "Revo支持";
+
+"mail_not_configured" = "您的邮件帐户似乎未配置为从应用发送邮件。
+
+如果您有任何支持咨询，请直接将他们发送至waylansands@gmail.com";
+
+// Watermark
+"Remove Watermark" = "删除水印";
+
+"watermark_removal_message" = "Revo水印将从将来的录音中删除。提醒您，如果您喜欢此应用，请在App Store上进行评论。很长的路要走.";
+
+"Leave Review" = "留下评论";
+
+"Dismiss" = "解雇";
+
+// About
+"about_revo_message" = "Revo被创建为一个教育项目，旨在进一步探索Apple的AVFoundation框架。
+
+由于该应用使用相对较新的组件，因此仅在设备XS，XS Max，XR和更高版本的iOS 14上受支持。
+
+如果您喜欢该应用程序，或者想提供任何反馈，请在App Store上进行评论。";
+
+
+// MARK: - Recording Controls
+
+"Live Broadcasting" = "现场直播";
+
+"live_broadcasting_message" = "在实时模式下拍摄时，需要选择要广播到的应用程序。
+
+如果您不想开始现场直播，请再次选择该按钮以切换回去。";
+
+"OK" = "好";
+
+//Switch Mode
+
+"Switch Mode" = "切换模式";
+
+"switchMode_message" = "切换模式可让您在无缝切换到前后摄像头的同时录制素材。
+
+要在其他模式之间切换，请选择录制按钮右侧的图标。";
+
+"Got it" = "得到它了";
+
+"Device Unsupported" = "不支援的装置";
+
+"device_unsupported_message" = "不幸的是，该应用程序当前仅支持设备XS，XS Max，XR以及以后在iOS 14上运行的设备。
+
+尽管许多使该应用程序独特的功能将不可用，但您仍可以使用该应用程序。";
+
+
+// MARK: - Main Recording Screen
+
+"Restricted Access" = "禁止进入";
+
+"restricted_access_message" = "您设备的摄像头访问权限受到限制，请先进行更改，然后再继续。";
+
+"Camera access needed" = "需要摄像头访问";
+
+"Visit settings"  = "造访设定";
+
+"send_to_settings_message" = "为了使Revo正常运行，需要使用摄像头。要允许摄像头访问，请在应用设置内切换开关。";
+
+// MARK: - Library
+
+"Select" = "选择";
+
+"Cancel" = "取消";
+
+"Delete" = "删除";
+
+"Are you sure?" = "你确定吗？";
+
+"delete_recording_message" = "删除后，记录将永久删除。";
+
+"Library currently empty" = "图书馆目前为空";
+
+"Recordings will appear here" = "录音将出现在这里";
+
+"selected" = "已选";
+
+//MARK: - Split Mode Style
+
+"Line Height" = "线高";
+
+"Line Color" = "线色";
+
+"Save" = "保存";
+
+
+//MARK: - PIP Mode Style
+
+"Frame Style" = "镜框样式";
+
+"Border Width" = "边框宽度";
+
+"Border Color" = "边框颜色";
+
+"Square" = "广场";
+
+"Circle" = "圈";
+
+
+

@@ -1,0 +1,136 @@
+/* 
+ Localizable.strings
+ Revo
+ 
+ Created by Waylan Sands on 24/1/21.
+ 
+ */
+
+// MARK: - Errors
+"Recording Error" = "Erreur d'enregistrement";
+
+"Device Error" = "Erreur de périphérique";
+
+"cant_find_rear_camera" = "Revo ne trouve pas votre caméra arrière. Si l'appareil n'est pas compromis, essayez de quitter l'application et réessayer.";
+
+"cant_find_front_camera" = "Revo ne trouve pas votre caméra frontale. Si l'appareil n'est pas compromis, essayez de quitter l'application et réessayer.";
+
+
+//MARK: - Settings Screen
+
+"Settings" = "Réglages";
+
+"Get support" = "Obtenir de l'aide";
+
+"Remove watermark" = "Supprimer filigrane";
+
+"Share the app" = "Partagez l'appli";
+
+"About Revo" = "À propos de Revo";
+
+// Alerts
+
+// Support
+"Revo Support" = "Support Revo";
+
+"mail_not_configured" = "Il semble que votre compte de messagerie ne soit pas configuré pour envoyer des e-mails depuis l'application.
+
+Si vous avez des demandes d'assistance, veuillez les envoyer à waylansands@gmail.com";
+
+// Watermark
+"Remove Watermark" = "Supprimer filigrane";
+
+"watermark_removal_message" = "TLe filigrane Revo sera supprimé des futurs enregistrements. Pour rappel, si vous appréciez l'application, veuillez laisser un avis sur l'App Store. Cela va très loin.";
+
+"Leave Review" = "Laisser un avis";
+
+"Dismiss" = "Rejeter";
+
+// About
+"about_revo_message" = "Revo a été créé en tant que projet éducatif pour explorer davantage le cadre AVFoundation d'Apple.
+
+Comme l'application utilise des composants relativement nouveaux, elle n'est prise en charge que sur les appareils XS, XS Max, XR et versions ultérieures fonctionnant sous iOS 14.
+
+Si vous appréciez l'application ou souhaitez faire part de vos commentaires, veuillez laisser un avis sur l'App Store.";
+
+
+// MARK: - Recording Controls
+
+"Live Broadcasting" = "La diffusion en direct";
+
+"live_broadcasting_message" = "Lors de la prise de vue en mode direct, vous devez sélectionner une application vers laquelle vous souhaitez diffuser.
+
+Si vous ne souhaitez pas démarrer une diffusion en direct, sélectionnez à nouveau le bouton pour revenir en arrière.";
+
+"OK" = "D'accord";
+
+//Switch Mode
+
+"Switch Mode" = "Mode de commutation";
+
+"switchMode_message" = "Le mode de commutation vous permet d'enregistrer des séquences tout en basculant de manière transparente vers la caméra avant et arrière.
+
+Pour basculer entre les autres modes, sélectionnez l'icône à droite du bouton d'enregistrement.";
+
+"Got it" = "Je l'ai";
+
+"Device Unsupported" = "Appareil non pris en charge";
+
+"device_unsupported_message" = "Malheureusement, cette application ne prend actuellement en charge que les appareils XS, XS Max, XR et versions ultérieures fonctionnant sous iOS 14.
+
+Vous pouvez utiliser l'application bien que de nombreuses fonctionnalités qui rendent cette application unique ne soient pas disponibles.";
+
+
+// MARK: - Main Recording Screen
+
+"Restricted Access" = "Accès restreint";
+
+"restricted_access_message" = "L'accès à la caméra de votre appareil est restreint, veuillez le modifier avant de continuer.";
+
+"Camera access needed" = "Accès à la caméra nécessaire";
+
+"Visit settings"  = "Paramètres de visite";
+
+"send_to_settings_message" = "Pour que Revo fonctionne, un accès à la caméra est nécessaire. Pour autoriser l'accès à la caméra, veuillez basculer le commutateur dans les paramètres de l'application.";
+
+// MARK: - Library
+
+"Select" = "Sélectionner";
+
+"Cancel" = "Annuler";
+
+"Delete" = "Delete";
+
+"Are you sure?" = "Êtes-vous sûr?";
+
+"delete_recording_message" = "Les enregistrements sont supprimés définitivement une fois supprimés.";
+
+"Library currently empty" = "Bibliothèque actuellement vide";
+
+"Recordings will appear here" = "Les enregistrements apparaîtront ici";
+
+"selected" = "choisi";
+
+//MARK: - Split Mode Style
+
+"Line Height" = "Hauteur de la ligne";
+
+"Line Color" = "Couleur de la ligne";
+
+"Save" = "Sauver";
+
+
+//MARK: - PIP Mode Style
+
+"Frame Style" = "Style de cadre";
+
+"Border Width" = "Largeur de la bordure";
+
+"Border Color" = "Couleur de la bordure";
+
+"Square" = "Carré";
+
+"Circle" = "Cercle";
+
+
+

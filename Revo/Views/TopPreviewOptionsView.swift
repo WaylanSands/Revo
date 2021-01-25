@@ -42,7 +42,7 @@ class TopPreviewOptionsView: UIView {
         self.addSubview(backButton)
         backButton.translatesAutoresizingMaskIntoConstraints = false
         backButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -15).isActive = true
-        backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20).isActive = true
+        backButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 20).isActive = true
         
         self.addSubview(dateLabel)
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ class TopPreviewOptionsView: UIView {
         self.addSubview(audioButton)
         audioButton.translatesAutoresizingMaskIntoConstraints = false
         audioButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -15).isActive = true
-        audioButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20).isActive = true
+        audioButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -20).isActive = true
     }
     
     func updatePositionTo(state: SelectionState) {
