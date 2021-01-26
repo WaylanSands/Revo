@@ -91,6 +91,8 @@ struct RevoAnalytics {
             presentationModeString = "switchCam_mode"
         case .pip:
             presentationModeString = "pip_mode"
+        case .web:
+            break
         }
         
         Analytics.logEvent(recordingModeString + presentationModeString, parameters: nil)

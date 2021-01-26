@@ -240,7 +240,6 @@ class LibraryVC: UIViewController {
         let activityVC = UIActivityViewController(activityItems: selectedRecordingsURLs, applicationActivities: nil)
         
         activityVC.completionWithItemsHandler = { activity, success, items, error in
-          
             if !success {
                 // Cancelled by the user
                 return
@@ -248,9 +247,7 @@ class LibraryVC: UIViewController {
             
             guard let activity = activity else { return }
             RevoAnalytics.videoActivityCompletedWith(activity: activity)
-
         }
-
         
         DispatchQueue.main.async {
             self.present(activityVC, animated: true)

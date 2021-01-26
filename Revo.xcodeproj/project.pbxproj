@@ -10,6 +10,7 @@
 		314B8EA9D83B6E9EE1067792 /* Pods_Revo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A16C4FD4F333AAED0D518C1D /* Pods_Revo.framework */; };
 		48523BB325BE43D400B0AF40 /* RevoAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48523BB225BE43D400B0AF40 /* RevoAnalytics.swift */; };
 		48523BBB25BE61C700B0AF40 /* UIView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48523BBA25BE61C700B0AF40 /* UIView+Ext.swift */; };
+		4852D57F25BFB22A0075CF52 /* WebVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4852D57E25BFB22A0075CF52 /* WebVC.swift */; };
 		4858226E25BD13930005DF6D /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4858226D25BD13930005DF6D /* String+Ext.swift */; };
 		4858227925BD18E20005DF6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4858227B25BD18E20005DF6D /* Localizable.strings */; };
 		485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EEA5625AD5A3500F88165 /* AssetWriterError.swift */; };
@@ -78,6 +79,9 @@
 		2D76CBC81F009E22A641B95B /* Pods_RevoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RevoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		48523BB225BE43D400B0AF40 /* RevoAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevoAnalytics.swift; sourceTree = "<group>"; };
 		48523BBA25BE61C700B0AF40 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
+		4852D57C25BFA52F0075CF52 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		4852D57D25BFA52F0075CF52 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4852D57E25BFB22A0075CF52 /* WebVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebVC.swift; sourceTree = "<group>"; };
 		4858226D25BD13930005DF6D /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		4858227525BD186D0005DF6D /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4858227A25BD18E20005DF6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -200,6 +204,7 @@
 				48B6587D25AD171A0043DEDF /* SplitScreenVC.swift */,
 				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
 				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
+				4852D57E25BFB22A0075CF52 /* WebVC.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -468,6 +473,7 @@
 				fr,
 				es,
 				hi,
+				ar,
 			);
 			mainGroup = 48F72D3F25AD12520064E8C8;
 			productRefGroup = 48F72D4925AD12520064E8C8 /* Products */;
@@ -628,6 +634,7 @@
 				48B658DE25AD18AD0043DEDF /* Bundel+Ext.swift in Sources */,
 				48B658B025AD18370043DEDF /* FocusAnimationView.swift in Sources */,
 				48523BB325BE43D400B0AF40 /* RevoAnalytics.swift in Sources */,
+				4852D57F25BFB22A0075CF52 /* WebVC.swift in Sources */,
 				48B658CF25AD18960043DEDF /* Time.swift in Sources */,
 				48B658C725AD18840043DEDF /* RevoImages.swift in Sources */,
 				48B658DF25AD18AD0043DEDF /* FileManager+Ext.swift in Sources */,
@@ -704,6 +711,7 @@
 				48774CA425BECD8B001361EC /* fr */,
 				48774CA625BECF28001361EC /* es */,
 				48774CA825BED0F2001361EC /* hi */,
+				4852D57D25BFA52F0075CF52 /* ar */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -723,6 +731,7 @@
 				48774CA325BECD8B001361EC /* fr */,
 				48774CA525BECF27001361EC /* es */,
 				48774CA725BED0F2001361EC /* hi */,
+				4852D57C25BFA52F0075CF52 /* ar */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

@@ -1,0 +1,136 @@
+/* 
+ Localizable.strings
+ Revo
+ 
+ Created by Waylan Sands on 24/1/21.
+ 
+ */
+
+// MARK: - Errors
+"Recording Error" = "خطأ في التسجيل";
+
+"Device Error" = "خطأ في الجهاز";
+
+"cant_find_rear_camera" = "لا يمكن لـ Revo العثور على الكاميرا الخلفية. إذا لم يتم اختراق الجهاز ، فحاول إنهاء التطبيق والمحاولة مرة أخرى.";
+
+"cant_find_front_camera" = "لا يمكن لـ Revo العثور على الكاميرا الأمامية الخاصة بك. إذا لم يتم اختراق الجهاز ، فحاول إنهاء التطبيق والمحاولة مرة أخرى.";
+
+
+//MARK: - Settings Screen
+
+"Settings" = "إعدادات";
+
+"Get support" = "احصل على الدعم";
+
+"Remove watermark" = "إزالة العلامة المائية";
+
+"Share the app" = "شارك التطبيق";
+
+"About Revo" = "حول ريفو";
+
+// Alerts
+
+// Support
+"Revo Support" = "دعم ريفو";
+
+"mail_not_configured" = "يبدو أن حساب البريد الخاص بك غير مهيأ لإرسال بريد من التطبيق.
+
+إذا كان لديك أي استفسارات متعلقة بالدعم ، يرجى إرسالها إلى waylansands@gmail.com";
+
+// Watermark
+"Remove Watermark" = "إزالة العلامة المائية";
+
+"watermark_removal_message" = "ستتم إزالة العلامة المائية Revo من التسجيلات المستقبلية. للتذكير ، إذا كنت تستمتع بالتطبيق ، فيرجى ترك تعليق على App Store. يقطع شوطا طويلا.";
+
+"Leave Review" = "اترك مراجعة";
+
+"Dismiss" = "رفض";
+
+// About
+"about_revo_message" = "تم إنشاء Revo كمشروع تعليمي لاستكشاف إطار عمل AVFoundation الخاص بشركة Apple.
+
+نظرًا لأن التطبيق يستخدم مكونات جديدة نسبيًا ، فهو مدعوم فقط على الأجهزة XS و XS Max و XR والإصدارات الأحدث التي تعمل بنظام iOS 14.
+
+إذا كنت تستمتع بالتطبيق أو ترغب في تقديم أي ملاحظات ، فيرجى ترك تعليق على متجر التطبيقات.";
+
+
+// MARK: - Recording Controls
+
+"Live Broadcasting" = "البث المباشر";
+
+"live_broadcasting_message" = "عند التصوير في الوضع المباشر ، يُطلب منك تحديد التطبيق الذي ترغب في البث إليه.
+
+إذا كنت لا ترغب في بدء بث مباشر ، فحدد الزر مرة أخرى للتبديل مرة أخرى.";
+
+"OK" = "حسنا";
+
+//Switch Mode
+
+"Switch Mode" = "تغيير النظام";
+
+"switchMode_message" = "يسمح لك وضع التبديل بتسجيل لقطات أثناء التبديل بسلاسة إلى الكاميرا الأمامية والخلفية.
+
+للتبديل بين الأوضاع الأخرى ، حدد الرمز الموجود على يمين زر التسجيل.";
+
+"Got it" = "فهمتك";
+
+"Device Unsupported" = "الجهاز غير مدعوم";
+
+"device_unsupported_message" = "لسوء الحظ ، يدعم هذا التطبيق حاليًا فقط الأجهزة XS و XS Max و XR والتي تعمل لاحقًا بنظام iOS 14
+
+يمكنك استخدام التطبيق على الرغم من أن العديد من الميزات التي تجعل هذا التطبيق فريدًا لن تكون متاحة.";
+
+
+// MARK: - Main Recording Screen
+
+"Restricted Access" = "وصول مقيد";
+
+"restricted_access_message" = "الوصول إلى الكاميرا بجهازك مقيد ، يرجى تغييره قبل المتابعة.";
+
+"Camera access needed" = "يلزم الوصول إلى الكاميرا";
+
+"Visit settings"  = "قم بزيارة الإعدادات";
+
+"send_to_settings_message" = "لكي يعمل Revo ، يلزم الوصول إلى الكاميرا. للسماح بالوصول إلى الكاميرا ، يرجى تبديل المفتاح داخل إعدادات التطبيق.";
+
+// MARK: - Library
+
+"Select" = "تحديد";
+
+"Cancel" = "إلغاء";
+
+"Delete" = "حذف";
+
+"Are you sure?" = "هل أنت واثق؟";
+
+"delete_recording_message" = "تتم إزالة التسجيلات بشكل دائم بمجرد حذفها.";
+
+"Library currently empty" = "المكتبة فارغة حاليا";
+
+"Recordings will appear here" = "ستظهر التسجيلات هنا";
+
+"selected" = "المحدد";
+
+//MARK: - Split Mode Style
+
+"Line Height" = "ارتفاع خط";
+
+"Line Color" = "لون الخط";
+
+"Save" = "حفظ";
+
+
+//MARK: - PIP Mode Style
+
+"Frame Style" = "نمط الإطار";
+
+"Border Width" = "عرض الحدود";
+
+"Border Color" = "لون الحدود";
+
+"Square" = "ميدان";
+
+"Circle" = "دائرة";
+
+
+

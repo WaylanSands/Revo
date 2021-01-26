@@ -21,6 +21,7 @@ protocol ControlsDelegate: class {
 enum PresentationMode {
     case splitScreen
     case switchCam
+    case web
     case pip
 }
 
@@ -226,7 +227,7 @@ class RecordingControlsVC: UIViewController {
         addGestureRecognisers()
         configureViews()
     }
-    
+        
     override func viewDidAppear(_ animated: Bool) {
         updateLibraryButtonThumbnail()
         
@@ -235,7 +236,6 @@ class RecordingControlsVC: UIViewController {
         if !AVCaptureMultiCamSession.isMultiCamSupported {
             presentationButton.isHidden = true
         }
-    
     }
     
     private func configureNotificationObservers() {
@@ -540,6 +540,7 @@ class RecordingControlsVC: UIViewController {
         }, completion: nil)
     }
     
+    let webView = WebVC()
     
     @objc private func changeRecordingPresentation() {
         switch presentationMode {
@@ -556,6 +557,12 @@ class RecordingControlsVC: UIViewController {
             delegate?.changePresentationTo(mode: .splitScreen)
             presentationMode = .splitScreen
         case .splitScreen:
+            presentationButton.setImage(RevoImages.webIcon, for: .normal)
+            delegate?.changePresentationTo(mode: .web)
+            webView.modalPresentationStyle = .fullScreen
+            present(webView, animated: true, completion: nil)
+            presentationMode = .web
+        case .web:
             presentationButton.setImage(RevoImages.switchFullScreenPreview, for: .normal)
             delegate?.changePresentationTo(mode: .switchCam)
             editPreviewStyleButton.isHidden = true

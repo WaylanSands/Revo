@@ -41,6 +41,7 @@ class MainRecordingVC: UIViewController {
     
     private let multiCamSession = AVCaptureMultiCamSession()
     private let singleCamSession = AVCaptureSession()
+    private let webCamSession = AVCaptureSession()
     private var selectedRearDevice: AVCaptureDevice?
     
     enum ActiveSingleCamera {
@@ -95,6 +96,11 @@ class MainRecordingVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         RevoAnalytics.logScreenView(for: "Main recording Screen", ofClass: "MainRecordingVC")
         configureForegroundObserver()
+        
+//        let webView = WebVC(url: URL(string: "https://www.google.com")!)
+//        webView.modalPresentationStyle = .fullScreen
+//        present(webView, animated: false, completion: nil)
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -346,6 +352,8 @@ class MainRecordingVC: UIViewController {
         activeRearPreviewLayerLayer.session = nil
         activeFrontPreviewLayerLayer.session = nil
         
+        print(presentationMode)
+        
         switch presentationMode {
         case .switchCam:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
@@ -381,8 +389,33 @@ class MainRecordingVC: UIViewController {
             frontFullScreenPreviewView.isUserInteractionEnabled = false
             frontFloatingPreviewView.isHidden = true
             rearPreviewView.isHidden = true
+        case .web:
+            setupSingleCam()
         }
         multiCamSession.commitConfiguration()
+    }
+    
+    private func setupSingleCam() {
+        webCamSession.beginConfiguration()
+
+        let device = frontCamera()!
+
+        do {
+            let deviceInput = try AVCaptureDeviceInput(device: device)
+
+            for each in webCamSession.inputs {
+                webCamSession.removeInput(each)
+            }
+
+            webCamSession.addInput(deviceInput)
+            topWindowRecordingControlsVC.webView.frontFloatingPreviewView.videoPreviewLayer.session = webCamSession
+            activeFrontPreviewLayerLayer = topWindowRecordingControlsVC.webView.frontFloatingPreviewView.videoPreviewLayer
+
+            webCamSession.commitConfiguration()
+            webCamSession.startRunning()
+        } catch {
+            Alert.showBlockingAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
+        }
     }
     
     /// Version 1 of revo does not allow front device's setting to be changed out
@@ -640,6 +673,8 @@ extension MainRecordingVC: ControlsDelegate {
             } else if singleCamSession.isRunning && activeSingleCam == .rear {
                 setupSingleCamSessionFor(cameraPosition: .front)
             }
+        case .web:
+            break
         }
     }
     

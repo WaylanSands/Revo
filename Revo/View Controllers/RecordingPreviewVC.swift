@@ -133,14 +133,21 @@ class RecordingPreviewVC: UIViewController {
     
     @objc private func shareRecording() {
         let activityVC = UIActivityViewController(activityItems: [recordingURL!], applicationActivities: nil)
+        
+        activityVC.completionWithItemsHandler = { activity, success, items, error in
+            if !success {
+                // Cancelled by the user
+                return
+            }
+            
+            guard let activity = activity else { return }
+            RevoAnalytics.videoActivityCompletedWith(activity: activity)
+        }
+        
         DispatchQueue.main.async {
             self.present(activityVC, animated: true)
         }
     }
-    
-//    @objc private func replayRecording() {
-//    
-//    }
     
     @objc private func backButtonPress() {
         recordingOptionsView.isHidden = true

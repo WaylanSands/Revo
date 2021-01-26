@@ -21,9 +21,11 @@ struct RevoImages {
     static let settingsIcon = UIImage(named: "settings_icon")
     static let flashOnIcon = UIImage(named: "flash_on_icon")
     static let libraryIcon = UIImage(named: "library_icon")
+    static let webIcon = UIImage(named: "web_preview_icon")
     static let zoomIcon = UIImage(named: "zoom_icon")
     static let infoIcon = UIImage(named: "info_icon")
     static let isoIcon = UIImage(named: "iso_icon")
+
         
     
     // SF Symbols
