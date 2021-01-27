@@ -15,6 +15,7 @@ protocol ControlsDelegate: class {
     func cameraSelectionOf(selection: CameraSelection)
     func editPreviewStyleFor(mode: PresentationMode)
     func switchPreviewsFor(mode: PresentationMode)
+    func toggleRecodingTo(mode: RecordingMode)
     func changeTorchTo(mode: TorchMode)
 }
 
@@ -84,6 +85,7 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
+    private let modeSelectView = ModeSelectView()
     private let settingsVC = SettingsVC()
     
     private var currentSetting: CameraSetting?
@@ -103,9 +105,15 @@ class RecordingControlsVC: UIViewController {
     
     weak var delegate: ControlsDelegate?
     
-    
     // MARK: Record Button
     private let recordingButton = RecordButtonView()
+        
+    private let lowerDarkView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.isUserInteractionEnabled = false
+        return view
+    }()
     
     private let timeLabel: UILabel = {
         let label = UILabel()
@@ -157,13 +165,6 @@ class RecordingControlsVC: UIViewController {
         return button
     }()
     
-    private let presentationButton: UIButton = {
-        let button = UIButton()
-        button.setImage(RevoImages.switchFullScreenPreview, for: .normal)
-        button.addTarget(self, action: #selector(changeRecordingPresentation), for: .touchUpInside)
-        return button
-    }()
-    
     let cameraSelectionButton: UIButton = {
         let button = UIButton()
         button.setTitle("1", for: .normal)
@@ -185,7 +186,6 @@ class RecordingControlsVC: UIViewController {
         let button = UIButton()
         button.setImage(RevoImages.switchPreviews, for:.normal)
         button.addTarget(self, action: #selector(switchPreviews), for: .touchUpInside)
-        button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 20)
         return button
     }()
     
@@ -223,8 +223,8 @@ class RecordingControlsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureNotificationObservers()
         addGestureRecognisers()
+        configureObservers()
         configureViews()
     }
         
@@ -234,17 +234,24 @@ class RecordingControlsVC: UIViewController {
         // Hide the presentationButton button to limit the user's options for
         // toggling features which use AVCaptureMultiCamSession.
         if !AVCaptureMultiCamSession.isMultiCamSupported {
-            presentationButton.isHidden = true
+//            presentationButton.isHidden = true
         }
     }
+
     
-    private func configureNotificationObservers() {
+    private func configureObservers() {
         // Observe when new preview style has been saved
         NotificationCenter.default.addObserver(self, selector: #selector(savePreviewStyle), name: NSNotification.Name(rawValue: "savedStyle"), object: nil)
         
         // Recognising device orientation changes
         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
+        
+        // Observe when MainRecordingVC's webToolBarView is triggering actions
+        NotificationCenter.default.addObserver(self, selector: #selector(recordingModePress), name: NSNotification.Name(rawValue: "toggleCameraMode"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(recordButtonTap), name: NSNotification.Name(rawValue: "recordScreen"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(visitLibraryVC), name: NSNotification.Name(rawValue: "visitLibrary"), object: nil)
     }
+
     
     private func addGestureRecognisers() {
         recordingButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recordButtonTap)))
@@ -274,7 +281,6 @@ class RecordingControlsVC: UIViewController {
             
             // Buttons will be rotated to reflect device orientation
             UIView.animate(withDuration: 0.3, animations: {
-                self.presentationButton.transform = transform
                 self.editPreviewStyleButton.transform = transform
                 self.recordingModeButton.transform = transform
                 self.exposureButton.transform = transform
@@ -303,7 +309,6 @@ class RecordingControlsVC: UIViewController {
     private func configureViews() {
         // Added PassThroughView that allows touches to fall through to lower window. This
         // passThroughView is the lowest sub-view, any UIViews above will respond to touches
-        
         let passThroughView = PassThroughView()
         passThroughView.frame = view.frame
         view.addSubview(passThroughView)
@@ -330,6 +335,13 @@ class RecordingControlsVC: UIViewController {
         switchCamInfoButton.centerYAnchor.constraint(equalTo: timeLabel.centerYAnchor, constant: 0).isActive = true
         switchCamInfoButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         
+        view.addSubview(lowerDarkView)
+        lowerDarkView.translatesAutoresizingMaskIntoConstraints = false
+        lowerDarkView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        lowerDarkView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        lowerDarkView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        lowerDarkView.heightAnchor.constraint(equalToConstant: 170).isActive = true
+        
         view.addSubview(libraryButton)
         libraryButton.translatesAutoresizingMaskIntoConstraints = false
         libraryButton.centerYAnchor.constraint(equalTo: view.bottomAnchor, constant: -80).isActive = true
@@ -337,12 +349,12 @@ class RecordingControlsVC: UIViewController {
         libraryButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        view.addSubview(cameraSelectionButton)
-        cameraSelectionButton.translatesAutoresizingMaskIntoConstraints = false
-        cameraSelectionButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        cameraSelectionButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-        cameraSelectionButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        cameraSelectionButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        view.addSubview(switchButton)
+        switchButton.translatesAutoresizingMaskIntoConstraints = false
+        switchButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
+        switchButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        switchButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        switchButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
         
         view.addSubview(recordingModeButton)
         recordingModeButton.translatesAutoresizingMaskIntoConstraints = false
@@ -350,11 +362,12 @@ class RecordingControlsVC: UIViewController {
         recordingModeButton.leftAnchor.constraint(equalTo: libraryButton.rightAnchor, constant: 25).isActive = true
         recordingModeButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
-        view.addSubview(presentationButton)
-        presentationButton.translatesAutoresizingMaskIntoConstraints = false
-        presentationButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        presentationButton.rightAnchor.constraint(equalTo: cameraSelectionButton.leftAnchor, constant: -30).isActive = true
-        presentationButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        view.addSubview(cameraSelectionButton)
+        cameraSelectionButton.translatesAutoresizingMaskIntoConstraints = false
+        cameraSelectionButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
+        cameraSelectionButton.rightAnchor.constraint(equalTo: switchButton.leftAnchor, constant: -30).isActive = true
+        cameraSelectionButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        cameraSelectionButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(recordingButton)
         recordingButton.translatesAutoresizingMaskIntoConstraints = false
@@ -363,23 +376,16 @@ class RecordingControlsVC: UIViewController {
         recordingButton.heightAnchor.constraint(equalToConstant: 75).isActive = true
         recordingButton.widthAnchor.constraint(equalToConstant: 75).isActive = true
         
-        view.addSubview(switchButton)
-        switchButton.translatesAutoresizingMaskIntoConstraints = false
-        switchButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:  -30).isActive = true
-        switchButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        switchButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        switchButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        
         view.addSubview(flashButton)
         flashButton.translatesAutoresizingMaskIntoConstraints = false
-        flashButton.bottomAnchor.constraint(equalTo: switchButton.topAnchor, constant: -20).isActive = true
+        flashButton.bottomAnchor.constraint(equalTo: view.centerYAnchor, constant:  -70).isActive = true
         flashButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         flashButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         flashButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         
         view.addSubview(exposureButton)
         exposureButton.translatesAutoresizingMaskIntoConstraints = false
-        exposureButton.topAnchor.constraint(equalTo: switchButton.bottomAnchor, constant: 20).isActive = true
+        exposureButton.topAnchor.constraint(equalTo: flashButton.bottomAnchor, constant:  20).isActive = true
         exposureButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         exposureButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         exposureButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
@@ -390,6 +396,17 @@ class RecordingControlsVC: UIViewController {
         zoomButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         zoomButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         zoomButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        view.addSubview(modeSelectView)
+        modeSelectView.translatesAutoresizingMaskIntoConstraints = false
+        modeSelectView.bottomAnchor.constraint(equalTo: recordingButton.topAnchor).isActive = true
+        modeSelectView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        modeSelectView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        modeSelectView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        modeSelectView.modeSelection = updatePresentation
+        
+//        view.addSubview(webToolBarView)
+//        webToolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
         
         view.addSubview(cameraSettingSlider)
         cameraSettingSlider.translatesAutoresizingMaskIntoConstraints = false
@@ -407,7 +424,7 @@ class RecordingControlsVC: UIViewController {
     
     //MARK: - Record Screen
     
-    @objc private func recordButtonTap(tapGesture: UITapGestureRecognizer) {
+    @objc private func recordButtonTap() {
         
         switch recordingMode {
         case .video:
@@ -534,40 +551,32 @@ class RecordingControlsVC: UIViewController {
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
             self.editPreviewStyleButton.alpha = newAlpha
             self.cameraSelectionButton.alpha = newAlpha
-            self.presentationButton.alpha = newAlpha
             self.recordingModeButton.alpha = newAlpha
             self.libraryButton.alpha = newAlpha
         }, completion: nil)
     }
-    
-    let webView = WebVC()
-    
-    @objc private func changeRecordingPresentation() {
-        switch presentationMode {
+        
+    private func updatePresentation(to mode: PresentationMode) {
+        switch mode {
         case .switchCam:
-            presentationButton.setImage(RevoImages.multiScreenIcon, for: .normal)
-            delegate?.changePresentationTo(mode: .pip)
+            delegate?.changePresentationTo(mode: .switchCam)
+            editPreviewStyleButton.isHidden = true
+            switchCamInfoButton.isHidden = false
+            presentationMode = .switchCam
+        case .pip:
+            delegate?.changePresentationTo(mode:.pip)
             // The switchCamInfoButton is only shown in switchCam mode. The style can not be
             // edited in switchCam mode so editPreviewStyleButton is hidden.
             editPreviewStyleButton.isHidden = false
             switchCamInfoButton.isHidden = true
             presentationMode = .pip
-        case .pip:
-            presentationButton.setImage(RevoImages.splitScreenIcon, for: .normal)
+        case .splitScreen:
             delegate?.changePresentationTo(mode: .splitScreen)
             presentationMode = .splitScreen
-        case .splitScreen:
-            presentationButton.setImage(RevoImages.webIcon, for: .normal)
-            delegate?.changePresentationTo(mode: .web)
-            webView.modalPresentationStyle = .fullScreen
-            present(webView, animated: true, completion: nil)
-            presentationMode = .web
         case .web:
-            presentationButton.setImage(RevoImages.switchFullScreenPreview, for: .normal)
-            delegate?.changePresentationTo(mode: .switchCam)
-            editPreviewStyleButton.isHidden = true
-            switchCamInfoButton.isHidden = false
-            presentationMode = .switchCam
+            animateOutControlsForWebMode()
+            delegate?.changePresentationTo(mode: .web)
+            presentationMode = .web
         }
     }
     
@@ -667,7 +676,6 @@ class RecordingControlsVC: UIViewController {
     @objc private func cameraSelectionPress(sender: UIButton) {
         // This will check which current camera is selected then toggle to
         // the next available from the devicesAvailable array
-        
         let zoomFactorString = sender.titleLabel!.text!
         let currentIndex = devicesAvailable.firstIndex(of: zoomFactorString)!
         var newIndex = currentIndex + 1
@@ -810,7 +818,30 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
         }
     }
     
-    
+    func animateOutControlsForWebMode() {
+        for each in view.subviews {
+            if !each.isKind(of: PassThroughView.self) && !each.isKind(of: WebToolBarView.self) && each != timeLabel {
+                each.isHidden = true
+            }
+        }
+//        recordingButton
+//        lowerDarkView
+//        libraryButton
+//        recordingModeButton
+//        settingsButton
+//        editPreviewStyleButton
+//        switchCamInfoButton
+//        cameraSelectionButton
+//        flashButton
+//        switchButton
+//        exposureButton
+//        cameraSettingSlider
+//        zoomButton
+        
+//        transitionWebToolBarUp()
+    }
+
+        
 }
 
 extension RecordingControlsVC: RPBroadcastControllerDelegate {
@@ -821,3 +852,4 @@ extension RecordingControlsVC: RPBroadcastControllerDelegate {
     }
     
 }
+

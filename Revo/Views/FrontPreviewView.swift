@@ -26,7 +26,7 @@ class FrontPreviewView: UIView {
         
     private var lastSize: CGFloat = 200
     
-    private  var frameStyle: FrameStyle = .square {
+    var frameStyle: FrameStyle = .square {
         didSet {
             if frameStyle == .circular {
                 self.layer.cornerRadius = self.frame.width / 2
@@ -91,7 +91,6 @@ class FrontPreviewView: UIView {
         default:
             break
         }
-        
     }
     
     // Check if the view's frame is outside of MainRecordingVC's view if so

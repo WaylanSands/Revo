@@ -9,9 +9,20 @@
 import UIKit
 import WebKit
 
+protocol WebDelegate: class {
+    func visitLibrary()
+    func previousPage()
+    func forward()
+    func record()
+}
+
 
 class WebVC: UIViewController {
-    
+
+    var frontFloatingPreviewView = FrontPreviewView()
+    let toolBarView = WebToolBarView()
+    weak var delegate: WebDelegate?
+    var controlsAreHidden = true
     
     let webConfiguration: WKWebViewConfiguration = {
         let config = WKWebViewConfiguration()
@@ -19,7 +30,7 @@ class WebVC: UIViewController {
         return config
     }()
     
-    lazy var webView: WKWebView = {
+    lazy var wkWebView: WKWebView = {
         let view = WKWebView(frame: .zero, configuration: webConfiguration)
         view.allowsLinkPreview = false
         view.allowsBackForwardNavigationGestures = true
@@ -33,24 +44,34 @@ class WebVC: UIViewController {
         return view
     }()
     
-    var frontFloatingPreviewView = FrontPreviewView()
+    private let timeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "00:00:00"
+        label.font = UIFont.monospacedDigitSystemFont(ofSize: 19, weight: .semibold)
+        label.textAlignment = .center
+        label.textColor = .white
+        return label
+    }()
+    
     
     let topView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
         return view
     }()
-        
-    let backButton = UIBarButtonItem(image: UIImage(named: "back_web_icon"), style: .plain, target: self, action: #selector(backPress))
-    let forwardButton = UIBarButtonItem(image: UIImage(named: "forward_web_icon"), style: .plain, target: self, action: #selector(forwardPress))
-    let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: self, action: nil)
-    let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-    let reloadButton = UIBarButtonItem(image: UIImage(named: "roload_web_icon"), style: .plain, target: self, action: #selector(refreshPress))
-    let webButton = UIBarButtonItem(image: RevoImages.webIcon, style: .plain, target: self, action: #selector(dismissWebView))
-
-    let toolbar: UIToolbar = {
-        let bar = UIToolbar()
-        return bar
+    
+    let dismissButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.whiteDownArrow, for: .normal)
+        button.addTarget(self, action: #selector(dismissWebView), for: .touchUpInside)
+        return button
+    }()
+    
+    let controlsButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.hideControls, for: .normal)
+        button.addTarget(self, action: #selector(toggleControlVisibility), for: .touchUpInside)
+        return button
     }()
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -60,18 +81,28 @@ class WebVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadInitialRequest()
+        configureDelegates()
         configureViews()
     }
     
+    private func configureDelegates() {
+        toolBarView.delegate = self
+    }
+    
     private func loadInitialRequest() {
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        wkWebView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         let request = URLRequest(url: URL(string: "https://www.google.com")!)
-        webView.load(request)
+        wkWebView.load(request)
     }
 
     private func configureViews() {
         view.backgroundColor = .white
-        let guide = view.safeAreaLayoutGuide
+        
+        view.addSubview(timeLabel)
+        timeLabel.translatesAutoresizingMaskIntoConstraints = false
+        timeLabel.centerYAnchor.constraint(equalTo: view.topAnchor, constant: 55).isActive = true
+        timeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        timeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         view.addSubview(topView)
         topView.translatesAutoresizingMaskIntoConstraints = false
@@ -80,39 +111,45 @@ class WebVC: UIViewController {
         topView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
         topView.heightAnchor.constraint(equalToConstant: 80).isActive =  true
         
+        topView.addSubview(dismissButton)
+        dismissButton.translatesAutoresizingMaskIntoConstraints = false
+        dismissButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -15).isActive = true
+        dismissButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive =  true
+        
+        topView.addSubview(controlsButton)
+        controlsButton.translatesAutoresizingMaskIntoConstraints = false
+        controlsButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -10).isActive = true
+        controlsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        controlsButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        controlsButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        
         view.addSubview(progressView)
         progressView.translatesAutoresizingMaskIntoConstraints = false
         progressView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive =  true
         progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
         progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
+
+        view.addSubview(wkWebView)
+        wkWebView.translatesAutoresizingMaskIntoConstraints = false
+        wkWebView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive =  true
+        wkWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
+        wkWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
+        wkWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive =  true
         
-        view.addSubview(toolbar)
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
-        toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
-        toolbar.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive =  true
-        
-        view.addSubview(webView)
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        webView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive =  true
-        webView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
-        webView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
-        webView.bottomAnchor.constraint(equalTo: toolbar.topAnchor).isActive =  true
+        view.addSubview(toolBarView)
+        toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
         
         view.bringSubviewToFront(progressView)
         
         view.addSubview(frontFloatingPreviewView)
+        frontFloatingPreviewView.frame = CGRect(x: (UIScreen.main.bounds.width / 2) - 100, y: (UIScreen.main.bounds.height / 2), width: 200, height: 200)
         frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        toolbar.setItems([backButton, fixedSpace, forwardButton, spacer, webButton,fixedSpace, reloadButton], animated: false)
-        fixedSpace.width = 40
+        frontFloatingPreviewView.frameStyle = .circular
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
-            progressView.progress = Float(webView.estimatedProgress)
+            progressView.progress = Float(wkWebView.estimatedProgress)
             progressView.isHidden = false
             if progressView.progress == 1 {
                 progressView.isHidden = true
@@ -120,25 +157,47 @@ class WebVC: UIViewController {
         }
     }
     
-    
-    @objc func dismissVC() {
-        dismiss(animated: true, completion: nil)
+    @objc func toggleControlVisibility() {
+        if controlsAreHidden {
+            controlsButton.setImage(RevoImages.showControls, for: .normal)
+            transitionWebToolBarUp()
+            controlsAreHidden = false
+        } else {
+            controlsButton.setImage(RevoImages.hideControls, for: .normal)
+            transitionWebToolBarDown()
+            controlsAreHidden = true
+        }
+        
     }
     
-    @objc func backPress() {
-        webView.goBack()
+    func transitionWebToolBarUp() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 120, width: UIScreen.main.bounds.width, height: 120)
+        }, completion: nil)
     }
     
-    @objc func forwardPress() {
-        webView.goForward()
-    }
-    
-    @objc func refreshPress() {
-        webView.reload()
+    func transitionWebToolBarDown() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
+        }, completion: nil)
     }
     
     @objc func dismissWebView() {
         dismiss(animated: true, completion: nil)
     }
+}
+
+extension WebVC: WebToolBarDelegate {
+    
+    func goBackwardsAPage() {
+        print("GOOOOOOO     back")
+        wkWebView.goBack()
+    }
+    
+    func goForwardAPage() {
+        print("forward")
+        wkWebView.goForward()
+    }
+    
 }
 

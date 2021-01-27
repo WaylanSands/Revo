@@ -11,6 +11,7 @@
 		48523BB325BE43D400B0AF40 /* RevoAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48523BB225BE43D400B0AF40 /* RevoAnalytics.swift */; };
 		48523BBB25BE61C700B0AF40 /* UIView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48523BBA25BE61C700B0AF40 /* UIView+Ext.swift */; };
 		4852D57F25BFB22A0075CF52 /* WebVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4852D57E25BFB22A0075CF52 /* WebVC.swift */; };
+		4854538A25C0CD2C00341C66 /* ModeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4854538925C0CD2C00341C66 /* ModeSelectView.swift */; };
 		4858226E25BD13930005DF6D /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4858226D25BD13930005DF6D /* String+Ext.swift */; };
 		4858227925BD18E20005DF6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4858227B25BD18E20005DF6D /* Localizable.strings */; };
 		485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EEA5625AD5A3500F88165 /* AssetWriterError.swift */; };
@@ -46,6 +47,8 @@
 		48B658EA25AD191A0043DEDF /* focus_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E825AD191A0043DEDF /* focus_animation.json */; };
 		48B658EB25AD191A0043DEDF /* mobile_360_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E925AD191A0043DEDF /* mobile_360_animation.json */; };
 		48B68F2025BE372000A2D9F5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */; };
+		48D43D9925C1196600830988 /* WebToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9825C1196600830988 /* WebToolBarView.swift */; };
+		48D43D9E25C1222800830988 /* WebRecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9D25C1222800830988 /* WebRecordButtonView.swift */; };
 		48F72D4C25AD12520064E8C8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F72D4B25AD12520064E8C8 /* AppDelegate.swift */; };
 		48F72D4E25AD12520064E8C8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */; };
 		48F72D5525AD12530064E8C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48F72D5425AD12530064E8C8 /* Assets.xcassets */; };
@@ -82,6 +85,7 @@
 		4852D57C25BFA52F0075CF52 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4852D57D25BFA52F0075CF52 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4852D57E25BFB22A0075CF52 /* WebVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebVC.swift; sourceTree = "<group>"; };
+		4854538925C0CD2C00341C66 /* ModeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectView.swift; sourceTree = "<group>"; };
 		4858226D25BD13930005DF6D /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		4858227525BD186D0005DF6D /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4858227A25BD18E20005DF6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -139,6 +143,8 @@
 		48B658E825AD191A0043DEDF /* focus_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = focus_animation.json; sourceTree = "<group>"; };
 		48B658E925AD191A0043DEDF /* mobile_360_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = mobile_360_animation.json; sourceTree = "<group>"; };
 		48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		48D43D9825C1196600830988 /* WebToolBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebToolBarView.swift; sourceTree = "<group>"; };
+		48D43D9D25C1222800830988 /* WebRecordButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRecordButtonView.swift; sourceTree = "<group>"; };
 		48F72D4825AD12520064E8C8 /* Revo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Revo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		48F72D4B25AD12520064E8C8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -213,6 +219,7 @@
 			isa = PBXGroup;
 			children = (
 				48B658A425AD18360043DEDF /* TopPreviewOptionsView.swift */,
+				4854538925C0CD2C00341C66 /* ModeSelectView.swift */,
 				48B658AB25AD18360043DEDF /* RecordingOptionsView.swift */,
 				48B658A625AD18360043DEDF /* FocusAnimationView.swift */,
 				48B658AD25AD18370043DEDF /* SplitModeStyleView.swift */,
@@ -222,6 +229,8 @@
 				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
 				48B658A825AD18360043DEDF /* SplitBarView.swift */,
 				48B658AA25AD18360043DEDF /* PreviewView.swift */,
+				48D43D9825C1196600830988 /* WebToolBarView.swift */,
+				48D43D9D25C1222800830988 /* WebRecordButtonView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -639,6 +648,7 @@
 				48B658C725AD18840043DEDF /* RevoImages.swift in Sources */,
 				48B658DF25AD18AD0043DEDF /* FileManager+Ext.swift in Sources */,
 				48B658AF25AD18370043DEDF /* PipModeStyleView.swift in Sources */,
+				48D43D9E25C1222800830988 /* WebRecordButtonView.swift in Sources */,
 				48B658B125AD18370043DEDF /* RecordButtonView.swift in Sources */,
 				48B658AE25AD18370043DEDF /* TopPreviewOptionsView.swift in Sources */,
 				48B658B325AD18370043DEDF /* FrontPreviewView.swift in Sources */,
@@ -648,7 +658,9 @@
 				48B658C625AD18840043DEDF /* RevoColor.swift in Sources */,
 				48F72D4C25AD12520064E8C8 /* AppDelegate.swift in Sources */,
 				48B658B225AD18370043DEDF /* SplitBarView.swift in Sources */,
+				4854538A25C0CD2C00341C66 /* ModeSelectView.swift in Sources */,
 				48F72D4E25AD12520064E8C8 /* SceneDelegate.swift in Sources */,
+				48D43D9925C1196600830988 /* WebToolBarView.swift in Sources */,
 				48B658E225AD18AD0043DEDF /* URL+Ext.swift in Sources */,
 				48B658B425AD18370043DEDF /* PreviewView.swift in Sources */,
 				485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */,

@@ -25,8 +25,6 @@ struct RevoImages {
     static let zoomIcon = UIImage(named: "zoom_icon")
     static let infoIcon = UIImage(named: "info_icon")
     static let isoIcon = UIImage(named: "iso_icon")
-
-        
     
     // SF Symbols
     static func cameraIcon() -> UIImage? {
@@ -55,6 +53,14 @@ struct RevoImages {
     static let blackShareIcon = UIImage(named: "black_share_icon")
     static let blackAppIcon = UIImage(named: "black_app_icon")
     static let mailIcon = UIImage(named: "mail_icon")
+    
+    // WebVC
+    static let hideControls = UIImage(named: "hide_controls_icon")
+    static let showControls = UIImage(named: "show_controls_icon")
+
+    // WebToolBarView
+    static let backWebButton = UIImage(named: "back_web_icon")
+    static let forwardWebButton = UIImage(named: "forward_web_icon")
     
 
 }

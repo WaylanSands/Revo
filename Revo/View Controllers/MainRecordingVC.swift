@@ -32,6 +32,8 @@ class MainRecordingVC: UIViewController {
     private let splitStyleView = SplitModeStyleView()
     private let pipStyleView = PipModeStyleView()
     
+    private let webView = WebVC()
+
     private var currentlyRecording = false
     private var pipIsFrontCamera = true
     private var rearDeviceISO: CGFloat?
@@ -120,6 +122,8 @@ class MainRecordingVC: UIViewController {
     private func configureDelegates() {
         pipStyleView.styleDelegate = frontFloatingPreviewView
         splitStyleView.styleDelegate = splitScreenVC
+        webView.wkWebView.scrollView.delegate = self
+        webView.delegate = self
     }
     
     private func configureTopWindow() {
@@ -238,7 +242,6 @@ class MainRecordingVC: UIViewController {
             }
         }
     }
-    
     
     private func discoverDevices() {
         // The correct array is passed to the topWindowRecordingControlsVC so that
@@ -391,6 +394,8 @@ class MainRecordingVC: UIViewController {
             rearPreviewView.isHidden = true
         case .web:
             setupSingleCam()
+            webView.modalPresentationStyle = .fullScreen
+            present(webView, animated: true, completion: nil)
         }
         multiCamSession.commitConfiguration()
     }
@@ -408,8 +413,8 @@ class MainRecordingVC: UIViewController {
             }
 
             webCamSession.addInput(deviceInput)
-            topWindowRecordingControlsVC.webView.frontFloatingPreviewView.videoPreviewLayer.session = webCamSession
-            activeFrontPreviewLayerLayer = topWindowRecordingControlsVC.webView.frontFloatingPreviewView.videoPreviewLayer
+            webView.frontFloatingPreviewView.videoPreviewLayer.session = webCamSession
+            activeFrontPreviewLayerLayer = webView.frontFloatingPreviewView.videoPreviewLayer
 
             webCamSession.commitConfiguration()
             webCamSession.startRunning()
@@ -637,6 +642,10 @@ class MainRecordingVC: UIViewController {
 
 extension MainRecordingVC: ControlsDelegate {
     
+    func toggleRecodingTo(mode: RecordingMode) {
+        webView.toolBarView.recordingMode = mode
+    }
+    
     
     func switchPreviewsFor(mode: PresentationMode) {
         switch mode {
@@ -772,3 +781,39 @@ extension MainRecordingVC: ControlsDelegate {
     }
     
 }
+
+extension MainRecordingVC: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0 {
+//            print("down")
+//            topWindowRecordingControlsVC.transitionWebToolBarDown()
+//            webView.wkWebView.scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//        } else {
+//            print("up")
+//            topWindowRecordingControlsVC.transitionWebToolBarUp()
+//            webView.wkWebView.scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+//        }
+    }
+}
+
+
+extension MainRecordingVC: WebDelegate {
+    func visitLibrary() {
+        //
+    }
+    
+    func previousPage() {
+        //
+    }
+    
+    func forward() {
+        //
+    }
+    
+    func record() {
+        //
+    }
+
+}
+
