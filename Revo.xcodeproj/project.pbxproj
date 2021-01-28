@@ -14,8 +14,9 @@
 		4854538A25C0CD2C00341C66 /* ModeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4854538925C0CD2C00341C66 /* ModeSelectView.swift */; };
 		4858226E25BD13930005DF6D /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4858226D25BD13930005DF6D /* String+Ext.swift */; };
 		4858227925BD18E20005DF6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4858227B25BD18E20005DF6D /* Localizable.strings */; };
+		48598D2225C2CE6000D68C07 /* UIDevice+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48598D2125C2CE6000D68C07 /* UIDevice+Ext.swift */; };
 		485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EEA5625AD5A3500F88165 /* AssetWriterError.swift */; };
-		48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */; };
+		48B6587E25AD171A0043DEDF /* RevoVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587725AD17190043DEDF /* RevoVideoPlayer.swift */; };
 		48B6587F25AD171A0043DEDF /* PassThroughWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587825AD171A0043DEDF /* PassThroughWindow.swift */; };
 		48B6588025AD171A0043DEDF /* MainRecordingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587925AD171A0043DEDF /* MainRecordingVC.swift */; };
 		48B6588125AD171A0043DEDF /* RecordingControlsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */; };
@@ -90,6 +91,7 @@
 		4858227525BD186D0005DF6D /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4858227A25BD18E20005DF6D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4858227F25BD18EF0005DF6D /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
+		48598D2125C2CE6000D68C07 /* UIDevice+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Ext.swift"; sourceTree = "<group>"; };
 		485EEA5625AD5A3500F88165 /* AssetWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWriterError.swift; sourceTree = "<group>"; };
 		48774C9525BEBEA3001361EC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		48774C9625BEBEA3001361EC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -111,7 +113,7 @@
 		48774CA625BECF28001361EC /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		48774CA725BED0F2001361EC /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		48774CA825BED0F2001361EC /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
-		48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingPreviewVC.swift; sourceTree = "<group>"; };
+		48B6587725AD17190043DEDF /* RevoVideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RevoVideoPlayer.swift; sourceTree = "<group>"; };
 		48B6587825AD171A0043DEDF /* PassThroughWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassThroughWindow.swift; sourceTree = "<group>"; };
 		48B6587925AD171A0043DEDF /* MainRecordingVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainRecordingVC.swift; sourceTree = "<group>"; };
 		48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingControlsVC.swift; sourceTree = "<group>"; };
@@ -205,8 +207,8 @@
 			isa = PBXGroup;
 			children = (
 				48B6587A25AD171A0043DEDF /* RecordingControlsVC.swift */,
-				48B6587725AD17190043DEDF /* RecordingPreviewVC.swift */,
 				48B6587925AD171A0043DEDF /* MainRecordingVC.swift */,
+				48B6587725AD17190043DEDF /* RevoVideoPlayer.swift */,
 				48B6587D25AD171A0043DEDF /* SplitScreenVC.swift */,
 				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
 				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
@@ -229,8 +231,8 @@
 				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
 				48B658A825AD18360043DEDF /* SplitBarView.swift */,
 				48B658AA25AD18360043DEDF /* PreviewView.swift */,
-				48D43D9825C1196600830988 /* WebToolBarView.swift */,
 				48D43D9D25C1222800830988 /* WebRecordButtonView.swift */,
+				48D43D9825C1196600830988 /* WebToolBarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -274,6 +276,7 @@
 				48B658DC25AD18AD0043DEDF /* URL+Ext.swift */,
 				4858226D25BD13930005DF6D /* String+Ext.swift */,
 				48523BBA25BE61C700B0AF40 /* UIView+Ext.swift */,
+				48598D2125C2CE6000D68C07 /* UIDevice+Ext.swift */,
 			);
 			path = Extentions;
 			sourceTree = "<group>";
@@ -641,6 +644,7 @@
 				48B658E025AD18AD0043DEDF /* UIButton+Ext.swift in Sources */,
 				48B658E125AD18AD0043DEDF /* UIColor+Ext.swift in Sources */,
 				48B658DE25AD18AD0043DEDF /* Bundel+Ext.swift in Sources */,
+				48598D2225C2CE6000D68C07 /* UIDevice+Ext.swift in Sources */,
 				48B658B025AD18370043DEDF /* FocusAnimationView.swift in Sources */,
 				48523BB325BE43D400B0AF40 /* RevoAnalytics.swift in Sources */,
 				4852D57F25BFB22A0075CF52 /* WebVC.swift in Sources */,
@@ -665,7 +669,7 @@
 				48B658B425AD18370043DEDF /* PreviewView.swift in Sources */,
 				485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */,
 				48B6588025AD171A0043DEDF /* MainRecordingVC.swift in Sources */,
-				48B6587E25AD171A0043DEDF /* RecordingPreviewVC.swift in Sources */,
+				48B6587E25AD171A0043DEDF /* RevoVideoPlayer.swift in Sources */,
 				48B658B725AD18370043DEDF /* SplitModeStyleView.swift in Sources */,
 				48B658B525AD18370043DEDF /* RecordingOptionsView.swift in Sources */,
 				48B658DD25AD18AD0043DEDF /* UIImage+Ext.swift in Sources */,

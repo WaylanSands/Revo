@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 protocol ModeSelectionDelegate {
     func changeModeTo(_ mode: PresentationMode)
@@ -73,9 +74,16 @@ class ModeSelectView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        self.configureGestures()
-        self.findTotalWith()
-        self.configureViews()
+        configureMutiCamSupport()
+        configureGestures()
+        findTotalWith()
+        configureViews()
+    }
+    
+    private func configureMutiCamSupport() {
+        if !AVCaptureMultiCamSession.isMultiCamSupported {
+            modeLabels.removeAll(where: { $0.text == "PIP" || $0.text == "SPLIT" })
+        }
     }
     
     private func configureGestures() {
@@ -92,12 +100,11 @@ class ModeSelectView: UIView {
         let splitGesture = UITapGestureRecognizer(target: self, action: #selector(splitLabelTapped))
         let pipGesture = UITapGestureRecognizer(target: self, action: #selector(pipLabelTapped))
         let webGesture = UITapGestureRecognizer(target: self, action: #selector(webLabelTapped))
-
+        
         switchLabel.addGestureRecognizer(switchGesture)
         splitLabel.addGestureRecognizer(splitGesture)
         pipLabel.addGestureRecognizer(pipGesture)
         webLabel.addGestureRecognizer(webGesture)
-
     }
     
     func findTotalWith() {
@@ -115,11 +122,16 @@ class ModeSelectView: UIView {
     func configureViews() {
         self.addSubview(stackView)
         stackView.frame = CGRect(x: screenCenterX - initialOffset, y: 0, width: stackViewWidth, height: 50)
-
-        stackView.addArrangedSubview(switchLabel)
-        stackView.addArrangedSubview(pipLabel)
-        stackView.addArrangedSubview(splitLabel)
-        stackView.addArrangedSubview(webLabel)
+        
+        if AVCaptureMultiCamSession.isMultiCamSupported {
+            stackView.addArrangedSubview(switchLabel)
+            stackView.addArrangedSubview(pipLabel)
+            stackView.addArrangedSubview(splitLabel)
+            stackView.addArrangedSubview(webLabel)
+        } else {
+            stackView.addArrangedSubview(switchLabel)
+            stackView.addArrangedSubview(webLabel)
+        }
     }
     
     func offsetForLabel(index: Int) {
@@ -174,10 +186,11 @@ class ModeSelectView: UIView {
     }
     
     func animateModeLabelsTo(x: CGFloat) {
+        updateSelectedStyle()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
             self.stackView.frame = CGRect(x: x, y: 0, width: self.stackViewWidth, height: 50)
         }) { _ in
-            self.updateSelectedStyle()
+            self.updatePresentationTo(mode: self.activeLabel.text!)
         }
     }
     
@@ -189,7 +202,6 @@ class ModeSelectView: UIView {
             } else {
                 each.textColor = .white
                 each.font = UIFont.systemFont(ofSize: 15, weight: .bold)
-                updatePresentationTo(mode: each.text!)
             }
         }
     }
@@ -217,23 +229,31 @@ class ModeSelectView: UIView {
     }
     
     @objc func switchLabelTapped() {
-        selectionIndex = 0
-        offsetForLabel(index: 0)
+        let index = modeLabels.firstIndex(of: switchLabel)!
+        selectionIndex = index
+        offsetForLabel(index: index)
+        updateSelectedStyle()
     }
     
     @objc func pipLabelTapped() {
-        selectionIndex = 1
-        offsetForLabel(index: 1)
+        let index = modeLabels.firstIndex(of: pipLabel)!
+        selectionIndex = index
+        offsetForLabel(index: index)
+        updateSelectedStyle()
     }
     
     @objc func splitLabelTapped() {
-        selectionIndex = 2
-        offsetForLabel(index: 2)
+        let index = modeLabels.firstIndex(of: splitLabel)!
+        selectionIndex = index
+        offsetForLabel(index: index)
+        updateSelectedStyle()
     }
     
     @objc func webLabelTapped() {
-        selectionIndex = 3
-        offsetForLabel(index:3)
+        let index = modeLabels.firstIndex(of: webLabel)!
+        selectionIndex = index
+        offsetForLabel(index: index)
+        updateSelectedStyle()
     }
 
 }

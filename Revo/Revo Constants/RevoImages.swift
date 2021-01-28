@@ -40,9 +40,7 @@ struct RevoImages {
     
     // RecordingOptionsView
     static let deleteIcon = UIImage(named: "delete_icon")
-    static let pauseIcon = UIImage(named: "pause_icon")
     static let shareIcon = UIImage(named: "share_icon")
-    static let playIcon = UIImage(named: "play_icon")
     
     // TopPreviewOptionsView
     static let whiteBackArrowIcon = UIImage(named: "white_back_arrow")
@@ -61,6 +59,10 @@ struct RevoImages {
     // WebToolBarView
     static let backWebButton = UIImage(named: "back_web_icon")
     static let forwardWebButton = UIImage(named: "forward_web_icon")
+    
+    // RevoVideoPlayer
+    static let pauseIcon = UIImage(named: "pause_icon")
+    static let playIcon = UIImage(named: "play_icon")
     
 
 }

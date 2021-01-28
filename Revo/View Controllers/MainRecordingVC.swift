@@ -19,7 +19,7 @@ import AVFoundation
 class MainRecordingVC: UIViewController {
     
     private var topWindow: PassThroughWindow?
-    private let topWindowRecordingControlsVC = RecordingControlsVC()
+    private let recordingControlsVC = RecordingControlsVC()
     
     // Used when in pip mode
     private var frontFloatingPreviewView = FrontPreviewView()
@@ -99,6 +99,15 @@ class MainRecordingVC: UIViewController {
         RevoAnalytics.logScreenView(for: "Main recording Screen", ofClass: "MainRecordingVC")
         configureForegroundObserver()
         
+        if presentationMode == .web && AVCaptureMultiCamSession.isMultiCamSupported  {
+            recordingControlsVC.modeSelectView.splitLabelTapped()
+            recordingControlsVC.animateInControls()
+        } else if presentationMode == .web {
+            // AVCaptureMultiCamSession is not supported revert to Switch Mode
+            recordingControlsVC.modeSelectView.switchLabelTapped()
+            recordingControlsVC.animateInControls()
+        }
+        
 //        let webView = WebVC(url: URL(string: "https://www.google.com")!)
 //        webView.modalPresentationStyle = .fullScreen
 //        present(webView, animated: false, completion: nil)
@@ -111,26 +120,25 @@ class MainRecordingVC: UIViewController {
     
     private func configureClosures() {
         // topWindowRecordingControlsVC requests the latest camera values when adjusting exposure and zoom
-        topWindowRecordingControlsVC.currentCameraExposureTargetBiasMinMax = self.currentCameraExposureTargetBiasMinToMax
-        topWindowRecordingControlsVC.currentCameraExposureTargetBias = self.currentCameraExposureTargetBias
-        topWindowRecordingControlsVC.currentCameraMaxZoomFactor = self.currentCameraMaxZoomFactor
-        topWindowRecordingControlsVC.currentCameraZoomFactor = self.currentCameraZoomFactor
-        topWindowRecordingControlsVC.alertMultiViewOfRecordingStart = self.beginRecording
-        topWindowRecordingControlsVC.alertMultiViewOfRecordingEnd = self.endRecording
+        recordingControlsVC.currentCameraExposureTargetBiasMinMax = self.currentCameraExposureTargetBiasMinToMax
+        recordingControlsVC.currentCameraExposureTargetBias = self.currentCameraExposureTargetBias
+        recordingControlsVC.currentCameraMaxZoomFactor = self.currentCameraMaxZoomFactor
+        recordingControlsVC.currentCameraZoomFactor = self.currentCameraZoomFactor
+        recordingControlsVC.alertMultiViewOfRecordingStart = self.beginRecording
+        recordingControlsVC.alertMultiViewOfRecordingEnd = self.endRecording
     }
     
     private func configureDelegates() {
         pipStyleView.styleDelegate = frontFloatingPreviewView
         splitStyleView.styleDelegate = splitScreenVC
         webView.wkWebView.scrollView.delegate = self
-        webView.delegate = self
     }
     
     private func configureTopWindow() {
         if let currentWindowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             topWindow = PassThroughWindow(windowScene: currentWindowScene)
-            topWindowRecordingControlsVC.delegate = self
-            topWindow!.rootViewController = topWindowRecordingControlsVC
+            recordingControlsVC.delegate = self
+            topWindow!.rootViewController = recordingControlsVC
             topWindow!.windowLevel = .statusBar
             topWindow!.isHidden = false
             topWindow!.makeKeyAndVisible()
@@ -177,7 +185,7 @@ class MainRecordingVC: UIViewController {
         
         // Needs to be set as true because frontFullScreenPreviewView is hidden.
         // configurePreviewLayers() is ran before configureViews which would of set it to false
-        topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
+        recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
         
         // Front camera preview layer
         view.addSubview(frontFloatingPreviewView)
@@ -188,7 +196,7 @@ class MainRecordingVC: UIViewController {
         view.addSubview(appLogo)
         appLogo.translatesAutoresizingMaskIntoConstraints = false
         appLogo.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).isActive = true
-        appLogo.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
+        appLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
     }
     
     // check the app's authorisation status and start cam session if authorised.
@@ -255,18 +263,18 @@ class MainRecordingVC: UIViewController {
                                                                 mediaType: .video, position: .back)
         
         if discoverySession.devices.isEmpty {
-            topWindowRecordingControlsVC.cameraSelectionButton.isHidden = true
-            topWindowRecordingControlsVC.devicesAvailable = singleCamera
+            recordingControlsVC.cameraSelectionButton.isHidden = true
+            recordingControlsVC.devicesAvailable = singleCamera
         }
         
         discoverySession.devices.forEach { (device) in
             switch device.deviceType {
             case .builtInTripleCamera:
-                topWindowRecordingControlsVC.devicesAvailable = tripleCameras
+                recordingControlsVC.devicesAvailable = tripleCameras
             case .builtInDualWideCamera:
-                topWindowRecordingControlsVC.devicesAvailable = duelWideCameras
+                recordingControlsVC.devicesAvailable = duelWideCameras
             case .builtInDualCamera:
-                topWindowRecordingControlsVC.devicesAvailable = duelTeleCameras
+                recordingControlsVC.devicesAvailable = duelTeleCameras
             default:
                 break
             }
@@ -347,16 +355,20 @@ class MainRecordingVC: UIViewController {
         }
     }
     
-    // MARK: - Configure for new Presentation Mode
+    // MARK: - Update Presentation Mode
     
     private func configurePreviewLayers() {
+        
+        if !AVCaptureMultiCamSession.isMultiCamSupported && presentationMode == .switchCam {
+            self.setupSingleCamSessionFor(cameraPosition: .back)
+            return
+        }
+        
         multiCamSession.beginConfiguration()
         
         activeRearPreviewLayerLayer.session = nil
         activeFrontPreviewLayerLayer.session = nil
-        
-        print(presentationMode)
-        
+                
         switch presentationMode {
         case .switchCam:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
@@ -369,7 +381,7 @@ class MainRecordingVC: UIViewController {
             // Stop cameraSelectionButton from interaction if returning to switchCam with
             // frontFullScreenPreviewView showing.
             if  !frontFullScreenPreviewView.isHidden {
-                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
+                recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
             }
         case .pip:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
@@ -377,7 +389,7 @@ class MainRecordingVC: UIViewController {
             activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
             activeFrontPreviewLayerLayer = frontFloatingPreviewView.videoPreviewLayer
             // cameraSelectionButton is re-enabled when switching modes incase it was left off during switchCam
-            topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
+            recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
             frontFloatingPreviewView.isHidden = false
             rearPreviewView.isHidden = false
             revertFrontDeviceSettings()
@@ -388,19 +400,19 @@ class MainRecordingVC: UIViewController {
             activeFrontPreviewLayerLayer = splitScreenVC.bottomPreviewView.videoPreviewLayer
             // frontFullScreenPreviewView needs to be marked as isUserInteractionEnabled false
             // to allow touches to the splitScreenVC
-            topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
+            recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
             frontFullScreenPreviewView.isUserInteractionEnabled = false
             frontFloatingPreviewView.isHidden = true
             rearPreviewView.isHidden = true
         case .web:
-            setupSingleCam()
+            setupFrontWebCam()
             webView.modalPresentationStyle = .fullScreen
             present(webView, animated: true, completion: nil)
         }
         multiCamSession.commitConfiguration()
     }
     
-    private func setupSingleCam() {
+    private func setupFrontWebCam() {
         webCamSession.beginConfiguration()
 
         let device = frontCamera()!
@@ -454,7 +466,7 @@ class MainRecordingVC: UIViewController {
             return nil
         }
     }
-    
+        
     private func frontCamera() -> AVCaptureDevice? {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
             return device
@@ -567,7 +579,7 @@ class MainRecordingVC: UIViewController {
     
     
     @objc private func visitLibraryVC() {
-        topWindowRecordingControlsVC.visitLibraryVC()
+        recordingControlsVC.visitLibraryVC()
     }
     
     
@@ -618,11 +630,14 @@ class MainRecordingVC: UIViewController {
     
     //MARK: - Begin a recoding session
     private func beginRecording() {
+        // Let webView know even if not in Web Mode
+        webView.currentlyRecording = true
         currentlyRecording = true
         checkToAddWatermark()
     }
     
     private func endRecording() {
+        webView.currentlyRecording = false
         currentlyRecording = false
         appLogo.alpha = 0
     }
@@ -641,11 +656,6 @@ class MainRecordingVC: UIViewController {
 
 
 extension MainRecordingVC: ControlsDelegate {
-    
-    func toggleRecodingTo(mode: RecordingMode) {
-        webView.toolBarView.recordingMode = mode
-    }
-    
     
     func switchPreviewsFor(mode: PresentationMode) {
         switch mode {
@@ -671,11 +681,11 @@ extension MainRecordingVC: ControlsDelegate {
             // single-cam session to be set up.
             if frontFullScreenPreviewView.isHidden && multiCamSession.isRunning {
                 // cameraSelectionButton is disabled as the user can not toggle front facing cameras
-                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
+                recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
                 frontFullScreenPreviewView.isHidden = false
             } else if !frontFullScreenPreviewView.isHidden && multiCamSession.isRunning {
                 // cameraSelectionButton is reenabled when switching to the rear camera
-                topWindowRecordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
+                recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
                 frontFullScreenPreviewView.isHidden = true
             } else if singleCamSession.isRunning && activeSingleCam == .front {
                 setupSingleCamSessionFor(cameraPosition: .back)
@@ -730,27 +740,36 @@ extension MainRecordingVC: ControlsDelegate {
     // superview as the user had canceled their selection.
     func editPreviewStyleFor(mode: PresentationMode) {
         if presentationMode == .pip {
-            if topWindowRecordingControlsVC.view.subviews.contains(pipStyleView) {
+            if recordingControlsVC.view.subviews.contains(pipStyleView) {
                 pipStyleView.cancelButtonPress()
                 pipStyleView.removeFromSuperview()
             } else {
                 pipStyleView.frame = view.frame
-                topWindowRecordingControlsVC.view.addSubview(pipStyleView)
+                recordingControlsVC.view.addSubview(pipStyleView)
             }
         } else if presentationMode == .splitScreen {
-            if topWindowRecordingControlsVC.view.subviews.contains(splitStyleView) {
+            if recordingControlsVC.view.subviews.contains(splitStyleView) {
                 splitStyleView.cancelButtonPress()
                 splitStyleView.removeFromSuperview()
             } else {
                 splitStyleView.frame = view.frame
-                topWindowRecordingControlsVC.view.addSubview(splitStyleView)
+                recordingControlsVC.view.addSubview(splitStyleView)
             }
         }
     }
     
     func changePresentationTo(mode: PresentationMode) {
         presentationMode = mode
-        configurePreviewLayers()
+        
+        if presentationMode == .splitScreen || presentationMode == .switchCam {
+            UIView.animate(withDuration: 0.0) {
+                self.frontFloatingPreviewView.isHidden = true
+            } completion: { _ in
+                self.configurePreviewLayers()
+            }
+        } else {
+            configurePreviewLayers()
+        }
     }
     
     func changeTorchTo(mode: TorchMode) {
@@ -776,8 +795,17 @@ extension MainRecordingVC: ControlsDelegate {
     /// Resets the primary devices exposure target bias to zero.
     func resetExposureSettings() {
         primaryDevice().setExposureTargetBias(0, completionHandler: nil)
-        topWindowRecordingControlsVC.cameraSettingSlider.isHidden = true
-        topWindowRecordingControlsVC.cameraSettingSlider.value = 0
+        recordingControlsVC.cameraSettingSlider.isHidden = true
+        recordingControlsVC.cameraSettingSlider.value = 0
+    }
+    
+    // Handling Web View actions
+    func goBackwardsWebPage() {
+        webView.wkWebView.goBack()
+    }
+    
+    func goForwardWebPage() {
+        webView.wkWebView.goForward()
     }
     
 }
@@ -795,25 +823,5 @@ extension MainRecordingVC: UIScrollViewDelegate {
 //            webView.wkWebView.scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
 //        }
     }
-}
-
-
-extension MainRecordingVC: WebDelegate {
-    func visitLibrary() {
-        //
-    }
-    
-    func previousPage() {
-        //
-    }
-    
-    func forward() {
-        //
-    }
-    
-    func record() {
-        //
-    }
-
 }
 

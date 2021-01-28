@@ -85,11 +85,11 @@ class WebRecordButtonView: UIView {
         
         switch currentState {
         case .ready:
-            newRadius = 5
+            newRadius = 10
             scale = 0.6
             currentState = .recording
         case .recording:
-            newRadius = 15
+            newRadius = 20
             currentState = .ready
             scale = 1
         }

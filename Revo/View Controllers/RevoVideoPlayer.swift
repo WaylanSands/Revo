@@ -13,7 +13,7 @@ protocol RecordingPreviewDelegate: class {
 }
 
 
-class RecordingPreviewVC: UIViewController {
+class RevoVideoPlayer: UIViewController {
     
     enum ControlState {
         case visible
@@ -21,12 +21,11 @@ class RecordingPreviewVC: UIViewController {
     }
     
     private var recordingURL: URL?
-    
+
     private var controlState: ControlState = .invisible
-    
     private lazy var player = AVPlayer(url: recordingURL!)
-    
     weak var deletionDelegate: RecordingPreviewDelegate?
+    private var recordingDisplayLink: CADisplayLink!
             
     let recordingOptionsView: RecordingOptionsView = {
         let view = RecordingOptionsView()
@@ -40,6 +39,14 @@ class RecordingPreviewVC: UIViewController {
         view.backButton.addTarget(self, action: #selector(backButtonPress), for: .touchUpInside)
         view.audioButton.addTarget(self, action: #selector(audioButtonPress), for: .touchUpInside)
         return view
+    }()
+    
+    private let playPauseButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.pauseIcon, for: .normal)
+        button.addTarget(self, action: #selector(playPauseButtonPress), for: .touchUpInside)
+        button.alpha = 0
+        return button
     }()
        
     private lazy var playerViewController: AVPlayerViewController = {
@@ -64,6 +71,10 @@ class RecordingPreviewVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         RevoAnalytics.logScreenView(for: "Recording Preview Screen", ofClass: "RecordingPreviewVC")
+        NotificationCenter.default.addObserver(self, selector: #selector(playerFinished), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        recordingDisplayLink = CADisplayLink(target: self, selector: #selector(trackPlaybackProgress))
+        recordingDisplayLink.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
+        recordingDisplayLink.isPaused = false
     }
     
     init(recordingURL: URL) {
@@ -80,6 +91,11 @@ class RecordingPreviewVC: UIViewController {
         playerViewController.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playerLayerTap)))
         playerViewController.view.frame = view.bounds
         
+        view.addSubview(playPauseButton)
+        playPauseButton.translatesAutoresizingMaskIntoConstraints = false
+        playPauseButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        playPauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
         view.addSubview(recordingOptionsView)
         recordingOptionsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 67)
         // Setup the optionsLabel to show the file size of the recording.
@@ -87,21 +103,6 @@ class RecordingPreviewVC: UIViewController {
         
         view.addSubview(topBarView)
         topBarView.frame = CGRect(x: 0, y: -80, width: UIScreen.main.bounds.width, height: 80)
-    }
-    
-    @objc private func playerLayerTap(sender: UITapGestureRecognizer) {
-        switch controlState {
-        case .visible:
-            recordingOptionsView.updatePositionTo(state: .inactive)
-            topBarView.updatePositionTo(state: .inactive)
-            controlState = .invisible
-        case .invisible:
-            recordingOptionsView.updatePositionTo(state: .active)
-            recordingOptionsView.optionsLabel.isHidden = false
-            topBarView.updatePositionTo(state: .active)
-            controlState = .visible
-        }
-        
     }
     
     private func addFileCreationDate() {
@@ -165,6 +166,73 @@ class RecordingPreviewVC: UIViewController {
             topBarView.setAudioButtonTo(muted: true)
         }
     }
-
+    
+    @objc private func playerLayerTap() {
+        
+        //The player has finished and controls should remain visible
+        if player.currentTime() == player.currentItem?.duration && controlState == .visible {
+            return
+        }
+        
+        switch controlState {
+        case .visible:
+            recordingOptionsView.updatePositionTo(state: .inactive)
+            topBarView.updatePositionTo(state: .inactive)
+            animatePlayPauseButton(alpha: 0)
+            controlState = .invisible
+        case .invisible:
+            recordingOptionsView.updatePositionTo(state: .active)
+            recordingOptionsView.optionsLabel.isHidden = false
+            topBarView.updatePositionTo(state: .active)
+            animatePlayPauseButton(alpha: 1)
+            controlState = .visible
+        }
+    }
+    
+    @objc func playPauseButtonPress() {
+        if player.timeControlStatus == .playing {
+            playPauseButton.setImage(RevoImages.playIcon, for: .normal)
+            player.pause()
+        } else if player.currentTime() < player.currentItem!.duration {
+            playPauseButton.setImage(RevoImages.pauseIcon, for: .normal)
+            recordingDisplayLink.isPaused = false
+            playerLayerTap()
+            player.play()
+        } else if player.currentTime() == player.currentItem?.duration {
+            playPauseButton.setImage(RevoImages.pauseIcon, for: .normal)
+            
+            player.seek(to: .zero) { _ in
+                self.recordingDisplayLink.isPaused = false
+                self.playerLayerTap()
+                self.player.play()
+            }
+        }
+        
+    }
+    
+    func animatePlayPauseButton(alpha: CGFloat) {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+            self.playPauseButton.alpha = alpha
+        }, completion: nil)
+    }
+    
+    @objc func playerFinished() {
+        playPauseButton.setImage(RevoImages.playIcon, for: .normal)
+        recordingDisplayLink.isPaused = true
+        playerLayerTap()
+        print("Finished")
+    }
+    
+    @objc func trackPlaybackProgress() {
+        let currentTime = player.currentTime().seconds
+        let duration = player.currentItem!.duration.seconds
+        recordingOptionsView.progressView.progress = Float(currentTime / duration)
+        recordingOptionsView.optionsLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 16, weight: .medium)
+        recordingOptionsView.optionsLabel.text = Time.asString(from: currentTime)
+        recordingOptionsView.progressView.isHidden = false
+    }
+    
+    
+    
 
 }

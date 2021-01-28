@@ -9,19 +9,10 @@
 import UIKit
 import WebKit
 
-protocol WebDelegate: class {
-    func visitLibrary()
-    func previousPage()
-    func forward()
-    func record()
-}
-
-
 class WebVC: UIViewController {
 
     var frontFloatingPreviewView = FrontPreviewView()
-    let toolBarView = WebToolBarView()
-    weak var delegate: WebDelegate?
+    var currentlyRecording = false
     var controlsAreHidden = true
     
     let webConfiguration: WKWebViewConfiguration = {
@@ -81,14 +72,9 @@ class WebVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadInitialRequest()
-        configureDelegates()
         configureViews()
     }
-    
-    private func configureDelegates() {
-        toolBarView.delegate = self
-    }
-    
+
     private func loadInitialRequest() {
         wkWebView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         let request = URLRequest(url: URL(string: "https://www.google.com")!)
@@ -96,8 +82,6 @@ class WebVC: UIViewController {
     }
 
     private func configureViews() {
-        view.backgroundColor = .white
-        
         view.addSubview(timeLabel)
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         timeLabel.centerYAnchor.constraint(equalTo: view.topAnchor, constant: 55).isActive = true
@@ -109,16 +93,21 @@ class WebVC: UIViewController {
         topView.topAnchor.constraint(equalTo: view.topAnchor).isActive =  true
         topView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
         topView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
-        topView.heightAnchor.constraint(equalToConstant: 80).isActive =  true
+        
+        if UIScreen.main.nativeBounds.height > 1334 {
+            topView.heightAnchor.constraint(equalToConstant: 80).isActive =  true
+        } else {
+            topView.heightAnchor.constraint(equalToConstant: 70).isActive =  true
+        }
         
         topView.addSubview(dismissButton)
         dismissButton.translatesAutoresizingMaskIntoConstraints = false
-        dismissButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -15).isActive = true
+        dismissButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -10).isActive = true
         dismissButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive =  true
         
         topView.addSubview(controlsButton)
         controlsButton.translatesAutoresizingMaskIntoConstraints = false
-        controlsButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -10).isActive = true
+        controlsButton.bottomAnchor.constraint(equalTo: topView.bottomAnchor, constant: -5).isActive = true
         controlsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
         controlsButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         controlsButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
@@ -136,8 +125,8 @@ class WebVC: UIViewController {
         wkWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
         wkWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive =  true
         
-        view.addSubview(toolBarView)
-        toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
+//        view.addSubview(toolBarView)
+//        toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
         
         view.bringSubviewToFront(progressView)
         
@@ -160,44 +149,23 @@ class WebVC: UIViewController {
     @objc func toggleControlVisibility() {
         if controlsAreHidden {
             controlsButton.setImage(RevoImages.showControls, for: .normal)
-            transitionWebToolBarUp()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "animateWebToolBarUp"), object: nil)
             controlsAreHidden = false
         } else {
             controlsButton.setImage(RevoImages.hideControls, for: .normal)
-            transitionWebToolBarDown()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "animateWebToolBarDown"), object: nil)
             controlsAreHidden = true
         }
-        
-    }
-    
-    func transitionWebToolBarUp() {
-        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-            self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 120, width: UIScreen.main.bounds.width, height: 120)
-        }, completion: nil)
-    }
-    
-    func transitionWebToolBarDown() {
-        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-            self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
-        }, completion: nil)
     }
     
     @objc func dismissWebView() {
-        dismiss(animated: true, completion: nil)
-    }
-}
-
-extension WebVC: WebToolBarDelegate {
-    
-    func goBackwardsAPage() {
-        print("GOOOOOOO     back")
-        wkWebView.goBack()
-    }
-    
-    func goForwardAPage() {
-        print("forward")
-        wkWebView.goForward()
+        if currentlyRecording {
+            Alert.showBasicAlert(title: "Current Recording", message: "You're currently in a recording session, stop the session first if you would like to leave", vc: self)
+        } else {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "animateWebToolBarDown"), object: nil)
+            dismiss(animated: true, completion: nil)
+            loadInitialRequest()
+        }
     }
     
 }
-

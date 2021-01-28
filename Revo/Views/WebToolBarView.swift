@@ -8,8 +8,11 @@
 import UIKit
 
 protocol WebToolBarDelegate: class {
+    func webRecordingButtonPress()
+    func toggleRecodingMode()
     func goBackwardsAPage()
     func goForwardAPage()
+    func visitLibrary()
 }
 
 class WebToolBarView: UIView {
@@ -25,21 +28,26 @@ class WebToolBarView: UIView {
         }
     }
 
-    private let recordingButton = WebRecordButtonView()
+    // The Recoding button for the web view
+    let recordingButton = WebRecordButtonView()
+    
     weak var delegate: WebToolBarDelegate?
     
-    private let libraryButton: UIButton = {
+    let libraryButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.libraryIcon, for: .normal)
         button.imageView?.contentMode = .scaleAspectFill
         button.addTarget(self, action: #selector(visitLibraryVC), for: .touchUpInside)
+        button.layer.borderWidth = 3
+        button.layer.cornerRadius = 5
+        button.clipsToBounds = true
         button.clipsToBounds = true
         return button
     }()
     
     private let recordingModeButton: UIButton = {
         let button = UIButton()
-        button.addTarget(self, action: #selector(cameraMode), for: .touchUpInside)
+        button.addTarget(self, action: #selector(toggleCameraMode), for: .touchUpInside)
         button.setImage(RevoImages.cameraIcon(), for: .normal)
         button.tintColor = .white
         return button
@@ -63,6 +71,7 @@ class WebToolBarView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        self.addGestureRecogniser()
         self.configureViews()
     }
     
@@ -70,13 +79,17 @@ class WebToolBarView: UIView {
         super.init(coder: coder)
     }
     
+    private func addGestureRecogniser() {
+        recordingButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recordingButtonPress)))
+    }
+    
     private func configureViews() {
         self.addSubview(libraryButton)
         libraryButton.translatesAutoresizingMaskIntoConstraints = false
         libraryButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 20).isActive = true
         libraryButton.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 20).isActive = true
-        libraryButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        libraryButton.widthAnchor.constraint(equalToConstant: 45).isActive = true
+        libraryButton.heightAnchor.constraint(equalToConstant: 45).isActive = true
         
         self.addSubview(recordingModeButton)
         recordingModeButton.translatesAutoresizingMaskIntoConstraints = false
@@ -102,27 +115,70 @@ class WebToolBarView: UIView {
         forwardButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -20).isActive = true
         forwardButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
         forwardButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
-
+    }
+    
+    func updateLibraryButtonThumbnail() {
+        if let fileURL = FileManager.lastFileAddedToDirectory() {
+            let image = UIImage.thumbnailFromMovie(url: fileURL)
+            DispatchQueue.main.async {
+                self.libraryButton.setImage(image, for: .normal)
+                self.libraryButton.layer.borderColor = UIColor.white.cgColor
+            }
+        } else {
+            libraryButton.setImage(RevoImages.libraryIcon, for: .normal)
+            self.libraryButton.layer.borderColor = UIColor.clear.cgColor
+        }
     }
     
     @objc func visitLibraryVC() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "visitLibrary"), object: nil)
+        if recordingButton.currentState == .recording {
+            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you visit the library", vc: delegate as! UIViewController)
+        } else {
+            delegate?.visitLibrary()
+        }
     }
     
-    @objc func recordPress() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "recordScreen"), object: nil)
+    @objc func recordingButtonPress() {
+        delegate?.webRecordingButtonPress()
     }
     
-    @objc func cameraMode() {
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "toggleCameraMode"), object: nil)
+    @objc func toggleCameraMode() {
+        if recordingButton.currentState == .recording {
+            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you would like to change recording mode", vc: delegate as! UIViewController)
+            return
+        }
+        
         switch recordingMode {
         case .live:
             recordingButton.recordingMode = .video
+            delegate?.toggleRecodingMode()
             recordingMode = .video
         case .video:
-//            checkIfUserIsAwareOfLiveMode()
+            recordingButton.recordingMode = .live
+            delegate?.toggleRecodingMode()
+            checkIfUserIsAwareOfLiveMode()
+            recordingMode = .live
+        }
+    }
+    
+    func updateForCamera(mode: RecordingMode) {
+        switch mode {
+        case .live:
             recordingButton.recordingMode = .live
             recordingMode = .live
+        case .video:
+            recordingButton.recordingMode = .video
+            recordingMode = .video
+        }
+        
+    }
+    
+    private func checkIfUserIsAwareOfLiveMode() {
+        let userIsAware = UserDefaults.standard.bool(forKey: "userIsAwareOfLiveMode")
+        // Make sure that the user has not seen this message before
+        if !userIsAware {
+            Alert.showBasicAlert(title: "Live Broadcasting".localized, message: "live_broadcasting_message".localized, vc: delegate as! UIViewController)
+            UserDefaults.standard.setValue(true, forKey: "userIsAwareOfLiveMode")
         }
     }
     

@@ -27,6 +27,11 @@ class LibraryVC: UIViewController {
         let cellWidth = (view.frame.width / 2) - 21.5
         layout.itemSize = CGSize(width: cellWidth, height: cellWidth * 1.5 )
         layout.sectionInset = UIEdgeInsets(top: 60, left: 14, bottom: 60, right: 14)
+//        if UIScreen.main.nativeBounds.height > 1334 {
+//            layout.sectionInset = UIEdgeInsets(top: 60, left: 14, bottom: 60, right: 14)
+//        } else {
+//            layout.sectionInset = UIEdgeInsets(top: 40, left: 14, bottom: 40, right: 14)
+//        }
         layout.minimumInteritemSpacing = 15
         layout.minimumLineSpacing = 16
         return layout
@@ -179,8 +184,13 @@ class LibraryVC: UIViewController {
 
         view.addSubview(downArrowButton)
         downArrowButton.translatesAutoresizingMaskIntoConstraints = false
-        downArrowButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60).isActive = true
         downArrowButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+
+        if UIScreen.main.nativeBounds.height > 1334 {
+            downArrowButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60).isActive = true
+        } else {
+            downArrowButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
+        }
         
         view.addSubview(appLogoLabel)
         appLogoLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -189,7 +199,7 @@ class LibraryVC: UIViewController {
         
         view.addSubview(selectButton)
         selectButton.translatesAutoresizingMaskIntoConstraints = false
-        selectButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60).isActive = true
+        selectButton.centerYAnchor.constraint(equalTo: downArrowButton.centerYAnchor).isActive = true
         selectButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
         selectButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
@@ -341,10 +351,10 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
     }
     
     func showRecordingWith(url: URL) {
-        let previewVC = RecordingPreviewVC(recordingURL: url)
-        previewVC.deletionDelegate = self
-        previewVC.modalPresentationStyle = .fullScreen
-        self.present(previewVC, animated: false, completion: nil)
+        let videoPlayerVC = RevoVideoPlayer(recordingURL: url)
+        videoPlayerVC.deletionDelegate = self
+        videoPlayerVC.modalPresentationStyle = .fullScreen
+        self.present(videoPlayerVC, animated: false, completion: nil)
     }
     
     

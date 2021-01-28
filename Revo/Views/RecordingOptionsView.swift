@@ -29,6 +29,14 @@ class RecordingOptionsView: UIView {
         return label
     }()
     
+    let progressView: UIProgressView = {
+        let view = UIProgressView()
+        view.tintColor = .blue
+        view.isHidden = true
+        view.sizeToFit()
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: .zero)
         self.backgroundColor = UIColor.black.withAlphaComponent(0.9)
@@ -50,11 +58,16 @@ class RecordingOptionsView: UIView {
         deleteButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 20).isActive = true
         deleteButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -20).isActive = true
         
-        
         self.addSubview(optionsLabel)
         optionsLabel.translatesAutoresizingMaskIntoConstraints = false
         optionsLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 23).isActive = true
         optionsLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        
+        self.addSubview(progressView)
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.bottomAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        progressView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive =  true
+        progressView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive =  true
     }
     
     func updatePositionTo(state: SelectionState) {
