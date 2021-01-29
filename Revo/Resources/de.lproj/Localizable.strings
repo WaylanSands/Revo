@@ -68,9 +68,7 @@ Wenn Sie keine Live-Übertragung starten möchten, klicken Sie erneut auf die Sc
 
 "Switch Mode" = "Wechselmodus";
 
-"switchMode_message" = "Im Umschaltmodus können Sie Filmmaterial aufnehmen und gleichzeitig nahtlos zur vorderen und hinteren Kamera wechseln.
-
-Um zwischen anderen Modi zu wechseln, wählen Sie das Symbol rechts neben der Aufnahmetaste.";
+"switchMode_message" = "Im Umschaltmodus können Sie Filmmaterial aufnehmen und gleichzeitig nahtlos zur vorderen und hinteren Kamera wechseln.";
 
 "Got it" = "Ich habs";
 
@@ -92,6 +90,10 @@ Sie können die App verwenden, obwohl viele der Funktionen, die diese App einzig
 "Visit settings"  = "Besuchen Sie die Einstellungen";
 
 "send_to_settings_message" = "Damit Revo funktioniert, ist ein Kamerazugriff erforderlich. Um den Zugriff auf die Kamera zu ermöglichen, schalten Sie den Schalter in den Einstellungen der App um";
+
+"Switch Camera" = "Kamera Wechseln";
+
+"Double tap message" = "Tippen Sie zweimal auf den Bildschirm, um die Kamera während der Aufnahme zu wechseln.";
 
 // MARK: - Library
 

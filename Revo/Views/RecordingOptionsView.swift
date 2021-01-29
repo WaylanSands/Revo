@@ -9,6 +9,9 @@ import UIKit
 
 class RecordingOptionsView: UIView {
     
+    /// Dynamically set depending on device size
+    private var dynamicHeight: CGFloat = 80
+    
     let shareButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.shareIcon, for: .normal)
@@ -40,11 +43,19 @@ class RecordingOptionsView: UIView {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         self.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        self.configureHeight()
         self.configureViews()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+    
+    private func configureHeight() {
+        if UIScreen.main.nativeBounds.height <= 1334 {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            dynamicHeight = 65
+        }
     }
     
     private func configureViews() {
@@ -75,7 +86,7 @@ class RecordingOptionsView: UIView {
         switch state {
         case .active:
             // Reveal view
-            yPosition = UIScreen.main.bounds.height - 80
+            yPosition = UIScreen.main.bounds.height - dynamicHeight
         case .inactive:
             // Hide view
             yPosition = UIScreen.main.bounds.height
@@ -83,7 +94,7 @@ class RecordingOptionsView: UIView {
         }
         
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-            self.frame = CGRect(x: 0, y: yPosition, width: UIScreen.main.bounds.width, height: 80)
+            self.frame = CGRect(x: 0, y: yPosition, width: UIScreen.main.bounds.width, height: self.dynamicHeight)
         }, completion: nil)
     }
     

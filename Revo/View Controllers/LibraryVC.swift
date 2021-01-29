@@ -26,12 +26,7 @@ class LibraryVC: UIViewController {
         let layout = UICollectionViewFlowLayout()
         let cellWidth = (view.frame.width / 2) - 21.5
         layout.itemSize = CGSize(width: cellWidth, height: cellWidth * 1.5 )
-        layout.sectionInset = UIEdgeInsets(top: 60, left: 14, bottom: 60, right: 14)
-//        if UIScreen.main.nativeBounds.height > 1334 {
-//            layout.sectionInset = UIEdgeInsets(top: 60, left: 14, bottom: 60, right: 14)
-//        } else {
-//            layout.sectionInset = UIEdgeInsets(top: 40, left: 14, bottom: 40, right: 14)
-//        }
+        layout.sectionInset = UIEdgeInsets(top: 65, left: 14, bottom: 60, right: 14)
         layout.minimumInteritemSpacing = 15
         layout.minimumLineSpacing = 16
         return layout
@@ -82,7 +77,7 @@ class LibraryVC: UIViewController {
     
     private let appLogoLabel: UILabel = {
         let label = UILabel()
-        label.text = "revo"
+        label.text = "Revo"
         label.textColor = RevoColor.blackText
         label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         return label
@@ -189,6 +184,7 @@ class LibraryVC: UIViewController {
         if UIScreen.main.nativeBounds.height > 1334 {
             downArrowButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60).isActive = true
         } else {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
             downArrowButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
         }
         
@@ -217,6 +213,7 @@ class LibraryVC: UIViewController {
         emptyCollectionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         
         view.addSubview(recordingOptionsView)
+        // Default height is 80 though recordingOptionsView sets a dynamic height during initialisation.
         recordingOptionsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 80)
 
     }

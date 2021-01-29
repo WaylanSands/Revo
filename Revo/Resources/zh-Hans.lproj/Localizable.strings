@@ -68,9 +68,7 @@
 
 "Switch Mode" = "切换模式";
 
-"switchMode_message" = "切换模式可让您在无缝切换到前后摄像头的同时录制素材。
-
-要在其他模式之间切换，请选择录制按钮右侧的图标。";
+"switchMode_message" = "切换模式可让您在无缝切换到前后摄像头的同时录制素材。";
 
 "Got it" = "得到它了";
 
@@ -92,6 +90,10 @@
 "Visit settings"  = "造访设定";
 
 "send_to_settings_message" = "为了使Revo正常运行，需要使用摄像头。要允许摄像头访问，请在应用设置内切换开关。";
+
+"Switch Camera" = "切换相机";
+
+"Double tap message" = "双击屏幕在录制时切换相机。";
 
 // MARK: - Library
 

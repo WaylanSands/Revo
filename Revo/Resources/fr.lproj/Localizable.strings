@@ -68,9 +68,7 @@ Si vous ne souhaitez pas démarrer une diffusion en direct, sélectionnez à nou
 
 "Switch Mode" = "Mode de commutation";
 
-"switchMode_message" = "Le mode de commutation vous permet d'enregistrer des séquences tout en basculant de manière transparente vers la caméra avant et arrière.
-
-Pour basculer entre les autres modes, sélectionnez l'icône à droite du bouton d'enregistrement.";
+"switchMode_message" = "Le mode de commutation vous permet d'enregistrer des séquences tout en basculant de manière transparente vers la caméra avant et arrière.";
 
 "Got it" = "Je l'ai";
 
@@ -92,6 +90,10 @@ Vous pouvez utiliser l'application bien que de nombreuses fonctionnalités qui r
 "Visit settings"  = "Paramètres de visite";
 
 "send_to_settings_message" = "Pour que Revo fonctionne, un accès à la caméra est nécessaire. Pour autoriser l'accès à la caméra, veuillez basculer le commutateur dans les paramètres de l'application.";
+
+"Switch Camera" = "Changer de caméra";
+
+"Double tap message" = "Appuyez deux fois sur l'écran pour changer de caméra pendant l'enregistrement.";
 
 // MARK: - Library
 

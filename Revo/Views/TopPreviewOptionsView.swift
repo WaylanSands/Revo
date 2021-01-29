@@ -8,6 +8,9 @@
 import UIKit
 
 class TopPreviewOptionsView: UIView {
+    
+    /// Dynamically set depending on device size
+    private var dynamicHeight: CGFloat = 80
 
     let dateLabel: UILabel = {
         let label = UILabel()
@@ -31,11 +34,19 @@ class TopPreviewOptionsView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        self.configureHeight()
         self.configureViews()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+    
+    private func configureHeight() {
+        if UIScreen.main.nativeBounds.height <= 1334 {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            dynamicHeight = 65
+        }
     }
     
     private func configureViews() {
@@ -63,11 +74,11 @@ class TopPreviewOptionsView: UIView {
             yPosition = 0
         case .inactive:
             // Hide view
-            yPosition = -80
+            yPosition = -dynamicHeight
         }
         
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-            self.frame = CGRect(x: 0, y: yPosition, width: UIScreen.main.bounds.width, height: 80)
+            self.frame = CGRect(x: 0, y: yPosition, width: UIScreen.main.bounds.width, height: self.dynamicHeight)
         }, completion: nil)
     }
     

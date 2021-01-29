@@ -68,9 +68,7 @@ Pokud si nepřejete zahájit živé vysílání, přepněte jej opětovným stis
 
 "Switch Mode" = "Přepnout Režim";
 
-"switchMode_message" = "Přepínací režim umožňuje nahrávat záběry a plynule přepínat na přední a zadní kameru.
-
-Chcete-li přepínat mezi ostatními režimy, vyberte ikonu napravo od tlačítka nahrávání.";
+"switchMode_message" = "Přepínací režim umožňuje nahrávat záběry a plynule přepínat na přední a zadní kameru.";
 
 "Got it" = "Mám to";
 
@@ -92,6 +90,10 @@ Aplikaci můžete používat, i když mnoho funkcí, díky nimž je tato aplikac
 "Visit settings"  = "Navštivte nastavení";
 
 "send_to_settings_message" = "Aby funkce Revo fungovala, je nutný přístup ke kameře. Chcete-li povolit přístup k fotoaparátu, přepněte přepínač v rámci nastavení aplikace.";
+
+"Switch Camera" = "Přepnout kameru";
+
+"Double tap message" = "Dvojitým klepnutím na obrazovku přepnete kameru během nahrávání.";
 
 // MARK: - Library
 

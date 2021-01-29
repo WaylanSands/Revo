@@ -48,7 +48,7 @@
 		48B658EA25AD191A0043DEDF /* focus_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E825AD191A0043DEDF /* focus_animation.json */; };
 		48B658EB25AD191A0043DEDF /* mobile_360_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E925AD191A0043DEDF /* mobile_360_animation.json */; };
 		48B68F2025BE372000A2D9F5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */; };
-		48D43D9925C1196600830988 /* WebToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9825C1196600830988 /* WebToolBarView.swift */; };
+		48D43D9925C1196600830988 /* WebControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9825C1196600830988 /* WebControlsView.swift */; };
 		48D43D9E25C1222800830988 /* WebRecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9D25C1222800830988 /* WebRecordButtonView.swift */; };
 		48F72D4C25AD12520064E8C8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F72D4B25AD12520064E8C8 /* AppDelegate.swift */; };
 		48F72D4E25AD12520064E8C8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F72D4D25AD12520064E8C8 /* SceneDelegate.swift */; };
@@ -145,7 +145,7 @@
 		48B658E825AD191A0043DEDF /* focus_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = focus_animation.json; sourceTree = "<group>"; };
 		48B658E925AD191A0043DEDF /* mobile_360_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = mobile_360_animation.json; sourceTree = "<group>"; };
 		48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		48D43D9825C1196600830988 /* WebToolBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebToolBarView.swift; sourceTree = "<group>"; };
+		48D43D9825C1196600830988 /* WebControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebControlsView.swift; sourceTree = "<group>"; };
 		48D43D9D25C1222800830988 /* WebRecordButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRecordButtonView.swift; sourceTree = "<group>"; };
 		48F72D4825AD12520064E8C8 /* Revo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Revo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		48F72D4B25AD12520064E8C8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -232,7 +232,7 @@
 				48B658A825AD18360043DEDF /* SplitBarView.swift */,
 				48B658AA25AD18360043DEDF /* PreviewView.swift */,
 				48D43D9D25C1222800830988 /* WebRecordButtonView.swift */,
-				48D43D9825C1196600830988 /* WebToolBarView.swift */,
+				48D43D9825C1196600830988 /* WebControlsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -664,7 +664,7 @@
 				48B658B225AD18370043DEDF /* SplitBarView.swift in Sources */,
 				4854538A25C0CD2C00341C66 /* ModeSelectView.swift in Sources */,
 				48F72D4E25AD12520064E8C8 /* SceneDelegate.swift in Sources */,
-				48D43D9925C1196600830988 /* WebToolBarView.swift in Sources */,
+				48D43D9925C1196600830988 /* WebControlsView.swift in Sources */,
 				48B658E225AD18AD0043DEDF /* URL+Ext.swift in Sources */,
 				48B658B425AD18370043DEDF /* PreviewView.swift in Sources */,
 				485EEA5725AD5A3500F88165 /* AssetWriterError.swift in Sources */,
@@ -889,7 +889,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -913,7 +913,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

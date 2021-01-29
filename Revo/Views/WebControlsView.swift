@@ -15,7 +15,7 @@ protocol WebToolBarDelegate: class {
     func visitLibrary()
 }
 
-class WebToolBarView: UIView {
+class WebControlsView: UIView {
     
     var recordingMode: RecordingMode = .video {
         didSet {
@@ -28,7 +28,7 @@ class WebToolBarView: UIView {
         }
     }
 
-    // The Recoding button for the web view
+    // The Recoding button for the Web Mode.
     let recordingButton = WebRecordButtonView()
     
     weak var delegate: WebToolBarDelegate?
@@ -132,19 +132,15 @@ class WebToolBarView: UIView {
     
     @objc func visitLibraryVC() {
         if recordingButton.currentState == .recording {
-            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you visit the library", vc: delegate as! UIViewController)
+            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you visit the library.", vc: delegate as! UIViewController)
         } else {
             delegate?.visitLibrary()
         }
     }
     
-    @objc func recordingButtonPress() {
-        delegate?.webRecordingButtonPress()
-    }
-    
     @objc func toggleCameraMode() {
         if recordingButton.currentState == .recording {
-            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you would like to change recording mode", vc: delegate as! UIViewController)
+            Alert.showBasicAlert(title: "Currently Recording", message: "You're currently in a recording session, stop the session first if you would like to change recording mode.", vc: delegate as! UIViewController)
             return
         }
         
@@ -170,7 +166,6 @@ class WebToolBarView: UIView {
             recordingButton.recordingMode = .video
             recordingMode = .video
         }
-        
     }
     
     private func checkIfUserIsAwareOfLiveMode() {
@@ -180,6 +175,10 @@ class WebToolBarView: UIView {
             Alert.showBasicAlert(title: "Live Broadcasting".localized, message: "live_broadcasting_message".localized, vc: delegate as! UIViewController)
             UserDefaults.standard.setValue(true, forKey: "userIsAwareOfLiveMode")
         }
+    }
+    
+    @objc func recordingButtonPress() {
+        delegate?.webRecordingButtonPress()
     }
     
     @objc func goBack() {

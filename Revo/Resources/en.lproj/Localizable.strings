@@ -68,9 +68,7 @@ If you do not wish to start a live broadcast select the button again to toggle b
 
 "Switch Mode" = "Switch Mode";
 
-"switchMode_message" = "Switch mode allows you to record footage while seamlessly switching to the front and back camera.
-
-To toggle between other modes select the icon to the right of the recording button.";
+"switchMode_message" = "Switch mode allows you to record footage while seamlessly switching to the front and back camera";
 
 "Got it" = "Got it";
 
@@ -92,6 +90,10 @@ You are able to use the app though many of the features that make this app uniqu
 "Visit settings"  = "Visit settings";
 
 "send_to_settings_message" = "In order for Revo to function, camera access is needed. To allow camera access please toggle the switch within the app's settings.";
+
+"Switch Camera" = "Switch Camera";
+
+"Double tap message" = "Double tap the screen to switch camera while recording.";
 
 // MARK: - Library
 

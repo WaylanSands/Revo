@@ -12,8 +12,8 @@ import FirebaseAnalytics
 protocol ControlsDelegate: class {
     func updateCapture(setting: CameraSetting, with slider: UISlider)
     func changePresentationTo(mode: PresentationMode)
-    func cameraSelectionOf(selection: CameraSelection)
     func editPreviewStyleFor(mode: PresentationMode)
+    func changeCameraTo(selection: CameraSelection)
     func switchPreviewsFor(mode: PresentationMode)
     func changeTorchTo(mode: TorchMode)
     
@@ -88,10 +88,12 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
-    let toolBarView = WebToolBarView()
-
-    
+    /// Used for selecting camera modes.
     let modeSelectView = ModeSelectView()
+    
+    /// Custom controls used when in Web Mode.
+    private let webControlsView = WebControlsView()
+
     private let settingsVC = SettingsVC()
     
     private var currentSetting: CameraSetting?
@@ -224,7 +226,7 @@ class RecordingControlsVC: UIViewController {
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    //
+
     //MARK: - View Did Load
     
     override func viewDidLoad() {
@@ -240,7 +242,8 @@ class RecordingControlsVC: UIViewController {
     }
     
     private func configureDelegates() {
-        toolBarView.delegate = self
+        webControlsView.delegate = self
+        modeSelectView.delegate = self
     }
     
     private func configureObservers() {
@@ -320,14 +323,15 @@ class RecordingControlsVC: UIViewController {
         // Regular views added above passThroughView
         view.addSubview(timeLabel)
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
-        let timeTopAnchor = timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 50)
-        timeTopAnchor.priority = UILayoutPriority(500)
-        timeTopAnchor.isActive = true
-        
-        timeLabel.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor ,constant: -610) .isActive = true
-        
-        timeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         timeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        timeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        
+        if UIScreen.main.nativeBounds.height > 1334 {
+            timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 50).isActive = true
+        } else {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 25).isActive = true
+        }
         
         view.addSubview(settingsButton)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
@@ -353,19 +357,22 @@ class RecordingControlsVC: UIViewController {
         if UIScreen.main.nativeBounds.height > 1334 {
             lowerDarkView.heightAnchor.constraint(equalToConstant: 170).isActive = true
         } else {
-            lowerDarkView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            lowerDarkView.heightAnchor.constraint(equalToConstant: 140).isActive = true
         }
         
         view.addSubview(libraryButton)
         libraryButton.translatesAutoresizingMaskIntoConstraints = false
-        let libraryBottomAnchor = libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -65)
-        libraryBottomAnchor.priority = UILayoutPriority(500)
-        libraryBottomAnchor.isActive = true
-        
-        libraryButton.topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor ,constant: 580) .isActive = true
         libraryButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         libraryButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        if UIScreen.main.nativeBounds.height > 1334 {
+            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -65).isActive = true
+        } else {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -35).isActive = true
+        }
         
         view.addSubview(switchButton)
         switchButton.translatesAutoresizingMaskIntoConstraints = false
@@ -421,10 +428,9 @@ class RecordingControlsVC: UIViewController {
         modeSelectView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         modeSelectView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         modeSelectView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        modeSelectView.modeSelection = updatePresentation
         
-        view.addSubview(toolBarView)
-        toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
+        view.addSubview(webControlsView)
+        webControlsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
         
         view.addSubview(cameraSettingSlider)
         cameraSettingSlider.translatesAutoresizingMaskIntoConstraints = false
@@ -505,10 +511,11 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
+    // Determine which recording button has been pressed
     private func animateRecordingButton() {
         switch presentationMode {
         case .web:
-            toolBarView.recordingButton.animateRecordingButton()
+            webControlsView.recordingButton.animateRecordingButton()
         default:
             recordingButton.animateRecordingButton()
         }
@@ -541,16 +548,18 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
-    func enableControlsWhileVideoProcesses(enable: Bool) {
+    // Do not allow users to navigate to the Library or start another
+    // recording until the previous video has been written.
+    private func enableControlsWhileVideoProcesses(enable: Bool) {
         switch presentationMode {
         case .web:
-            toolBarView.recordingButton.isUserInteractionEnabled = enable
-            toolBarView.libraryButton.isUserInteractionEnabled = enable
+            webControlsView.recordingButton.isUserInteractionEnabled = enable
+            webControlsView.libraryButton.isUserInteractionEnabled = enable
             if enable {
-                toolBarView.recordingButton.hideActivitySpinner()
-                toolBarView.updateLibraryButtonThumbnail()
+                webControlsView.recordingButton.hideActivitySpinner()
+                webControlsView.updateLibraryButtonThumbnail()
             } else {
-                toolBarView.recordingButton.showActivitySpinner()
+                webControlsView.recordingButton.showActivitySpinner()
             }
         default:
             recordingButton.isUserInteractionEnabled = enable
@@ -604,6 +613,7 @@ class RecordingControlsVC: UIViewController {
             self.modeSelectView.alpha = newAlpha
             self.libraryButton.alpha = newAlpha
             self.lowerDarkView.alpha = newAlpha
+            self.switchButton.alpha = newAlpha
         }, completion: nil)
     }
     
@@ -628,11 +638,11 @@ class RecordingControlsVC: UIViewController {
             switchCamInfoButton.isHidden = true
             presentationMode = .splitScreen
         case .web:
-            toolBarView.updateLibraryButtonThumbnail()
+            webControlsView.updateLibraryButtonThumbnail()
             editPreviewStyleButton.isHidden = true
             switchCamInfoButton.isHidden = true
             delegate?.changePresentationTo(mode: .web)
-            animateOutControlsForWebMode()
+            hideControlsForWebMode()
             presentationMode = .web
         }
     }
@@ -749,11 +759,11 @@ class RecordingControlsVC: UIViewController {
         
         switch newZoomFactor {
         case "0.5":
-            delegate?.cameraSelectionOf(selection: .ultraWide)
+            delegate?.changeCameraTo(selection: .ultraWide)
         case "1":
-            delegate?.cameraSelectionOf(selection: .wide)
+            delegate?.changeCameraTo(selection: .wide)
         case "1.5":
-            delegate?.cameraSelectionOf(selection: .telephoto)
+            delegate?.changeCameraTo(selection: .telephoto)
         default:
             break
         }
@@ -863,7 +873,7 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
                 
                 if error == nil {
                     print("Broadcast started successfully!")
-                    self.toolBarView.recordingButton.animateRecordingButton()
+                    self.webControlsView.recordingButton.animateRecordingButton()
                     self.recordingButton.animateRecordingButton()
                     self.recordingButton.hideActivitySpinner()
                     self.alertMultiViewOfRecordingStart()
@@ -876,23 +886,30 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
         }
     }
     
-    func animateOutControlsForWebMode() {
+    // Web mode used webControlsView to handle recording and navigation so we
+    // hide the default controls so they do not interfere. Also camera settings
+    // buttons are not applicable when in Web Mode.
+    func hideControlsForWebMode() {
         for each in view.subviews {
-            if !each.isKind(of: PassThroughView.self) && !each.isKind(of: WebToolBarView.self) && each != timeLabel {
+            if !each.isKind(of: PassThroughView.self) && !each.isKind(of: WebControlsView.self) && each != timeLabel {
                 each.isHidden = true
             }
         }
     }
     
-    func animateInControls() {
+    // Show the controls when returning from Web Mode (WebVC). This method is called
+    // from MainRecordingVC as that is the controller which presents WebVC.
+    func showControls() {
+        // cameraSettingSlider should be hidden by default.
         for each in view.subviews where each != cameraSettingSlider {
             each.isHidden = false
         }
         
-        if !AVCaptureMultiCamSession.isMultiCamSupported {
+        if devicesAvailable.count == 1 {
+            // There is only 1 rear camera available so user is unable to toggle
+            // through cameras via the cameraSelectionButton
             cameraSelectionButton.isHidden = true
         }
-        
     }
 
         
@@ -929,32 +946,40 @@ extension RecordingControlsVC: WebToolBarDelegate {
         recordButtonTap()
     }
     
-    // Not WebToolBarDelegate methods below.
-    // These are methods called by WebVC which manages hiding and showing the WebToolBarView
+    // The two methods below are called by WebVC which manages hiding and
+    // showing the WebToolBarView via NotificationCenter.
     
     @objc func animateWebToolBarUp() {
-        // This keeps the recoding mode in sync with self when first presenting the toolBarView
-        toolBarView.updateForCamera(mode: self.recordingMode)
+        // Keeps the webControlsView's recoding mode in sync with self when first presenting the webControlsView.
+        webControlsView.updateForCamera(mode: self.recordingMode)
         
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
             if UIScreen.main.nativeBounds.height > 1334 {
-                self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 120, width: UIScreen.main.bounds.width, height: 120)
+                self.webControlsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 120, width: UIScreen.main.bounds.width, height: 120)
             } else {
-                self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 90, width: UIScreen.main.bounds.width, height: 90)
+                self.webControlsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height - 90, width: UIScreen.main.bounds.width, height: 90)
             }
         }, completion: nil)
     }
     
     @objc func animateWebToolBarDown() {
-        
+        // User has selected to hide the webControlsView
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
             if UIScreen.main.nativeBounds.height > 1334 {
-                self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
+                self.webControlsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
             } else {
-                self.toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 90)
+                self.webControlsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 90)
             }
         }, completion: nil)
     }
     
     
+}
+
+extension RecordingControlsVC: ModeSelectionDelegate {
+    
+    func changeModeTo(_ mode: PresentationMode) {
+        updatePresentation(to: mode)
+    }
+ 
 }

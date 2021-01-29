@@ -12,10 +12,10 @@ import WebKit
 class WebVC: UIViewController {
 
     var frontFloatingPreviewView = FrontPreviewView()
+    private var controlsAreHidden = true
     var currentlyRecording = false
-    var controlsAreHidden = true
     
-    let webConfiguration: WKWebViewConfiguration = {
+    private let webConfiguration: WKWebViewConfiguration = {
         let config = WKWebViewConfiguration()
         config.allowsInlineMediaPlayback = true
         return config
@@ -28,7 +28,7 @@ class WebVC: UIViewController {
         return view
     }()
     
-    let progressView: UIProgressView = {
+    private let progressView: UIProgressView = {
         let view = UIProgressView()
         view.tintColor = .blue
         view.sizeToFit()
@@ -45,20 +45,20 @@ class WebVC: UIViewController {
     }()
     
     
-    let topView: UIView = {
+    private let topView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
         return view
     }()
     
-    let dismissButton: UIButton = {
+    private let dismissButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.whiteDownArrow, for: .normal)
         button.addTarget(self, action: #selector(dismissWebView), for: .touchUpInside)
         return button
     }()
     
-    let controlsButton: UIButton = {
+    private let controlsButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.hideControls, for: .normal)
         button.addTarget(self, action: #selector(toggleControlVisibility), for: .touchUpInside)
@@ -72,7 +72,16 @@ class WebVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadInitialRequest()
+        configureDelegate()
         configureViews()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        RevoAnalytics.logScreenView(for: "Web Mode Screen", ofClass: "WebVC")
+    }
+    
+    private func configureDelegate() {
+        wkWebView.navigationDelegate = self
     }
 
     private func loadInitialRequest() {
@@ -97,7 +106,8 @@ class WebVC: UIViewController {
         if UIScreen.main.nativeBounds.height > 1334 {
             topView.heightAnchor.constraint(equalToConstant: 80).isActive =  true
         } else {
-            topView.heightAnchor.constraint(equalToConstant: 70).isActive =  true
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            topView.heightAnchor.constraint(equalToConstant: 60).isActive =  true
         }
         
         topView.addSubview(dismissButton)
@@ -111,12 +121,6 @@ class WebVC: UIViewController {
         controlsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
         controlsButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         controlsButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        view.addSubview(progressView)
-        progressView.translatesAutoresizingMaskIntoConstraints = false
-        progressView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive =  true
-        progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
-        progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
 
         view.addSubview(wkWebView)
         wkWebView.translatesAutoresizingMaskIntoConstraints = false
@@ -125,10 +129,11 @@ class WebVC: UIViewController {
         wkWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
         wkWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive =  true
         
-//        view.addSubview(toolBarView)
-//        toolBarView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 120)
-        
-        view.bringSubviewToFront(progressView)
+        view.addSubview(progressView)
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.topAnchor.constraint(equalTo: topView.bottomAnchor).isActive =  true
+        progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive =  true
+        progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive =  true
         
         view.addSubview(frontFloatingPreviewView)
         frontFloatingPreviewView.frame = CGRect(x: (UIScreen.main.bounds.width / 2) - 100, y: (UIScreen.main.bounds.height / 2), width: 200, height: 200)
@@ -146,7 +151,7 @@ class WebVC: UIViewController {
         }
     }
     
-    @objc func toggleControlVisibility() {
+    @objc private func toggleControlVisibility() {
         if controlsAreHidden {
             controlsButton.setImage(RevoImages.showControls, for: .normal)
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "animateWebToolBarUp"), object: nil)
@@ -158,9 +163,9 @@ class WebVC: UIViewController {
         }
     }
     
-    @objc func dismissWebView() {
+    @objc private func dismissWebView() {
         if currentlyRecording {
-            Alert.showBasicAlert(title: "Current Recording", message: "You're currently in a recording session, stop the session first if you would like to leave", vc: self)
+            Alert.showBasicAlert(title: "Current Recording", message: "You're currently in a recording session, stop the session first if you would like to leave.", vc: self)
         } else {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "animateWebToolBarDown"), object: nil)
             dismiss(animated: true, completion: nil)
@@ -168,4 +173,12 @@ class WebVC: UIViewController {
         }
     }
     
+}
+
+extension WebVC: WKNavigationDelegate {
+    
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("didFailProvisionalNavigation \(error.localizedDescription)")
+    }
+
 }

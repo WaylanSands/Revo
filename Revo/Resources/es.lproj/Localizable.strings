@@ -68,9 +68,7 @@ Si no desea iniciar una transmisión en vivo, seleccione el botón nuevamente pa
 
 "Switch Mode" = "Modo interruptor";
 
-"switchMode_message" = "El modo de cambio le permite grabar imágenes mientras cambia sin problemas a la cámara frontal y trasera.
-
-Para alternar entre otros modos, seleccione el icono a la derecha del botón de grabación.";
+"switchMode_message" = "El modo de cambio le permite grabar imágenes mientras cambia sin problemas a la cámara frontal y trasera.";
 
 "Got it" = "Entendido";
 
@@ -92,6 +90,10 @@ Puede utilizar la aplicación, aunque muchas de las funciones que hacen que esta
 "Visit settings"  = "Configuración de visita";
 
 "send_to_settings_message" = "Para que Revo funcione, se necesita acceso a la cámara. Para permitir el acceso a la cámara, mueva el interruptor dentro de la configuración de la aplicación.";
+
+"Switch Camera" = "Cambiar cámara";
+
+"Double tap message" = "Toque dos veces la pantalla para cambiar de cámara mientras graba.";
 
 // MARK: - Library
 

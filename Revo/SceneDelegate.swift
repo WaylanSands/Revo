@@ -20,7 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
         window?.windowScene = windowScene
         print("""
-            The error below is thrown when returning the shared instance of the apps RPScreenRecorder.  A solution to remove this error is in progress.
+            
+            The error below is bug thrown when returning the shared instance of the apps RPScreenRecorder.  A solution to remove this error is in progress.
 
             """)
     }

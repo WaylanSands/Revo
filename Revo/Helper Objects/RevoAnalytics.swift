@@ -92,7 +92,7 @@ struct RevoAnalytics {
         case .pip:
             presentationModeString = "pip_mode"
         case .web:
-            break
+            presentationModeString = "web_mode"
         }
         
         Analytics.logEvent(recordingModeString + presentationModeString, parameters: nil)

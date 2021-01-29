@@ -27,7 +27,7 @@ class RevoVideoPlayer: UIViewController {
     weak var deletionDelegate: RecordingPreviewDelegate?
     private var recordingDisplayLink: CADisplayLink!
             
-    let recordingOptionsView: RecordingOptionsView = {
+    private let recordingOptionsView: RecordingOptionsView = {
         let view = RecordingOptionsView()
         view.deleteButton.addTarget(self, action: #selector(deleteRecording), for: .touchUpInside)
         view.shareButton.addTarget(self, action: #selector(shareRecording), for: .touchUpInside)
@@ -97,11 +97,11 @@ class RevoVideoPlayer: UIViewController {
         playPauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         view.addSubview(recordingOptionsView)
-        recordingOptionsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 67)
-        // Setup the optionsLabel to show the file size of the recording.
-        recordingOptionsView.optionsLabel.text = recordingURL!.fileSizeString
+        // Default height is 80 though recordingOptionsView sets a dynamic height during initialisation.
+        recordingOptionsView.frame = CGRect(x: 0, y: UIScreen.main.bounds.height, width: UIScreen.main.bounds.width, height: 80)
         
         view.addSubview(topBarView)
+        // Default height is 80 though recordingOptionsView sets a dynamic height during initialisation.
         topBarView.frame = CGRect(x: 0, y: -80, width: UIScreen.main.bounds.width, height: 80)
     }
     
@@ -210,7 +210,7 @@ class RevoVideoPlayer: UIViewController {
         
     }
     
-    func animatePlayPauseButton(alpha: CGFloat) {
+    private func animatePlayPauseButton(alpha: CGFloat) {
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
             self.playPauseButton.alpha = alpha
         }, completion: nil)

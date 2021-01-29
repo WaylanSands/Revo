@@ -68,9 +68,7 @@ Dacă nu doriți să începeți o transmisie live, selectați din nou butonul pe
 
 "Switch Mode" = "Switch Mode";
 
-"switchMode_message" = "Modul de comutare vă permite să înregistrați imagini în timp ce comutați fără probleme la camera frontală și cea din spate.
-
-Pentru a comuta între alte moduri, selectați pictograma din dreapta butonului de înregistrare.";
+"switchMode_message" = "Modul de comutare vă permite să înregistrați imagini în timp ce comutați fără probleme la camera frontală și cea din spate";
 
 "Got it" = "Am înțeles";
 
@@ -92,6 +90,10 @@ Puteți utiliza aplicația, deși multe dintre caracteristicile care fac aceast�
 "Visit settings"  = "Accesați setările";
 
 "send_to_settings_message" = "Pentru ca Revo să funcționeze, este necesar accesul camerei. Pentru a permite accesul camerei, vă rugăm să comutați comutatorul în setările aplicației.";
+
+"Switch Camera" = "Comutați Camera";
+
+"Double tap message" = "Atingeți de două ori ecranul pentru a comuta camera în timpul înregistrării.";
 
 // MARK: - Library
 

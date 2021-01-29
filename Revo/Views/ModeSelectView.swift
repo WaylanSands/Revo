@@ -8,28 +8,35 @@
 import UIKit
 import AVFoundation
 
-protocol ModeSelectionDelegate {
+protocol ModeSelectionDelegate: class {
     func changeModeTo(_ mode: PresentationMode)
 }
 
+/// ModeSelectView works like a custom UISegmentControl which allows
+/// users to select each Camera Mode more efficiently.
+///
+/// It mimics the design and functionality used in native Camera app as in iOS 14. Users may
+/// swipe left or right to make a selection or tap an individual label.
+///
+/// The ModeSelectView is also dynamic as it adjusts when device in not MultiCam supported.
 class ModeSelectView: UIView {
     
-    lazy var modeLabels = [switchLabel, pipLabel, splitLabel, webLabel]
-    lazy var activeLabel: UILabel = switchLabel
+    lazy private var modeLabels = [switchLabel, pipLabel, splitLabel, webLabel]
+    lazy private var activeLabel: UILabel = switchLabel
 
-    var labelFont: UIFont = UIFont.systemFont(ofSize: 15, weight: .regular)
-    let screenCenterX = UIScreen.main.bounds.width / 2
-    var stackViewWidth: CGFloat = 0.0
-    var selectionIndex: Int = 0
+    private var labelFont: UIFont = UIFont.systemFont(ofSize: 15, weight: .regular)
+    private let screenCenterX = UIScreen.main.bounds.width / 2
+    private var stackViewWidth: CGFloat = 0.0
+    private var selectionIndex: Int = 0
     
-    var modeSelection: ((PresentationMode) -> ())?
-    
-    var initialOffset: CGFloat {
+    weak var delegate: ModeSelectionDelegate?
+        
+    private var initialOffset: CGFloat {
         let label = modeLabels[0]
         return label.text!.widthWith(font: labelFont) / 2
     }
         
-    let switchLabel: UILabel = {
+    private let switchLabel: UILabel = {
        let label = UILabel()
         label.text = "SWITCH"
         label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
@@ -38,7 +45,7 @@ class ModeSelectView: UIView {
         return label
     }()
     
-    lazy var  pipLabel: UILabel = {
+    private lazy var  pipLabel: UILabel = {
        let label = UILabel()
         label.text = "PIP"
         label.font = labelFont
@@ -47,7 +54,7 @@ class ModeSelectView: UIView {
         return label
     }()
     
-    lazy var  splitLabel: UILabel = {
+    private lazy var  splitLabel: UILabel = {
        let label = UILabel()
         label.text = "SPLIT"
         label.font = labelFont
@@ -56,7 +63,7 @@ class ModeSelectView: UIView {
         return label
     }()
     
-    lazy var  webLabel: UILabel = {
+    private lazy var  webLabel: UILabel = {
        let label = UILabel()
         label.text = "WEB"
         label.font = labelFont
@@ -65,7 +72,7 @@ class ModeSelectView: UIView {
         return label
     }()
         
-    let stackView: UIStackView = {
+    private let stackView: UIStackView = {
        let view = UIStackView()
         view.distribution = .equalSpacing
         view.spacing = 25
@@ -74,13 +81,13 @@ class ModeSelectView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        configureMutiCamSupport()
+        configureMultiCamSupport()
         configureGestures()
         findTotalWith()
         configureViews()
     }
     
-    private func configureMutiCamSupport() {
+    private func configureMultiCamSupport() {
         if !AVCaptureMultiCamSession.isMultiCamSupported {
             modeLabels.removeAll(where: { $0.text == "PIP" || $0.text == "SPLIT" })
         }
@@ -107,7 +114,7 @@ class ModeSelectView: UIView {
         webLabel.addGestureRecognizer(webGesture)
     }
     
-    func findTotalWith() {
+    private func findTotalWith() {
         for each in modeLabels {
             stackViewWidth += each.text!.widthWith(font: each.font)
             stackViewWidth += stackView.spacing
@@ -119,7 +126,7 @@ class ModeSelectView: UIView {
         super.init(coder: coder)
     }
     
-    func configureViews() {
+    private func configureViews() {
         self.addSubview(stackView)
         stackView.frame = CGRect(x: screenCenterX - initialOffset, y: 0, width: stackViewWidth, height: 50)
         
@@ -134,7 +141,7 @@ class ModeSelectView: UIView {
         }
     }
     
-    func offsetForLabel(index: Int) {
+    private func offsetForLabel(index: Int) {
         var offSet: CGFloat = 0
         
         for each in modeLabels.prefix(through: index) {
@@ -149,7 +156,7 @@ class ModeSelectView: UIView {
         animateModeLabelsTo(x: screenCenterX - offSet)
     }
 
-    @objc func leftSwipe() {
+    @objc private func leftSwipe() {
         switch selectionIndex {
         case 0:
             selectionIndex = 1
@@ -167,7 +174,7 @@ class ModeSelectView: UIView {
         }
     }
     
-    @objc func rightSwipe() {
+    @objc private func rightSwipe() {
         switch selectionIndex {
         case 0:
             break
@@ -185,7 +192,7 @@ class ModeSelectView: UIView {
         }
     }
     
-    func animateModeLabelsTo(x: CGFloat) {
+    private func animateModeLabelsTo(x: CGFloat) {
         updateSelectedStyle()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
             self.stackView.frame = CGRect(x: x, y: 0, width: self.stackViewWidth, height: 50)
@@ -194,7 +201,7 @@ class ModeSelectView: UIView {
         }
     }
     
-    func updateSelectedStyle() {
+    private func updateSelectedStyle() {
         for each in modeLabels {
             if each != activeLabel {
                 each.textColor = UIColor.white.withAlphaComponent(0.4)
@@ -206,7 +213,7 @@ class ModeSelectView: UIView {
         }
     }
     
-    func updatePresentationTo(mode: String) {
+    private func updatePresentationTo(mode: String) {
         switch mode {
         case "SWITCH":
             updatePresentationTo(mode: .switchCam)
@@ -221,11 +228,8 @@ class ModeSelectView: UIView {
         }
     }
     
-    func updatePresentationTo(mode: PresentationMode) {
-        guard let modeSelection = modeSelection else {
-            fatalError("Mode selection closure was nil")
-        }
-        modeSelection(mode)
+    private func updatePresentationTo(mode: PresentationMode) {
+        delegate?.changeModeTo(mode)
     }
     
     @objc func switchLabelTapped() {
@@ -235,7 +239,7 @@ class ModeSelectView: UIView {
         updateSelectedStyle()
     }
     
-    @objc func pipLabelTapped() {
+    @objc private func pipLabelTapped() {
         let index = modeLabels.firstIndex(of: pipLabel)!
         selectionIndex = index
         offsetForLabel(index: index)
@@ -249,7 +253,7 @@ class ModeSelectView: UIView {
         updateSelectedStyle()
     }
     
-    @objc func webLabelTapped() {
+    @objc private func webLabelTapped() {
         let index = modeLabels.firstIndex(of: webLabel)!
         selectionIndex = index
         offsetForLabel(index: index)

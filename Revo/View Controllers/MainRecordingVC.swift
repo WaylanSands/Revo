@@ -63,10 +63,10 @@ class MainRecordingVC: UIViewController {
     // splitScreenVC holds its own previewLayers which manages gestures
     private let splitScreenVC = SplitScreenVC()
     
-    // AVCaptureVideoPreviewLayers change when switching recordingMode etc split screen
-    private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
+    // Used to alternate VideoPreviewLayers depending on Camera Mode
     private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
-    
+    private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
+
     private let appLogo: UILabel = {
         let label = UILabel()
         label.text = "revo"
@@ -99,18 +99,15 @@ class MainRecordingVC: UIViewController {
         RevoAnalytics.logScreenView(for: "Main recording Screen", ofClass: "MainRecordingVC")
         configureForegroundObserver()
         
+        // Used when returning from WebVC (Web Mode) to navigate to the applicable Mode.
         if presentationMode == .web && AVCaptureMultiCamSession.isMultiCamSupported  {
             recordingControlsVC.modeSelectView.splitLabelTapped()
-            recordingControlsVC.animateInControls()
+            recordingControlsVC.showControls()
         } else if presentationMode == .web {
             // AVCaptureMultiCamSession is not supported revert to Switch Mode
             recordingControlsVC.modeSelectView.switchLabelTapped()
-            recordingControlsVC.animateInControls()
+            recordingControlsVC.showControls()
         }
-        
-//        let webView = WebVC(url: URL(string: "https://www.google.com")!)
-//        webView.modalPresentationStyle = .fullScreen
-//        present(webView, animated: false, completion: nil)
 
     }
     
@@ -153,8 +150,19 @@ class MainRecordingVC: UIViewController {
     }
     
     private func configureGestureRecognisers() {
-        view.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(rearPreviewLongPress)))
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(rearPreviewTapped)))
+        view.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(mainViewLongPress)))
+        
+        // Used for focusing rear camera
+        let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(mainViewTapped))
+        singleTapGesture.numberOfTapsRequired = 1
+        view.addGestureRecognizer(singleTapGesture)
+
+        // Used for switching camera views especially while recording
+        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(mainViewDoubleTapped))
+        doubleTapGesture.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleTapGesture)
+        
+        singleTapGesture.require(toFail: doubleTapGesture)
     }
     
     // Observes app moving to foreground so app can check the apps authorisation when user starts or returns to the app.
@@ -196,7 +204,13 @@ class MainRecordingVC: UIViewController {
         view.addSubview(appLogo)
         appLogo.translatesAutoresizingMaskIntoConstraints = false
         appLogo.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).isActive = true
-        appLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
+        
+        if UIScreen.main.nativeBounds.height > 1334 {
+            appLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
+        } else {
+            // Device is an iPhone SE, 6S, 7 , 8 or smaller
+            appLogo.topAnchor.constraint(equalTo: view.topAnchor, constant: 15).isActive = true
+        }
     }
     
     // check the app's authorisation status and start cam session if authorised.
@@ -208,6 +222,9 @@ class MainRecordingVC: UIViewController {
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 if granted {
                     self.setupCaptureSession()
+                    DispatchQueue.main.async {
+                        Alert.showBasicAlert(title: "Switch Camera".localized, message: "Double tap message".localized, vc: self)
+                    }
                 } else {
                     // User selected "Don't allow camera access"
                     self.sendToSettingToAllowCameraAccess()
@@ -263,6 +280,7 @@ class MainRecordingVC: UIViewController {
                                                                 mediaType: .video, position: .back)
         
         if discoverySession.devices.isEmpty {
+            // Hide cameraSelectionButton as there is only 1 camera 
             recordingControlsVC.cameraSelectionButton.isHidden = true
             recordingControlsVC.devicesAvailable = singleCamera
         }
@@ -487,7 +505,8 @@ class MainRecordingVC: UIViewController {
     
     //MARK: - Focusing Gesture Recognisers
     
-    @objc private func rearPreviewTapped(sender: UITapGestureRecognizer) {
+    @objc private func mainViewTapped(sender: UITapGestureRecognizer) {
+                
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
         let device = primaryDevice()
@@ -531,7 +550,7 @@ class MainRecordingVC: UIViewController {
         }
     }
     
-    @objc private func rearPreviewLongPress(sender: UILongPressGestureRecognizer) {
+    @objc private func mainViewLongPress(sender: UILongPressGestureRecognizer) {
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
         let device = primaryDevice()
@@ -575,6 +594,11 @@ class MainRecordingVC: UIViewController {
             Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
         
+    }
+    
+    @objc func mainViewDoubleTapped() {
+        recordingControlsVC.cameraSettingSlider.isHidden = true
+        switchPreviewsFor(mode: presentationMode)
     }
     
     
@@ -693,6 +717,7 @@ extension MainRecordingVC: ControlsDelegate {
                 setupSingleCamSessionFor(cameraPosition: .front)
             }
         case .web:
+            // Switching cameras in web mode not supported in version 1.2
             break
         }
     }
@@ -716,7 +741,7 @@ extension MainRecordingVC: ControlsDelegate {
         }
     }
     
-    func cameraSelectionOf(selection: CameraSelection) {
+    func changeCameraTo(selection: CameraSelection) {
         switch selection {
         case .wide:
             selectedRearDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
