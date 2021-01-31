@@ -22,7 +22,7 @@ class SettingsVC: UIViewController {
         let label = UILabel()
         label.text = "Settings".localized
         label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
-        label.textColor = RevoColor.blackText
+        label.textColor = .label
         label.textAlignment = .center
         return label
     }()
@@ -30,7 +30,7 @@ class SettingsVC: UIViewController {
     private lazy var supportButton: UIButton = {
        let button = UIButton()
         button.setTitle("Get support".localized, for: .normal)
-        button.setTitleColor(RevoColor.blackText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(getSupport), for: .touchUpInside)
@@ -42,7 +42,7 @@ class SettingsVC: UIViewController {
     private let watermarkButton: UIButton = {
        let button = UIButton()
         button.setTitle("Remove watermark".localized, for: .normal)
-        button.setTitleColor(RevoColor.blackText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.contentEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0)
         button.contentHorizontalAlignment = .leading
@@ -59,7 +59,7 @@ class SettingsVC: UIViewController {
     private lazy var shareButton: UIButton = {
        let button = UIButton()
         button.setTitle("Share the app".localized, for: .normal)
-        button.setTitleColor(RevoColor.blackText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(shareApp), for: .touchUpInside)
@@ -71,7 +71,7 @@ class SettingsVC: UIViewController {
     private lazy var aboutButton: UIButton = {
        let button = UIButton()
         button.setTitle("About Revo".localized, for: .normal)
-        button.setTitleColor(RevoColor.blackText, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.imageEdgeInsets = UIView.localizedUIEdgeInsets(top: 0, leading: view.frame.width - 40, bottom: 0, trailing: 0)
         button.addTarget(self, action: #selector(aboutRevo), for: .touchUpInside)
@@ -85,7 +85,7 @@ class SettingsVC: UIViewController {
         let label = UILabel()
         label.text = "Version 1.2.0"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        label.textColor = UIColor.black.withAlphaComponent(0.3)
+        label.textColor = .tertiaryLabel
         label.textAlignment = .center
         return label
     }()
@@ -108,7 +108,7 @@ class SettingsVC: UIViewController {
     }
     
     private func configureViews() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor.systemBackground
         
         view.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -129,7 +129,7 @@ class SettingsVC: UIViewController {
         supportButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let supportButtonUnderlineView = UIView(frame: CGRect(x: 15, y: 50, width: view.frame.width, height: 1))
-        supportButtonUnderlineView.backgroundColor = UIColor.black
+        supportButtonUnderlineView.backgroundColor = .separator
         supportButton.addSubview(supportButtonUnderlineView)
         
         view.addSubview(watermarkButton)
@@ -140,7 +140,7 @@ class SettingsVC: UIViewController {
         watermarkButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let watermarkButtonUnderlineView = UIView(frame: CGRect(x: 15, y: 50, width: view.frame.width, height: 1))
-        watermarkButtonUnderlineView.backgroundColor = UIColor.black
+        watermarkButtonUnderlineView.backgroundColor = .separator
         watermarkButton.addSubview(watermarkButtonUnderlineView)
         
         watermarkButton.addSubview(removeWatermarkSwitch)
@@ -156,7 +156,7 @@ class SettingsVC: UIViewController {
         shareButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let shareButtonUnderlineView = UIView(frame: CGRect(x: 15, y: 50, width: view.frame.width, height: 1))
-        shareButtonUnderlineView.backgroundColor = UIColor.black
+        shareButtonUnderlineView.backgroundColor = .separator
         shareButton.addSubview(shareButtonUnderlineView)
         
         view.addSubview(aboutButton)
@@ -167,7 +167,7 @@ class SettingsVC: UIViewController {
         aboutButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let aboutButtonUnderlineView = UIView(frame: CGRect(x: 15, y: 50, width: view.frame.width, height: 1))
-        aboutButtonUnderlineView.backgroundColor = UIColor.black
+        aboutButtonUnderlineView.backgroundColor = .separator
         aboutButton.addSubview(aboutButtonUnderlineView)
         
         view.addSubview(versionLabel)

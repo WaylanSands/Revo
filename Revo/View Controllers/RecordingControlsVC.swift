@@ -115,10 +115,19 @@ class RecordingControlsVC: UIViewController {
     
     // MARK: Record Button
     private let recordingButton = RecordButtonView()
+    
+    private lazy var gradientLayer: CAGradientLayer = {
+        let topColor =  UIColor.black.withAlphaComponent(0.7).cgColor
+        let bottomColor =  UIColor.black.withAlphaComponent(0).cgColor
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [bottomColor, topColor]
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 170)
+        return gradientLayer
+    }()
         
-    private let lowerDarkView: UIView = {
+    private lazy var lowerDarkView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.layer.addSublayer(gradientLayer)
         view.isUserInteractionEnabled = false
         return view
     }()
@@ -368,7 +377,7 @@ class RecordingControlsVC: UIViewController {
         libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         if UIScreen.main.nativeBounds.height > 1334 {
-            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -65).isActive = true
+            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
         } else {
             // Device is an iPhone SE, 6S, 7 , 8 or smaller
             libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -35).isActive = true
@@ -398,8 +407,8 @@ class RecordingControlsVC: UIViewController {
         recordingButton.translatesAutoresizingMaskIntoConstraints = false
         recordingButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         recordingButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        recordingButton.heightAnchor.constraint(equalToConstant: 75).isActive = true
-        recordingButton.widthAnchor.constraint(equalToConstant: 75).isActive = true
+        recordingButton.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        recordingButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
         
         view.addSubview(flashButton)
         flashButton.translatesAutoresizingMaskIntoConstraints = false

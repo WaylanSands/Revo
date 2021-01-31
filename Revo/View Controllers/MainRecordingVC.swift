@@ -101,11 +101,11 @@ class MainRecordingVC: UIViewController {
         
         // Used when returning from WebVC (Web Mode) to navigate to the applicable Mode.
         if presentationMode == .web && AVCaptureMultiCamSession.isMultiCamSupported  {
-            recordingControlsVC.modeSelectView.splitLabelTapped()
+            recordingControlsVC.modeSelectView.splitButtonTapped()
             recordingControlsVC.showControls()
         } else if presentationMode == .web {
             // AVCaptureMultiCamSession is not supported revert to Switch Mode
-            recordingControlsVC.modeSelectView.switchLabelTapped()
+            recordingControlsVC.modeSelectView.switchButtonTapped()
             recordingControlsVC.showControls()
         }
 

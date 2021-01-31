@@ -17,7 +17,7 @@ class RecordButtonView: UIView {
     let innerCircleView: UIView = {
         let view = UIView()
         view.backgroundColor = RevoColor.recordingRed
-        view.layer.cornerRadius = 30
+        view.layer.cornerRadius = 27.5
         return view
     }()
     
@@ -42,7 +42,7 @@ class RecordButtonView: UIView {
         super.init(frame: frame)
         self.layer.borderColor = UIColor.white.cgColor
         self.isUserInteractionEnabled = true
-        self.layer.cornerRadius = 37.5
+        self.layer.cornerRadius = 35
         self.layer.borderWidth = 4
     }
     
@@ -55,8 +55,8 @@ class RecordButtonView: UIView {
         innerCircleView.translatesAutoresizingMaskIntoConstraints = false
         innerCircleView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         innerCircleView.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
-        innerCircleView.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        innerCircleView.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        innerCircleView.heightAnchor.constraint(equalToConstant: 55).isActive = true
+        innerCircleView.widthAnchor.constraint(equalToConstant: 55).isActive = true
         
         self.addSubview(activitySpinner)
         activitySpinner.translatesAutoresizingMaskIntoConstraints = false
@@ -89,7 +89,7 @@ class RecordButtonView: UIView {
             scale = 0.6
             currentState = .recording
         case .recording:
-            newRadius = 30
+            newRadius = 27.5
             currentState = .ready
             scale = 1
         }

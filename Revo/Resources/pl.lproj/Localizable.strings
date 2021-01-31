@@ -7,132 +7,132 @@
  */
 
 // MARK: - Errors
-"Recording Error" = "Eroare la înregistrare";
+"Recording Error" = "Błąd nagrywania";
 
-"Device Error" = "Eroare dispozitiv";
+"Device Error" = "Błąd urządzenia";
 
-"cant_find_rear_camera" = "Revo nu-ți găsește camera din spate. Dacă dispozitivul nu este compromis, încercați să părăsiți aplicația și să încercați din nou.";
+"cant_find_rear_camera" = "Revo nie może znaleźć twojego tylnego aparatu. Jeśli urządzenie nie jest zagrożone, zamknij aplikację i spróbuj ponownie.";
 
-"cant_find_front_camera" = "Revo nu-ți găsește camera frontală. Dacă dispozitivul nu este compromis, încercați să părăsiți aplicația și să încercați din nou.";
+"cant_find_front_camera" = "Revo nie może znaleźć twojego przedniego aparatu. Jeśli urządzenie nie jest zagrożone, zamknij aplikację i spróbuj ponownie.";
 
 
 //MARK: - Settings Screen
 
-"Settings" = "Setări";
+"Settings" = "Ustawienia";
 
-"Get support" = "Obține asistență";
+"Get support" = "Uzyskać wsparcie";
 
-"Remove watermark" = "Scoateți filigranul";
+"Remove watermark" = "Usuń znak wodny";
 
-"Share the app" = "Distribuiți aplicația";
+"Share the app" = "Udostępnij aplikację";
 
-"About Revo" = "Despre Revo";
+"About Revo" = "O Revo";
 
 // Alerts
 
 // Support
-"Revo Support" = "Suport Revo";
+"Revo Support" = "Wsparcie Revo";
 
-"mail_not_configured" = "Se pare că contul dvs. de e-mail nu este configurat pentru a trimite e-mailuri din aplicație.
+"mail_not_configured" = "Wygląda na to, że Twoje konto pocztowe nie jest skonfigurowane do wysyłania poczty z aplikacji.
 
-Dacă aveți întrebări de asistență, trimiteți-le la waylansands@gmail.com";
+Jeśli masz jakieś pytania dotyczące pomocy, prześlij je na adres waylansands@gmail.com";
 
 // Watermark
-"Remove Watermark" = "Scoateți filigranul";
+"Remove Watermark" = "Usuń znak wodny";
 
-"watermark_removal_message" = "Filigranul Revo va fi eliminat din înregistrările viitoare. Ca reamintire, dacă vă bucurați de aplicație, vă rugăm să lăsați o recenzie în App Store. Merge un drum lung.";
+"watermark_removal_message" = "Znak wodny Revo zostanie usunięty z przyszłych nagrań. Przypominamy, że jeśli podoba Ci się aplikacja, zostaw recenzję w App Store. To przechodzi długą drogę.";
 
-"Leave Review" = "Lăsați recenzia";
+"Leave Review" = "Zostaw recenzję";
 
-"Dismiss" = "Renunță";
+"Dismiss" = "Oddalić";
 
 // About
-"about_revo_message" = "Revo a fost creat ca un proiect educațional pentru a explora în continuare cadrul AVFoundation al Apple.
+"about_revo_message" = "Revo powstał jako projekt edukacyjny w celu dalszego zbadania struktury Apple AVFoundation.
 
-Deoarece aplicația folosește componente relativ noi, este acceptată numai pe dispozitivele XS, XS Max, XR și ulterior rulează pe iOS 14.
+Ponieważ aplikacja wykorzystuje stosunkowo nowe komponenty, jest obsługiwana tylko na urządzeniach XS, XS Max, XR i późniejszych z systemem iOS 14.
 
-Dacă vă place aplicația sau doriți să oferiți feedback, vă rugăm să lăsați o recenzie în App Store.";
+Jeśli podoba Ci się aplikacja lub chciałbyś podzielić się opinią, zostaw recenzję w App Store.";
 
 
 // MARK: - Recording Controls
 
-"Live Broadcasting" = "Transmisie live";
+"Live Broadcasting" = "Nadawanie na żywo";
 
-"live_broadcasting_message" = "Când fotografiați în modul Live, trebuie să selectați o aplicație pe care doriți să o transmiteți.
+"live_broadcasting_message" = "Podczas nagrywania w trybie na żywo musisz wybrać aplikację, do której chcesz transmitować.
 
-Dacă nu doriți să începeți o transmisie live, selectați din nou butonul pentru a comuta înapoi.";
+Jeśli nie chcesz rozpoczynać transmisji na żywo, wybierz ponownie przycisk, aby przełączyć się z powrotem.";
 
-"OK" = "O.K";
+"OK" = "dobrze";
 
 //Switch Mode
 
-"Switch Mode" = "Switch Mode";
+"Switch Mode" = "Tryb przełączania";
 
 "switchMode_message" = "Tryb przełączania umożliwia nagrywanie materiału filmowego z płynnym przełączaniem na przedni i tylny aparat.";
 
-"Got it" = "Am înțeles";
+"Got it" = "Rozumiem";
 
-"Device Unsupported" = "Dispozitiv neacceptat";
+"Device Unsupported" = "Urządzenie nieobsługiwane";
 
-"device_unsupported_message" = "Din păcate, această aplicație acceptă în prezent numai dispozitivele XS, XS Max, XR și care rulează ulterior pe iOS 14.
+"device_unsupported_message" = "Niestety ta aplikacja obsługuje obecnie tylko urządzenia XS, XS Max, XR i nowsze z systemem iOS 14.
 
-Puteți utiliza aplicația, deși multe dintre caracteristicile care fac această aplicație unică nu vor fi disponibile.";
+Możesz korzystać z aplikacji, chociaż wiele funkcji, które sprawiają, że ta aplikacja jest wyjątkowa, nie będzie dostępnych.";
 
 
 // MARK: - Main Recording Screen
 
-"Restricted Access" = "Acces interzis";
+"Restricted Access" = "Ograniczony dostęp";
 
-"restricted_access_message" = "Accesul camerei pe dispozitiv este restricționat, vă rugăm să îl modificați înainte de a continua.";
+"restricted_access_message" = "Dostęp do aparatu w Twoim urządzeniu jest ograniczony. Zmień go przed kontynuowaniem.";
 
-"Camera access needed" = "Este necesar accesul la cameră";
+"Camera access needed" = "Wymagany dostęp do aparatu";
 
-"Visit settings"  = "Accesați setările";
+"Visit settings"  = "Odwiedź ustawienia";
 
-"send_to_settings_message" = "Pentru ca Revo să funcționeze, este necesar accesul camerei. Pentru a permite accesul camerei, vă rugăm să comutați comutatorul în setările aplicației.";
+"send_to_settings_message" = "Aby Revo działał, potrzebny jest dostęp do kamery. Aby zezwolić na dostęp do aparatu, przełącz przełącznik w ustawieniach aplikacji.";
 
-"Switch Camera" = "Przełącz Aparat";
+"Switch Camera" = "Przełącz aparat";
 
 "Double tap message" = "Dotknij dwukrotnie ekranu, aby przełączyć aparat podczas nagrywania.";
 
 // MARK: - Library
 
-"Select" = "Selectați";
+"Select" = "Wybierz";
 
-"Cancel" = "Anulare";
+"Cancel" = "Anulować";
 
-"Delete" = "Șterge";
+"Delete" = "Usunąć";
 
-"Are you sure?" = "Esti sigur?";
+"Are you sure?" = "Jesteś pewny?";
 
-"delete_recording_message" = "Înregistrările sunt eliminate definitiv odată șterse.";
+"delete_recording_message" = "Nagrania są trwale usuwane po ich usunięciu.";
 
-"Library currently empty" = "Biblioteca este în prezent goală";
+"Library currently empty" = "Biblioteka jest obecnie pusta";
 
-"Recordings will appear here" = "Înregistrările vor apărea aici";
+"Recordings will appear here" = "Tutaj pojawią się nagrania";
 
-"selected" = "selectat";
+"selected" = "wybrany";
 
 //MARK: - Split Mode Style
 
-"Line Height" = "Inaltimea liniei";
+"Line Height" = "Wysokość linii";
 
-"Line Color" = "Culoare linie";
+"Line Color" = "Kolor linii";
 
-"Save" = "Salvați";
+"Save" = "Zapisać";
 
 
 //MARK: - PIP Mode Style
 
-"Frame Style" = "Stil cadru";
+"Frame Style" = "Styl ramy";
 
-"Border Width" = "Lățimea graniței";
+"Border Width" = "Szerokość granicy";
 
-"Border Color" = "Culoare margine";
+"Border Color" = "Kolor ramki";
 
-"Square" = "Pătrat";
+"Square" = "Kwadrat";
 
-"Circle" = "Cerc";
+"Circle" = "Okrąg";
 
 
 

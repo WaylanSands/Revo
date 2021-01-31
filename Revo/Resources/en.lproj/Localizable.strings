@@ -68,7 +68,7 @@ If you do not wish to start a live broadcast select the button again to toggle b
 
 "Switch Mode" = "Switch Mode";
 
-"switchMode_message" = "Switch mode allows you to record footage while seamlessly switching to the front and back camera";
+"switchMode_message" = "Switch mode allows you to record footage while seamlessly switching to the front and back camera.";
 
 "Got it" = "Got it";
 

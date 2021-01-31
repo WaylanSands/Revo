@@ -35,7 +35,7 @@ class LibraryVC: UIViewController {
     private lazy var libraryCollectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: layOut)
         view.register(RecordingViewCell.self, forCellWithReuseIdentifier: "RecordingViewCell")
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         return view
     }()
     
@@ -65,7 +65,7 @@ class LibraryVC: UIViewController {
     private let selectButton: UIButton = {
         let button = UIButton()
         button.setTitle("Select".localized, for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
         button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 15)
         button.addTarget(self, action: #selector(selectPress), for: .touchUpInside)
@@ -78,7 +78,7 @@ class LibraryVC: UIViewController {
     private let appLogoLabel: UILabel = {
         let label = UILabel()
         label.text = "Revo"
-        label.textColor = RevoColor.blackText
+        label.textColor = .label
         label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         return label
     }()
@@ -363,16 +363,14 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
             // The status bar colour will animate with the gradient
             downArrowButton.setImage(RevoImages.whiteDownArrow, for: .normal)
             animateGradientAlphaTo(value: 1.0)
-            selectButton.backgroundColor = .clear
             selectButton.setTitleColor(.white, for: .normal)
             appLogoLabel.textColor = .white
         } else {
             // Will change the top content to black and remove the gradient
             downArrowButton.setImage(RevoImages.blackDownArrow, for: .normal)
-            selectButton.setTitleColor(.black, for: .normal)
-            selectButton.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+            selectButton.setTitleColor(.label, for: .normal)
             animateGradientAlphaTo(value: 0.0)
-            appLogoLabel.textColor = .black
+            appLogoLabel.textColor = .label
         }
     }
     
@@ -386,10 +384,15 @@ extension LibraryVC: UICollectionViewDelegate,  UICollectionViewDataSource {
     // The preferredStatusBarStyle is updated when the user scrolls. The style reflects
     // the text colour of the collection view's title - appLogoLabel
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        if appLogoLabel.textColor == .white {
-            return .lightContent
+        
+        if self.traitCollection.userInterfaceStyle == .light {
+            if appLogoLabel.textColor == .white {
+                return .lightContent
+            } else {
+                return .darkContent
+            }
         } else {
-            return .darkContent
+            return .lightContent
         }
     }
     

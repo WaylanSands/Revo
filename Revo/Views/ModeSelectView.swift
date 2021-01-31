@@ -21,10 +21,11 @@ protocol ModeSelectionDelegate: class {
 /// The ModeSelectView is also dynamic as it adjusts when device in not MultiCam supported.
 class ModeSelectView: UIView {
     
-    lazy private var modeLabels = [switchLabel, pipLabel, splitLabel, webLabel]
-    lazy private var activeLabel: UILabel = switchLabel
+    lazy private var modeButtons: [UIButton] = [switchButton, pipButton, splitButton, webButton]
+    lazy private var activeButton: UIButton = switchButton
 
-    private var labelFont: UIFont = UIFont.systemFont(ofSize: 15, weight: .regular)
+    private var buttonFont: UIFont = UIFont.systemFont(ofSize: 13.5, weight: .medium)
+    private var selectedButtonFont: UIFont = UIFont.systemFont(ofSize: 13.5, weight: .bold)
     private let screenCenterX = UIScreen.main.bounds.width / 2
     private var stackViewWidth: CGFloat = 0.0
     private var selectionIndex: Int = 0
@@ -32,50 +33,59 @@ class ModeSelectView: UIView {
     weak var delegate: ModeSelectionDelegate?
         
     private var initialOffset: CGFloat {
-        let label = modeLabels[0]
-        return label.text!.widthWith(font: labelFont) / 2
+        let label = modeButtons[0]
+        return (label.titleLabel!.text!.widthWith(font: buttonFont) / 2) + 15
     }
         
-    private let switchLabel: UILabel = {
-       let label = UILabel()
-        label.text = "SWITCH"
-        label.font = UIFont.systemFont(ofSize: 15, weight: .bold)
-        label.isUserInteractionEnabled = true
-        label.textColor = .white
-        return label
+    private lazy var switchButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("SWITCH", for: UIControl.State.normal)
+        button.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        button.addTarget(self, action: #selector(switchButtonTapped), for: .touchUpInside)
+        button.titleLabel?.font = selectedButtonFont
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 15
+        return button
     }()
     
-    private lazy var  pipLabel: UILabel = {
-       let label = UILabel()
-        label.text = "PIP"
-        label.font = labelFont
-        label.textColor  = UIColor.white.withAlphaComponent(0.4)
-        label.isUserInteractionEnabled = true
-        return label
+    private lazy var  pipButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("PIP", for: UIControl.State.normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        button.addTarget(self, action: #selector(pipButtonTapped), for: .touchUpInside)
+        button.setTitleColor(UIColor.white.withAlphaComponent(0.9), for: .normal)
+        button.layer.cornerRadius = 15
+        return button
     }()
     
-    private lazy var  splitLabel: UILabel = {
-       let label = UILabel()
-        label.text = "SPLIT"
-        label.font = labelFont
-        label.textColor = UIColor.white.withAlphaComponent(0.4)
-        label.isUserInteractionEnabled = true
-        return label
+    private lazy var splitButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("SPLIT", for: UIControl.State.normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        button.addTarget(self, action: #selector(splitButtonTapped), for: .touchUpInside)
+        button.setTitleColor(UIColor.white.withAlphaComponent(0.9), for: .normal)
+        button.layer.cornerRadius = 15
+        return button
     }()
     
-    private lazy var  webLabel: UILabel = {
-       let label = UILabel()
-        label.text = "WEB"
-        label.font = labelFont
-        label.textColor = UIColor.white.withAlphaComponent(0.4)
-        label.isUserInteractionEnabled = true
-        return label
+    private lazy var webButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("WEB", for: UIControl.State.normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        button.addTarget(self, action: #selector(webButtonTapped), for: .touchUpInside)
+        button.setTitleColor(UIColor.white.withAlphaComponent(0.9), for: .normal)
+        button.layer.cornerRadius = 15
+        return button
     }()
         
     private let stackView: UIStackView = {
        let view = UIStackView()
         view.distribution = .equalSpacing
-        view.spacing = 25
+        view.spacing = 10
         return view
     }()
     
@@ -89,7 +99,7 @@ class ModeSelectView: UIView {
     
     private func configureMultiCamSupport() {
         if !AVCaptureMultiCamSession.isMultiCamSupported {
-            modeLabels.removeAll(where: { $0.text == "PIP" || $0.text == "SPLIT" })
+            modeButtons.removeAll(where: { $0.titleLabel!.text == "PIP" || $0.titleLabel!.text == "SPLIT" })
         }
     }
     
@@ -102,22 +112,13 @@ class ModeSelectView: UIView {
         
         self.addGestureRecognizer(leftSwipeGesture)
         self.addGestureRecognizer(rightSwipeGesture)
-        
-        let switchGesture = UITapGestureRecognizer(target: self, action: #selector(switchLabelTapped))
-        let splitGesture = UITapGestureRecognizer(target: self, action: #selector(splitLabelTapped))
-        let pipGesture = UITapGestureRecognizer(target: self, action: #selector(pipLabelTapped))
-        let webGesture = UITapGestureRecognizer(target: self, action: #selector(webLabelTapped))
-        
-        switchLabel.addGestureRecognizer(switchGesture)
-        splitLabel.addGestureRecognizer(splitGesture)
-        pipLabel.addGestureRecognizer(pipGesture)
-        webLabel.addGestureRecognizer(webGesture)
     }
     
     private func findTotalWith() {
-        for each in modeLabels {
-            stackViewWidth += each.text!.widthWith(font: each.font)
+        for each in modeButtons {
+            stackViewWidth += each.titleLabel!.text!.widthWith(font: each.titleLabel!.font)
             stackViewWidth += stackView.spacing
+            stackViewWidth += 30
         }
         stackViewWidth -= stackView.spacing
     }
@@ -128,29 +129,29 @@ class ModeSelectView: UIView {
     
     private func configureViews() {
         self.addSubview(stackView)
-        stackView.frame = CGRect(x: screenCenterX - initialOffset, y: 0, width: stackViewWidth, height: 50)
+        stackView.frame = CGRect(x: screenCenterX - initialOffset, y: 0, width: stackViewWidth, height: 30)
         
         if AVCaptureMultiCamSession.isMultiCamSupported {
-            stackView.addArrangedSubview(switchLabel)
-            stackView.addArrangedSubview(pipLabel)
-            stackView.addArrangedSubview(splitLabel)
-            stackView.addArrangedSubview(webLabel)
+            stackView.addArrangedSubview(switchButton)
+            stackView.addArrangedSubview(pipButton)
+            stackView.addArrangedSubview(splitButton)
+            stackView.addArrangedSubview(webButton)
         } else {
-            stackView.addArrangedSubview(switchLabel)
-            stackView.addArrangedSubview(webLabel)
+            stackView.addArrangedSubview(switchButton)
+            stackView.addArrangedSubview(webButton)
         }
     }
     
     private func offsetForLabel(index: Int) {
         var offSet: CGFloat = 0
         
-        for each in modeLabels.prefix(through: index) {
+        for each in modeButtons.prefix(through: index) {
             offSet += each.frame.width
             offSet += stackView.spacing
-            if each == modeLabels[index] {
+            if each == modeButtons[index] {
                 offSet -= each.frame.width / 2
                 offSet -= stackView.spacing
-                activeLabel = each
+                activeButton = each
             }
         }
         animateModeLabelsTo(x: screenCenterX - offSet)
@@ -195,20 +196,22 @@ class ModeSelectView: UIView {
     private func animateModeLabelsTo(x: CGFloat) {
         updateSelectedStyle()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-            self.stackView.frame = CGRect(x: x, y: 0, width: self.stackViewWidth, height: 50)
+            self.stackView.frame = CGRect(x: x, y: 0, width: self.stackViewWidth, height: 30)
         }) { _ in
-            self.updatePresentationTo(mode: self.activeLabel.text!)
+            self.updatePresentationTo(mode: self.activeButton.titleLabel!.text!)
         }
     }
     
     private func updateSelectedStyle() {
-        for each in modeLabels {
-            if each != activeLabel {
-                each.textColor = UIColor.white.withAlphaComponent(0.4)
-                each.font = labelFont
+        for each in modeButtons {
+            if each != activeButton {
+                each.setTitleColor(UIColor.white.withAlphaComponent(0.9), for: .normal)
+                each.titleLabel!.font = buttonFont
+                each.backgroundColor = .clear
             } else {
-                each.textColor = .white
-                each.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+                each.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+                each.titleLabel!.font = selectedButtonFont
+                each.setTitleColor(.white, for: .normal)
             }
         }
     }
@@ -232,29 +235,29 @@ class ModeSelectView: UIView {
         delegate?.changeModeTo(mode)
     }
     
-    @objc func switchLabelTapped() {
-        let index = modeLabels.firstIndex(of: switchLabel)!
+    @objc func switchButtonTapped() {
+        let index = modeButtons.firstIndex(of: switchButton)!
         selectionIndex = index
         offsetForLabel(index: index)
         updateSelectedStyle()
     }
     
-    @objc private func pipLabelTapped() {
-        let index = modeLabels.firstIndex(of: pipLabel)!
+    @objc private func pipButtonTapped() {
+        let index = modeButtons.firstIndex(of: pipButton)!
         selectionIndex = index
         offsetForLabel(index: index)
         updateSelectedStyle()
     }
     
-    @objc func splitLabelTapped() {
-        let index = modeLabels.firstIndex(of: splitLabel)!
+    @objc func splitButtonTapped() {
+        let index = modeButtons.firstIndex(of: splitButton)!
         selectionIndex = index
         offsetForLabel(index: index)
         updateSelectedStyle()
     }
     
-    @objc private func webLabelTapped() {
-        let index = modeLabels.firstIndex(of: webLabel)!
+    @objc private func webButtonTapped() {
+        let index = modeButtons.firstIndex(of: webButton)!
         selectionIndex = index
         offsetForLabel(index: index)
         updateSelectedStyle()
