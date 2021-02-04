@@ -17,33 +17,35 @@ struct RevoColor {
     static let colorOptions = [firstColumn, secondColumn, thirdColumn, forthColumn, fifthColumn]
     static let colorButtonSelectionColor = UIColor.fromHex(code: "#3C3C3C").cgColor
     
+    static let RevoStyleView = UIColor(named: "RevoStyleView")
+    
     static let firstColumn = [
-        UIColor.fromHex(code: "#FFAB1C"),
-        UIColor.fromHex(code: "#28D5FF"),
+        UIColor.fromHex(code: "#FDE9BA"),
+        UIColor.fromHex(code: "#74E190"),
         UIColor.white,
     ]
     
     static let secondColumn = [
-        UIColor.fromHex(code: "#FFD520"),
-        UIColor.fromHex(code: "#2869FF"),
-        UIColor.fromHex(code: "#9A9A9A"),
+        UIColor.fromHex(code: "#FFFB8F"),
+        UIColor.fromHex(code: "#A9D9EF"),
+        UIColor.fromHex(code: "#FFD3DD"),
     ]
     
     static let thirdColumn = [
-        UIColor.fromHex(code: "#F8FF59"),
-        UIColor.fromHex(code: "#4728FF"),
-        UIColor.fromHex(code: "#4D4D4D"),
+        UIColor.fromHex(code: "#FFF400"),
+        UIColor.fromHex(code: "#64A2B3"),
+        UIColor.fromHex(code: "#FDA99D"),
     ]
     
     static let forthColumn = [
-        UIColor.fromHex(code: "#8AFF19"),
-        UIColor.fromHex(code: "#9728FF"),
-        UIColor.fromHex(code: "#313131"),
+        UIColor.fromHex(code: "#D0E2A3"),
+        UIColor.fromHex(code: "#64A7FF"),
+        UIColor.fromHex(code: "#FF492D"),
     ]
     
     static let fifthColumn = [
-        UIColor.fromHex(code: "#12FF31"),
-        UIColor.fromHex(code: "#FF28B0"),
+        UIColor.fromHex(code: "#B0D890"),
+        UIColor.fromHex(code: "#39A5FF"),
         UIColor.fromHex(code: "#000000"),
     ]
 

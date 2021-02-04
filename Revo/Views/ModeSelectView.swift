@@ -21,7 +21,7 @@ protocol ModeSelectionDelegate: class {
 /// The ModeSelectView is also dynamic as it adjusts when device in not MultiCam supported.
 class ModeSelectView: UIView {
     
-    lazy private var modeButtons: [UIButton] = [switchButton, pipButton, splitButton, webButton]
+    lazy private var modeButtons: [UIButton] = [switchButton, pipButton, splitButton, uploadButton, webButton]
     lazy private var activeButton: UIButton = switchButton
 
     private var buttonFont: UIFont = UIFont.systemFont(ofSize: 13.5, weight: .medium)
@@ -71,6 +71,17 @@ class ModeSelectView: UIView {
         return button
     }()
     
+    private lazy var uploadButton: UIButton = {
+       let button = UIButton()
+        button.setTitle("UPLOAD", for: UIControl.State.normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        button.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
+        button.setTitleColor(UIColor.white.withAlphaComponent(0.9), for: .normal)
+        button.layer.cornerRadius = 15
+        return button
+    }()
+    
     private lazy var webButton: UIButton = {
        let button = UIButton()
         button.setTitle("WEB", for: UIControl.State.normal)
@@ -85,7 +96,7 @@ class ModeSelectView: UIView {
     private let stackView: UIStackView = {
        let view = UIStackView()
         view.distribution = .equalSpacing
-        view.spacing = 10
+        view.spacing = 5
         return view
     }()
     
@@ -135,9 +146,11 @@ class ModeSelectView: UIView {
             stackView.addArrangedSubview(switchButton)
             stackView.addArrangedSubview(pipButton)
             stackView.addArrangedSubview(splitButton)
+            stackView.addArrangedSubview(uploadButton)
             stackView.addArrangedSubview(webButton)
         } else {
             stackView.addArrangedSubview(switchButton)
+            stackView.addArrangedSubview(uploadButton)
             stackView.addArrangedSubview(webButton)
         }
     }
@@ -169,6 +182,9 @@ class ModeSelectView: UIView {
             selectionIndex = 3
             offsetForLabel(index: 3)
         case 3:
+            selectionIndex = 4
+            offsetForLabel(index: 4)
+        case 4:
             break
         default:
             break
@@ -188,6 +204,9 @@ class ModeSelectView: UIView {
         case 3:
             selectionIndex = 2
             offsetForLabel(index: 2)
+        case 4:
+            selectionIndex = 3
+            offsetForLabel(index: 3)
         default:
             break
         }
@@ -224,6 +243,8 @@ class ModeSelectView: UIView {
             updatePresentationTo(mode: .pip)
         case "SPLIT":
             updatePresentationTo(mode: .splitScreen)
+        case "UPLOAD":
+            updatePresentationTo(mode: .upload)
         case "WEB":
             updatePresentationTo(mode: .web)
         default:
@@ -251,6 +272,13 @@ class ModeSelectView: UIView {
     
     @objc func splitButtonTapped() {
         let index = modeButtons.firstIndex(of: splitButton)!
+        selectionIndex = index
+        offsetForLabel(index: index)
+        updateSelectedStyle()
+    }
+    
+    @objc func uploadButtonTapped() {
+        let index = modeButtons.firstIndex(of: uploadButton)!
         selectionIndex = index
         offsetForLabel(index: index)
         updateSelectedStyle()

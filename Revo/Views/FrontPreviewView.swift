@@ -40,10 +40,10 @@ class FrontPreviewView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: CGRect(x: UIScreen.main.bounds.width - 220, y: 100, width: 200, height: 200))
-        self.layer.borderColor = UIColor.white.cgColor
-        self.backgroundColor = UIColor.white.withAlphaComponent(0.7)
         self.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(trackPanning)))
         self.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(pinching)))
+        self.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+        self.layer.borderColor = UIColor.white.cgColor
         self.isUserInteractionEnabled = true
         self.layer.cornerRadius = 10
         self.layer.borderWidth = 5
@@ -145,6 +145,11 @@ extension FrontPreviewView: PipModeStyleDelegate {
         layer.borderColor = color.cgColor
         layer.borderWidth = borderWidth
         frameStyle = style
+    }
+    
+    func refreshStyle() {
+        layer.borderColor = layer.borderColor
+        layer.borderWidth = layer.borderWidth
     }
     
 

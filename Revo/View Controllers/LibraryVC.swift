@@ -106,7 +106,7 @@ class LibraryVC: UIViewController {
     private lazy var emptyCollectionLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        label.textColor = RevoColor.blackText
+        label.textColor = .label
         label.textAlignment = .center
         label.isHidden = true
         return label

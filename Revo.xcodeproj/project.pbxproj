@@ -48,6 +48,7 @@
 		48B658EA25AD191A0043DEDF /* focus_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E825AD191A0043DEDF /* focus_animation.json */; };
 		48B658EB25AD191A0043DEDF /* mobile_360_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 48B658E925AD191A0043DEDF /* mobile_360_animation.json */; };
 		48B68F2025BE372000A2D9F5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */; };
+		48C66B7B25C661B200F74323 /* UploadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48C66B7A25C661B200F74323 /* UploadVC.swift */; };
 		48D43D9925C1196600830988 /* WebControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9825C1196600830988 /* WebControlsView.swift */; };
 		48D43D9E25C1222800830988 /* WebRecordButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D43D9D25C1222800830988 /* WebRecordButtonView.swift */; };
 		48F72D4C25AD12520064E8C8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F72D4B25AD12520064E8C8 /* AppDelegate.swift */; };
@@ -145,6 +146,7 @@
 		48B658E825AD191A0043DEDF /* focus_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = focus_animation.json; sourceTree = "<group>"; };
 		48B658E925AD191A0043DEDF /* mobile_360_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = mobile_360_animation.json; sourceTree = "<group>"; };
 		48B68F1F25BE372000A2D9F5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		48C66B7A25C661B200F74323 /* UploadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadVC.swift; sourceTree = "<group>"; };
 		48D43D9825C1196600830988 /* WebControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebControlsView.swift; sourceTree = "<group>"; };
 		48D43D9D25C1222800830988 /* WebRecordButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRecordButtonView.swift; sourceTree = "<group>"; };
 		48F72D4825AD12520064E8C8 /* Revo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Revo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -210,6 +212,7 @@
 				48B6587925AD171A0043DEDF /* MainRecordingVC.swift */,
 				48B6587725AD17190043DEDF /* RevoVideoPlayer.swift */,
 				48B6587D25AD171A0043DEDF /* SplitScreenVC.swift */,
+				48C66B7A25C661B200F74323 /* UploadVC.swift */,
 				48B6587C25AD171A0043DEDF /* SettingsVC.swift */,
 				48B6587B25AD171A0043DEDF /* LibraryVC.swift */,
 				4852D57E25BFB22A0075CF52 /* WebVC.swift */,
@@ -657,6 +660,7 @@
 				48B658AE25AD18370043DEDF /* TopPreviewOptionsView.swift in Sources */,
 				48B658B325AD18370043DEDF /* FrontPreviewView.swift in Sources */,
 				48B658B625AD18370043DEDF /* RecordingViewCell.swift in Sources */,
+				48C66B7B25C661B200F74323 /* UploadVC.swift in Sources */,
 				48B6588425AD171A0043DEDF /* SplitScreenVC.swift in Sources */,
 				48B658BF25AD186E0043DEDF /* Recording.swift in Sources */,
 				48B658C625AD18840043DEDF /* RevoColor.swift in Sources */,
@@ -889,7 +893,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -913,7 +917,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

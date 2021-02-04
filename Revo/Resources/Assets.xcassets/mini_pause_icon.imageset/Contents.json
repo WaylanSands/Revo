@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "record_button_icon@1x.png",
+      "filename" : "mini_pause_icon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "record_button_icon@2x.png",
+      "filename" : "mini_pause_icon@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "record_button_icon@3x.png",
+      "filename" : "mini_pause_icon@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -24,7 +24,7 @@ class Recording {
             isImage = true
         } else {
             let asset = AVAsset(url: fileURL)
-            duration = Time.asString(from: asset.duration.seconds)
+            duration = Time.asDynamicString(from: asset.duration.seconds)
             self.thumbnail = UIImage.thumbnailFromMovie(url: fileURL)
         }
     }

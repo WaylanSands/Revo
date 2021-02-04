@@ -64,6 +64,19 @@ struct RevoImages {
     static let pauseIcon = UIImage(named: "pause_icon")
     static let playIcon = UIImage(named: "play_icon")
     
+    // UploadVC
+    static let blackUploadIcon = UIImage(named: "black_upload_icon")
+    static let whiteUploadIcon = UIImage(named: "white_upload_icon")
+    static let aspectFitIcon = UIImage(named: "aspect_fit_icon")
+    static let aspectFillIcon = UIImage(named: "aspect_fill_icon")
+    static let smallAudioOffIcon = UIImage(named: "small_audio_off_icon")
+    static let smallAudioIcon = UIImage(named: "small_audio_icon")
+    static let rotateIcon = UIImage(named: "rotate_icon")
+    static let miniPauseIcon = UIImage(named: "mini_pause_icon")
+    static let miniPlayIcon = UIImage(named: "mini_play_icon")
+
+
+    
 
 }
 

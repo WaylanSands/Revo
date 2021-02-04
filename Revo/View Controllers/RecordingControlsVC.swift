@@ -8,23 +8,40 @@
 import UIKit
 import ReplayKit
 import FirebaseAnalytics
+import MobileCoreServices
 
-protocol ControlsDelegate: class {
+protocol RecordingDelegate: class {
     func updateCapture(setting: CameraSetting, with slider: UISlider)
+    func changeCameraTo(selection: CameraSelection)
+    func changeTorchTo(mode: TorchMode)
+}
+
+// For handling presentation changes
+protocol PresentationDelegate: class {
     func changePresentationTo(mode: PresentationMode)
     func editPreviewStyleFor(mode: PresentationMode)
-    func changeCameraTo(selection: CameraSelection)
     func switchPreviewsFor(mode: PresentationMode)
-    func changeTorchTo(mode: TorchMode)
-    
-    // For handling Web Mode actions
+}
+
+// For handling Web Mode actions
+protocol WebDelegate: class {
     func goBackwardsWebPage()
     func goForwardWebPage()
+}
+
+// For handling Upload Mode actions
+protocol UploadDelegate: class {
+    func configurePlayerWith(url: URL)
+    func toggleVideoGravity()
+    func playOrPause()
+    func resizeVideo()
+    func muteVideo()
 }
 
 enum PresentationMode {
     case splitScreen
     case switchCam
+    case upload
     case web
     case pip
 }
@@ -62,6 +79,12 @@ enum EditingState {
     case editing
 }
 
+enum PlayerState {
+    case playing
+    case paused
+    case ready
+}
+
 class RecordingControlsVC: UIViewController {
     
     // For recording lower UIWindow
@@ -76,7 +99,14 @@ class RecordingControlsVC: UIViewController {
     
     private var cameraSelection: CameraSelection = .wide
     private var editingMode: EditingState = .ready
+    private var playerState: PlayerState = .ready
     
+    // Delegate properties
+    weak var presentationDelegate: PresentationDelegate?
+    weak var recordingDelegate: RecordingDelegate?
+    weak var uploadDelegate: UploadDelegate?
+    weak var webDelegate: WebDelegate?
+
     private var recordingMode: RecordingMode = .video {
         didSet {
             switch recordingMode {
@@ -111,8 +141,6 @@ class RecordingControlsVC: UIViewController {
     var alertMultiViewOfRecordingStart: (() -> Void)!
     var alertMultiViewOfRecordingEnd: (() -> Void)!
     
-    weak var delegate: ControlsDelegate?
-    
     // MARK: Record Button
     private let recordingButton = RecordButtonView()
     
@@ -136,6 +164,9 @@ class RecordingControlsVC: UIViewController {
         let label = UILabel()
         label.text = "00:00:00"
         label.font = UIFont.monospacedDigitSystemFont(ofSize: 19, weight: .semibold)
+        label.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = 10
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -232,6 +263,52 @@ class RecordingControlsVC: UIViewController {
         return button
     }()
     
+    // MARK: - Upload Mode Views
+    
+    private let imagePicker = UIImagePickerController()
+    
+    private lazy var uploadButton: UIButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
+        button.setImage(RevoImages.whiteUploadIcon, for: .normal)
+        button.isHidden = true
+        return button
+    }()
+    
+    private let uploadLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Upload Video"
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
+    }()
+    
+    private let playButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.miniPlayIcon, for:.normal)
+        button.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
+        button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 20)
+        return button
+    }()
+    
+    let aspectButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.aspectFillIcon, for:.normal)
+        button.addTarget(self, action: #selector(resizeButtonTapped), for: .touchUpInside)
+        button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 20)
+        return button
+    }()
+    
+    private let muteButton: UIButton = {
+        let button = UIButton()
+        button.setImage(RevoImages.smallAudioIcon, for:.normal)
+        button.addTarget(self, action: #selector(muteButtonTapped), for: .touchUpInside)
+        button.addUIBlurEffectWith(effect: UIBlurEffect(style: .light), cornerRadius: 20)
+        return button
+    }()
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -244,6 +321,7 @@ class RecordingControlsVC: UIViewController {
         configureObservers()
         configureDelegates()
         configureViews()
+        
     }
         
     override func viewDidAppear(_ animated: Bool) {
@@ -265,6 +343,9 @@ class RecordingControlsVC: UIViewController {
         // Observe when MainRecordingVC's webToolBarView is triggering actions
         NotificationCenter.default.addObserver(self, selector: #selector(animateWebToolBarDown), name: NSNotification.Name(rawValue: "animateWebToolBarDown"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(animateWebToolBarUp), name: NSNotification.Name(rawValue: "animateWebToolBarUp"), object: nil)
+        
+        // Upload Player Finished
+        NotificationCenter.default.addObserver(self, selector: #selector(playerFinished), name: NSNotification.Name(rawValue: "playerFinished"), object: nil)
     }
 
     
@@ -272,7 +353,7 @@ class RecordingControlsVC: UIViewController {
         recordingButton.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(recordButtonTap)))
     }
     
-    @objc func orientationChanged(notification: Notification) {
+    @objc func orientationChanged() {
         let deviceOrientation = UIDevice.current.orientation
         var angle: Double?
         
@@ -302,9 +383,12 @@ class RecordingControlsVC: UIViewController {
                 self.exposureButton.transform = transform
                 self.settingsButton.transform = transform
                 self.libraryButton.transform = transform
+                self.aspectButton.transform = transform
                 self.switchButton.transform = transform
                 self.flashButton.transform = transform
                 self.zoomButton.transform = transform
+                self.playButton.transform = transform
+                self.muteButton.transform = transform
             })
         }
     }
@@ -332,11 +416,12 @@ class RecordingControlsVC: UIViewController {
         // Regular views added above passThroughView
         view.addSubview(timeLabel)
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
-        timeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        timeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        
+        timeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        timeLabel.widthAnchor.constraint(equalToConstant: timeLabel.intrinsicContentSize.width + 20).isActive = true
+        timeLabel.heightAnchor.constraint(equalToConstant: timeLabel.font.lineHeight + 10).isActive = true
+
         if UIScreen.main.nativeBounds.height > 1334 {
-            timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 50).isActive = true
+            timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 45).isActive = true
         } else {
             // Device is an iPhone SE, 6S, 7 , 8 or smaller
             timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 25).isActive = true
@@ -411,25 +496,13 @@ class RecordingControlsVC: UIViewController {
         recordingButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
         
         view.addSubview(flashButton)
-        flashButton.translatesAutoresizingMaskIntoConstraints = false
-        flashButton.bottomAnchor.constraint(equalTo: view.centerYAnchor, constant:  -70).isActive = true
-        flashButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        flashButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        flashButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        flashButton.frame = CGRect(x: 16, y:  view.center.y - 50, width: 40, height: 40)
         
         view.addSubview(exposureButton)
-        exposureButton.translatesAutoresizingMaskIntoConstraints = false
-        exposureButton.topAnchor.constraint(equalTo: flashButton.bottomAnchor, constant:  20).isActive = true
-        exposureButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        exposureButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        exposureButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        exposureButton.frame = CGRect(x: 16, y: flashButton.frame.minY + 60, width: 40, height: 40)
         
         view.addSubview(zoomButton)
-        zoomButton.translatesAutoresizingMaskIntoConstraints = false
-        zoomButton.topAnchor.constraint(equalTo: exposureButton.bottomAnchor, constant: 20).isActive = true
-        zoomButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        zoomButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        zoomButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        zoomButton.frame = CGRect(x: 16, y: exposureButton.frame.minY + 60, width: 40, height: 40)
         
         view.addSubview(modeSelectView)
         modeSelectView.translatesAutoresizingMaskIntoConstraints = false
@@ -453,6 +526,28 @@ class RecordingControlsVC: UIViewController {
         // Rotated the width will act as the sliders height and height as width
         cameraSettingSlider.widthAnchor.constraint(equalToConstant: rotatedHeight).isActive = true
         cameraSettingSlider.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        
+        // For Upload Mode
+        
+        view.addSubview(uploadButton)
+        uploadButton.translatesAutoresizingMaskIntoConstraints = false
+        uploadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        uploadButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -20).isActive = true
+        
+        view.addSubview(uploadLabel)
+        uploadLabel.translatesAutoresizingMaskIntoConstraints = false
+        uploadLabel.topAnchor.constraint(equalTo: uploadButton.bottomAnchor, constant: 15).isActive = true
+        uploadLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        uploadLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        view.addSubview(playButton)
+        playButton.frame = CGRect(x: -50, y:  view.center.y - 50, width: 40, height: 40)
+        
+        view.addSubview(aspectButton)
+        aspectButton.frame = CGRect(x: -50, y: playButton.frame.minY + 60, width: 40, height: 40)
+        
+        view.addSubview(muteButton)
+        muteButton.frame = CGRect(x: -50, y: aspectButton.frame.minY + 60, width: 40, height: 40)
     }
     
     //MARK: - Record Screen
@@ -479,6 +574,22 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
+    private func configureAudioSession() {
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            if presentationMode == .upload {
+                // We set the audioSession to be aware that we are both recording and playing a video.
+                try audioSession.setCategory(.playAndRecord, mode: .videoRecording, options: [])
+            } else {
+                // We set the audioSession to the default.
+                try audioSession.setCategory(.soloAmbient, mode: .default, options: [])
+            }
+        } catch {
+            print("Failed to set audio session category.")
+        }
+    }
+    
     private func startRecord() {
         do {
             try assetWriter.setUpWriter()
@@ -487,6 +598,7 @@ class RecordingControlsVC: UIViewController {
             return
         }
         screenRecorder.isMicrophoneEnabled = true
+        configureAudioSession()
         screenRecorder.startCapture(handler: { cmSampleBuffer, rpSampleBufferType, error in
             
             if let error = error {
@@ -630,30 +742,66 @@ class RecordingControlsVC: UIViewController {
     private func updatePresentation(to mode: PresentationMode) {
         switch mode {
         case .switchCam:
-            delegate?.changePresentationTo(mode: .switchCam)
+            presentationDelegate?.changePresentationTo(mode: .switchCam)
+            animateUploadSettingButtonsTo(newX: -50)
             editPreviewStyleButton.isHidden = true
             switchCamInfoButton.isHidden = false
+            enableSwitchAndCameraButtons()
             presentationMode = .switchCam
+            animateInSettingButtons()
+            hideUploadButton()
         case .pip:
-            delegate?.changePresentationTo(mode:.pip)
+            presentationDelegate?.changePresentationTo(mode:.pip)
             // The switchCamInfoButton is only shown in switchCam mode. The style can not be
             // edited in switchCam mode so editPreviewStyleButton is hidden.
+            animateUploadSettingButtonsTo(newX: -50)
             editPreviewStyleButton.isHidden = false
             switchCamInfoButton.isHidden = true
+            enableSwitchAndCameraButtons()
+            animateInSettingButtons()
             presentationMode = .pip
+            hideUploadButton()
         case .splitScreen:
-            delegate?.changePresentationTo(mode: .splitScreen)
+            presentationDelegate?.changePresentationTo(mode: .splitScreen)
+            animateUploadSettingButtonsTo(newX: -50)
             editPreviewStyleButton.isHidden = false
             switchCamInfoButton.isHidden = true
             presentationMode = .splitScreen
+            enableSwitchAndCameraButtons()
+            animateInSettingButtons()
+            hideUploadButton()
         case .web:
             webControlsView.updateLibraryButtonThumbnail()
-            editPreviewStyleButton.isHidden = true
-            switchCamInfoButton.isHidden = true
-            delegate?.changePresentationTo(mode: .web)
-            hideControlsForWebMode()
+            presentationDelegate?.changePresentationTo(mode: .web)
+            animateUploadSettingButtonsTo(newX: -50)
+            enableSwitchAndCameraButtons()
             presentationMode = .web
+            hideUploadButton()
+            hideControls()
+        case .upload:
+            presentationDelegate?.changePresentationTo(mode: .upload)
+            switchCamInfoButton.isHidden = true
+            disableSwitchAndCameraButtons()
+            presentationMode = .upload
+            animateOutSettingButtons()
+            configureForUploadMode()
+            playerState = .ready
+            unhideUploadButton()
         }
+    }
+    
+    private func disableSwitchAndCameraButtons() {
+        cameraSelectionButton.isUserInteractionEnabled = false
+        switchButton.isUserInteractionEnabled = false
+        cameraSelectionButton.alpha = 0.4
+        switchButton.alpha = 0.4
+    }
+    
+    private func enableSwitchAndCameraButtons() {
+        cameraSelectionButton.isUserInteractionEnabled = true
+        switchButton.isUserInteractionEnabled = true
+        cameraSelectionButton.alpha = 1
+        switchButton.alpha = 1
     }
         
     @objc private func recordingModePress() {
@@ -698,11 +846,11 @@ class RecordingControlsVC: UIViewController {
         case .off:
             torchMode = .on
             flashButton.setImage(RevoImages.flashOnIcon, for: .normal)
-            delegate?.changeTorchTo(mode: torchMode)
+            recordingDelegate?.changeTorchTo(mode: torchMode)
         case .on:
             torchMode = .off
             flashButton.setImage(RevoImages.flashOffIcon, for: .normal)
-            delegate?.changeTorchTo(mode: torchMode)
+            recordingDelegate?.changeTorchTo(mode: torchMode)
         }
     }
     
@@ -715,7 +863,7 @@ class RecordingControlsVC: UIViewController {
             editingMode = .ready
             editPreviewStyleButton.setImage(RevoImages.editPreviewIcon, for: .normal)
         }
-        delegate?.editPreviewStyleFor(mode: presentationMode)
+        presentationDelegate?.editPreviewStyleFor(mode: presentationMode)
         view.bringSubviewToFront(editPreviewStyleButton)
     }
     
@@ -768,11 +916,11 @@ class RecordingControlsVC: UIViewController {
         
         switch newZoomFactor {
         case "0.5":
-            delegate?.changeCameraTo(selection: .ultraWide)
+            recordingDelegate?.changeCameraTo(selection: .ultraWide)
         case "1":
-            delegate?.changeCameraTo(selection: .wide)
+            recordingDelegate?.changeCameraTo(selection: .wide)
         case "1.5":
-            delegate?.changeCameraTo(selection: .telephoto)
+            recordingDelegate?.changeCameraTo(selection: .telephoto)
         default:
             break
         }
@@ -783,13 +931,19 @@ class RecordingControlsVC: UIViewController {
             toggleTorchMode()
         }
         
+        if presentationMode == .upload && playerState == .playing {
+            playButton.setImage(RevoImages.miniPlayIcon, for: .normal)
+            uploadDelegate?.playOrPause()
+            playerState = .paused
+        }
+        
         let libraryVC = LibraryVC()
         libraryVC.modalPresentationStyle = .fullScreen
         self.present(libraryVC, animated: true, completion: nil)
     }
     
     @objc private func switchPreviews() {
-        delegate?.switchPreviewsFor(mode: presentationMode)
+        presentationDelegate?.switchPreviewsFor(mode: presentationMode)
         cameraSettingSlider.isHidden = true
     }
     
@@ -804,7 +958,7 @@ class RecordingControlsVC: UIViewController {
         hideOrShowSliderFor(setting: .exposure)
     }
     
-    @objc private func changeZoom() {
+    @objc private func changeZoom() {        
         guard let maxZoomFactor = currentCameraMaxZoomFactor?(),
               let zoomFactor = currentCameraZoomFactor?() else {
             return
@@ -818,7 +972,7 @@ class RecordingControlsVC: UIViewController {
     
     @objc private func exposureSliderChanged(slider: UISlider, event: UIEvent) {
         guard let setting = currentSetting else { return }
-        delegate?.updateCapture(setting: setting, with: slider)
+        recordingDelegate?.updateCapture(setting: setting, with: slider)
         
         if let touchEvent = event.allTouches?.first {
             if touchEvent.phase == .ended {
@@ -853,6 +1007,101 @@ class RecordingControlsVC: UIViewController {
     
     @objc private func presentSettings() {
         self.present(settingsVC, animated: true, completion: nil)
+    }
+    
+    //MARK: - Upload Mode
+    
+    private func configureForUploadMode() {
+        aspectButton.setImage(RevoImages.aspectFillIcon, for: .normal)
+        muteButton.setImage(RevoImages.smallAudioIcon, for: .normal)
+        playButton.setImage(RevoImages.miniPlayIcon, for: .normal)
+        playerIsMuted = false
+        isAspectFill = true
+    }
+    
+    @objc private func uploadButtonTapped() {
+        guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary)  else {
+            // Show alert
+            return
+        }
+        
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "hideControls"), object: nil)
+                
+        guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
+            return
+        }
+        
+        imagePicker.mediaTypes = [kUTTypeMovie as String]
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.modalPresentationStyle = .fullScreen
+        imagePicker.videoExportPreset = AVAssetExportPresetPassthrough
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = true
+                
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+    @objc func playerFinished() {
+        playButton.setImage(RevoImages.miniPlayIcon, for: .normal)
+        playerState = .ready
+    }
+    
+    @objc func playButtonTapped() {
+        
+        switch playerState {
+        case .playing:
+            uploadDelegate?.playOrPause()
+            playButton.setImage(RevoImages.miniPlayIcon, for: .normal)
+            playerState = .paused
+        case .paused:
+            playButton.setImage(RevoImages.miniPauseIcon, for: .normal)
+            uploadDelegate?.playOrPause()
+            playerState = .playing
+            break
+        case .ready:
+            playButton.setImage(RevoImages.miniPauseIcon, for: .normal)
+            uploadDelegate?.playOrPause()
+            playerState = .playing
+            break
+        }
+    }
+    
+    private var isAspectFill = true
+    
+    @objc func resizeButtonTapped() {
+        uploadDelegate?.toggleVideoGravity()
+        
+        if isAspectFill {
+            aspectButton.setImage(RevoImages.aspectFitIcon, for: .normal)
+            isAspectFill = false
+        } else {
+            aspectButton.setImage(RevoImages.aspectFillIcon, for: .normal)
+            isAspectFill = true
+
+        }
+    }
+    
+    private var playerIsMuted = false
+    
+    @objc func muteButtonTapped() {
+        uploadDelegate?.muteVideo()
+        if playerIsMuted {
+            muteButton.setImage(RevoImages.smallAudioIcon, for: .normal)
+            playerIsMuted = false
+        } else {
+            muteButton.setImage(RevoImages.smallAudioOffIcon, for: .normal)
+            playerIsMuted = true
+        }
+    }
+    
+    private func unhide() {
+        uploadLabel.isHidden = false
+        uploadButton.isHidden = false
+    }
+    
+    private func hide() {
+        uploadLabel.isHidden = true
+        uploadButton.isHidden = true
     }
     
     
@@ -895,20 +1144,29 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
         }
     }
     
-    // Web mode used webControlsView to handle recording and navigation so we
+    // Web Mode uses it's own controls to handle recording and navigation so we
     // hide the default controls so they do not interfere. Also camera settings
-    // buttons are not applicable when in Web Mode.
-    func hideControlsForWebMode() {
+    // buttons are not applicable when in Web Mode so they're hidden too.
+    @objc func hideControls() {
         for each in view.subviews {
             if !each.isKind(of: PassThroughView.self) && !each.isKind(of: WebControlsView.self) && each != timeLabel {
                 each.isHidden = true
             }
         }
+        
+        if presentationMode == .upload {
+            timeLabel.isHidden = true
+        }
+        
+        if presentationMode == .web {
+            timeLabel.isHidden = false
+        }
+        
     }
     
     // Show the controls when returning from Web Mode (WebVC). This method is called
     // from MainRecordingVC as that is the controller which presents WebVC.
-    func showControls() {
+    @objc func showControls() {
         // cameraSettingSlider should be hidden by default.
         for each in view.subviews where each != cameraSettingSlider {
             each.isHidden = false
@@ -919,6 +1177,60 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
             // through cameras via the cameraSelectionButton
             cameraSelectionButton.isHidden = true
         }
+        
+        if presentationMode == .upload {
+            switchCamInfoButton.isHidden = true
+        }
+    }
+    
+    private func unhideUploadButton() {
+        uploadLabel.isHidden = false
+        uploadButton.isHidden = false
+    }
+    
+    private func hideUploadButton() {
+        uploadLabel.isHidden = true
+        uploadButton.isHidden = true
+    }
+    
+    private func animateOutSettingButtons() {
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
+            self.flashButton.frame = CGRect(x: -50, y:  self.view.center.y - 50, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.1, delay: 0.2, options: .curveEaseIn, animations: {
+            self.exposureButton.frame = CGRect(x: -50, y: self.flashButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.1, delay: 0.4, options: .curveEaseIn, animations: {
+            self.zoomButton.frame = CGRect(x: -50, y: self.exposureButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
+    }
+    
+    private func animateInSettingButtons() {
+        if self.flashButton.frame.minX == 16 {
+            return
+        }
+        
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: {
+            self.flashButton.frame = CGRect(x: 16, y: self.view.center.y - 50, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.2, delay: 0.2, options: .curveEaseIn, animations: {
+            self.exposureButton.frame = CGRect(x: 16, y: self.flashButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.2, delay: 0.4, options: .curveEaseIn, animations: {
+            self.zoomButton.frame = CGRect(x: 16, y: self.exposureButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
+    }
+    
+    private func animateUploadSettingButtonsTo(newX: CGFloat) {
+        UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseIn, animations: {
+            self.playButton.frame = CGRect(x: newX, y:  self.view.center.y - 50, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.1, delay: 0.2, options: .curveEaseIn, animations: {
+            self.aspectButton.frame = CGRect(x: newX, y: self.playButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
+        UIView.animate(withDuration: 0.1, delay: 0.4, options: .curveEaseIn, animations: {
+            self.muteButton.frame = CGRect(x: newX, y: self.aspectButton.frame.minY + 60, width: 40, height: 40)
+        }, completion: nil)
     }
 
         
@@ -940,11 +1252,11 @@ extension RecordingControlsVC: WebToolBarDelegate {
     }
    
     func goBackwardsAPage() {
-        delegate?.goBackwardsWebPage()
+        webDelegate?.goBackwardsWebPage()
     }
     
     func goForwardAPage() {
-        delegate?.goForwardWebPage()
+        webDelegate?.goForwardWebPage()
     }
     
     func visitLibrary() {
@@ -982,7 +1294,6 @@ extension RecordingControlsVC: WebToolBarDelegate {
         }, completion: nil)
     }
     
-    
 }
 
 extension RecordingControlsVC: ModeSelectionDelegate {
@@ -992,3 +1303,32 @@ extension RecordingControlsVC: ModeSelectionDelegate {
     }
  
 }
+
+extension RecordingControlsVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showControls"), object: nil)
+        
+        guard  let url = info[.mediaURL] as? URL else {
+            print("Fail")
+            // Alert message
+            return
+        }
+        uploadDelegate?.configurePlayerWith(url: url)
+        hideUploadButton()
+        picker.dismiss(animated: true, completion: nil)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.animateUploadSettingButtonsTo(newX: 20)
+        }
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showControls"), object: nil)
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    
+}
+
+

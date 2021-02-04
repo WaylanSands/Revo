@@ -153,6 +153,7 @@ class RevoVideoPlayer: UIViewController {
     @objc private func backButtonPress() {
         recordingOptionsView.isHidden = true
         topBarView.isHidden = true
+        player.pause()
         dismiss(animated: false, completion: nil)
     }
     

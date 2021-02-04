@@ -38,6 +38,7 @@ class PipModeStyleView: UIView {
         let label = UILabel()
         label.text = "Frame Style".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .label
         return label
     }()
     
@@ -52,6 +53,7 @@ class PipModeStyleView: UIView {
         let label = UILabel()
         label.text = "Border Width".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .label
         return label
     }()
     
@@ -60,13 +62,14 @@ class PipModeStyleView: UIView {
         let label = UILabel()
         label.text = "Border Color".localized
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .label
         return label
     }()
     
     
     private let optionsPanelView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = RevoColor.RevoStyleView
         view.layer.cornerRadius = 15
         return view
     }()
@@ -221,7 +224,11 @@ class PipModeStyleView: UIView {
     private func borderColorButtonWith(color: UIColor) -> UIButton {
         let button = UIButton()
         button.addTarget(self, action: #selector(borderColorSelection), for: .touchUpInside)
-        button.layer.borderColor = RevoColor.colorButtonSelectionColor
+        if self.traitCollection.userInterfaceStyle == .light {
+            button.layer.borderColor = UIColor.fromHex(code: "#3C3C3C").cgColor
+        } else {
+            button.layer.borderColor = UIColor.white.cgColor
+        }
         button.translatesAutoresizingMaskIntoConstraints = false
         button.widthAnchor.constraint(equalToConstant: 37).isActive = true
         button.heightAnchor.constraint(equalToConstant: 37).isActive = true

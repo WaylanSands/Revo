@@ -91,6 +91,8 @@ struct RevoAnalytics {
             presentationModeString = "switchCam_mode"
         case .pip:
             presentationModeString = "pip_mode"
+        case .upload:
+            presentationModeString = "upload_mode"
         case .web:
             presentationModeString = "web_mode"
         }

@@ -33,7 +33,7 @@ class MainRecordingVC: UIViewController {
     private let pipStyleView = PipModeStyleView()
     
     private let webView = WebVC()
-
+    
     private var currentlyRecording = false
     private var pipIsFrontCamera = true
     private var rearDeviceISO: CGFloat?
@@ -63,10 +63,13 @@ class MainRecordingVC: UIViewController {
     // splitScreenVC holds its own previewLayers which manages gestures
     private let splitScreenVC = SplitScreenVC()
     
+    // splitScreenVC holds its own previewLayers which manages gestures
+    private let uploadVC = UploadVC()
+    
     // Used to alternate VideoPreviewLayers depending on Camera Mode
     private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
     private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
-
+    
     private let appLogo: UILabel = {
         let label = UILabel()
         label.text = "revo"
@@ -85,9 +88,9 @@ class MainRecordingVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGestureRecognisers()
+        configureChildControllers()
         checkAuthStatusForVideo()
         configurePreviewLayers()
-        configureSubController()
         configureTopWindow()
         configureDelegates()
         configureClosures()
@@ -100,15 +103,11 @@ class MainRecordingVC: UIViewController {
         configureForegroundObserver()
         
         // Used when returning from WebVC (Web Mode) to navigate to the applicable Mode.
-        if presentationMode == .web && AVCaptureMultiCamSession.isMultiCamSupported  {
-            recordingControlsVC.modeSelectView.splitButtonTapped()
-            recordingControlsVC.showControls()
-        } else if presentationMode == .web {
-            // AVCaptureMultiCamSession is not supported revert to Switch Mode
-            recordingControlsVC.modeSelectView.switchButtonTapped()
+        if presentationMode == .web  {
+            recordingControlsVC.modeSelectView.uploadButtonTapped()
             recordingControlsVC.showControls()
         }
-
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -128,13 +127,15 @@ class MainRecordingVC: UIViewController {
     private func configureDelegates() {
         pipStyleView.styleDelegate = frontFloatingPreviewView
         splitStyleView.styleDelegate = splitScreenVC
-        webView.wkWebView.scrollView.delegate = self
+        recordingControlsVC.presentationDelegate = self
+        recordingControlsVC.recordingDelegate = self
+        recordingControlsVC.uploadDelegate = self
+        recordingControlsVC.webDelegate = self
     }
     
     private func configureTopWindow() {
         if let currentWindowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             topWindow = PassThroughWindow(windowScene: currentWindowScene)
-            recordingControlsVC.delegate = self
             topWindow!.rootViewController = recordingControlsVC
             topWindow!.windowLevel = .statusBar
             topWindow!.isHidden = false
@@ -142,11 +143,16 @@ class MainRecordingVC: UIViewController {
         }
     }
     
-    private func configureSubController() {
+    private func configureChildControllers() {
         self.addChild(splitScreenVC)
         self.view.addSubview(splitScreenVC.view)
         splitScreenVC.view.frame = self.view.bounds
         splitScreenVC.didMove(toParent: self)
+        
+        self.addChild(uploadVC)
+        self.view.addSubview(uploadVC.view)
+        uploadVC.view.frame = self.view.bounds
+        uploadVC.didMove(toParent: self)
     }
     
     private func configureGestureRecognisers() {
@@ -156,7 +162,7 @@ class MainRecordingVC: UIViewController {
         let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(mainViewTapped))
         singleTapGesture.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTapGesture)
-
+        
         // Used for switching camera views especially while recording
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(mainViewDoubleTapped))
         doubleTapGesture.numberOfTapsRequired = 2
@@ -386,7 +392,7 @@ class MainRecordingVC: UIViewController {
         
         activeRearPreviewLayerLayer.session = nil
         activeFrontPreviewLayerLayer.session = nil
-                
+        
         switch presentationMode {
         case .switchCam:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
@@ -401,6 +407,7 @@ class MainRecordingVC: UIViewController {
             if  !frontFullScreenPreviewView.isHidden {
                 recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = false
             }
+            uploadVC.pausePlayer()
         case .pip:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
             frontFloatingPreviewView.videoPreviewLayer.session = multiCamSession
@@ -411,6 +418,7 @@ class MainRecordingVC: UIViewController {
             frontFloatingPreviewView.isHidden = false
             rearPreviewView.isHidden = false
             revertFrontDeviceSettings()
+            uploadVC.pausePlayer()
         case .splitScreen:
             splitScreenVC.topPreviewView.videoPreviewLayer.session = multiCamSession
             splitScreenVC.bottomPreviewView.videoPreviewLayer.session = multiCamSession
@@ -422,7 +430,20 @@ class MainRecordingVC: UIViewController {
             frontFullScreenPreviewView.isUserInteractionEnabled = false
             frontFloatingPreviewView.isHidden = true
             rearPreviewView.isHidden = true
+            uploadVC.view.isHidden = true
+            uploadVC.pausePlayer()
+        case .upload:
+            rearPreviewView.videoPreviewLayer.session = multiCamSession
+            frontFloatingPreviewView.videoPreviewLayer.session = multiCamSession
+            activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
+            activeFrontPreviewLayerLayer = frontFloatingPreviewView.videoPreviewLayer
+            frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+            frontFloatingPreviewView.isHidden = false
+            rearPreviewView.isHidden = true
+            uploadVC.view.isHidden = false
+            uploadVC.clearMedia()
         case .web:
+            uploadVC.pausePlayer()
             setupFrontWebCam()
             webView.modalPresentationStyle = .fullScreen
             present(webView, animated: true, completion: nil)
@@ -432,20 +453,20 @@ class MainRecordingVC: UIViewController {
     
     private func setupFrontWebCam() {
         webCamSession.beginConfiguration()
-
+        
         let device = frontCamera()!
-
+        
         do {
             let deviceInput = try AVCaptureDeviceInput(device: device)
-
+            
             for each in webCamSession.inputs {
                 webCamSession.removeInput(each)
             }
-
+            
             webCamSession.addInput(deviceInput)
             webView.frontFloatingPreviewView.videoPreviewLayer.session = webCamSession
             activeFrontPreviewLayerLayer = webView.frontFloatingPreviewView.videoPreviewLayer
-
+            
             webCamSession.commitConfiguration()
             webCamSession.startRunning()
         } catch {
@@ -484,7 +505,7 @@ class MainRecordingVC: UIViewController {
             return nil
         }
     }
-        
+    
     private func frontCamera() -> AVCaptureDevice? {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
             return device
@@ -506,7 +527,7 @@ class MainRecordingVC: UIViewController {
     //MARK: - Focusing Gesture Recognisers
     
     @objc private func mainViewTapped(sender: UITapGestureRecognizer) {
-                
+        
         let focusPoint = sender.location(in: rearPreviewView)
         let point = rearPreviewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: focusPoint)
         let device = primaryDevice()
@@ -528,7 +549,7 @@ class MainRecordingVC: UIViewController {
             device.unlockForConfiguration()
             
             // Do not add a FocusAnimationView if recording
-            if currentlyRecording {
+            if currentlyRecording || presentationMode == .upload {
                 return
             }
             
@@ -571,7 +592,7 @@ class MainRecordingVC: UIViewController {
             
             device.unlockForConfiguration()
             
-            if currentlyRecording {
+            if currentlyRecording || presentationMode == .upload {
                 // Don't add animation
                 return
             }
@@ -678,8 +699,79 @@ class MainRecordingVC: UIViewController {
     
 }
 
+//  MARK: - RecordingDelegate
 
-extension MainRecordingVC: ControlsDelegate {
+extension MainRecordingVC: RecordingDelegate {
+    
+    func updateCapture(setting: CameraSetting, with slider: UISlider) {
+        let device = primaryDevice()
+        
+        do {
+            try device.lockForConfiguration()
+            
+            switch setting {
+            case .exposure:
+                device.setExposureTargetBias(slider.value, completionHandler: nil)
+            case .zoom:
+                device.ramp(toVideoZoomFactor: CGFloat(slider.value), withRate: 4)
+            }
+            
+            device.unlockForConfiguration()
+        } catch {
+            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
+        }
+    }
+    
+    func changeCameraTo(selection: CameraSelection) {
+        switch selection {
+        case .wide:
+            selectedRearDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+        case .ultraWide:
+            selectedRearDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
+        case .telephoto:
+            selectedRearDevice = AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
+        }
+        
+        if AVCaptureMultiCamSession.isMultiCamSupported {
+            setupCaptureSession()
+        } else {
+            setupSingleCamSessionFor(cameraPosition: .back)
+        }
+        
+    }
+    
+    func changeTorchTo(mode: TorchMode) {
+        let torchMode: AVCaptureDevice.TorchMode
+        switch mode {
+        case .off:
+            torchMode = .off
+        case .on:
+            torchMode = .on
+        }
+        
+        if currentRearDevice.hasTorch {
+            do {
+                try currentRearDevice.lockForConfiguration()
+                currentRearDevice.torchMode = torchMode
+                currentRearDevice.unlockForConfiguration()
+            } catch {
+                Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
+            }
+        }
+    }
+    
+    /// Resets the primary devices exposure target bias to zero.
+    func resetExposureSettings() {
+        primaryDevice().setExposureTargetBias(0, completionHandler: nil)
+        recordingControlsVC.cameraSettingSlider.isHidden = true
+        recordingControlsVC.cameraSettingSlider.value = 0
+    }
+    
+}
+
+//  MARK: - PresentationDelegate
+
+extension MainRecordingVC: PresentationDelegate {
     
     func switchPreviewsFor(mode: PresentationMode) {
         switch mode {
@@ -719,44 +811,10 @@ extension MainRecordingVC: ControlsDelegate {
         case .web:
             // Switching cameras in web mode not supported in version 1.2
             break
+        case .upload:
+            // Switching cameras in upload mode not supported in version 1.2
+            break
         }
-    }
-    
-    func updateCapture(setting: CameraSetting, with slider: UISlider) {
-        let device = primaryDevice()
-        
-        do {
-            try device.lockForConfiguration()
-            
-            switch setting {
-            case .exposure:
-                device.setExposureTargetBias(slider.value, completionHandler: nil)
-            case .zoom:
-                device.ramp(toVideoZoomFactor: CGFloat(slider.value), withRate: 4)
-            }
-            
-            device.unlockForConfiguration()
-        } catch {
-            Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
-        }
-    }
-    
-    func changeCameraTo(selection: CameraSelection) {
-        switch selection {
-        case .wide:
-            selectedRearDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
-        case .ultraWide:
-            selectedRearDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
-        case .telephoto:
-            selectedRearDevice = AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
-        }
-        
-        if AVCaptureMultiCamSession.isMultiCamSupported {
-            setupCaptureSession()
-        } else {
-            setupSingleCamSessionFor(cameraPosition: .back)
-        }
-
     }
     
     // Checks to see which preview user would like to re-style &
@@ -764,7 +822,7 @@ extension MainRecordingVC: ControlsDelegate {
     // previewStyleView is visible it will remove it from the
     // superview as the user had canceled their selection.
     func editPreviewStyleFor(mode: PresentationMode) {
-        if presentationMode == .pip {
+        if presentationMode == .pip || presentationMode == .upload {
             if recordingControlsVC.view.subviews.contains(pipStyleView) {
                 pipStyleView.cancelButtonPress()
                 pipStyleView.removeFromSuperview()
@@ -796,33 +854,11 @@ extension MainRecordingVC: ControlsDelegate {
             configurePreviewLayers()
         }
     }
-    
-    func changeTorchTo(mode: TorchMode) {
-        let torchMode: AVCaptureDevice.TorchMode
-        switch mode {
-        case .off:
-            torchMode = .off
-        case .on:
-            torchMode = .on
-        }
-        
-        if currentRearDevice.hasTorch {
-            do {
-                try currentRearDevice.lockForConfiguration()
-                currentRearDevice.torchMode = torchMode
-                currentRearDevice.unlockForConfiguration()
-            } catch {
-                Alert.showBasicAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
-            }
-        }
-    }
-    
-    /// Resets the primary devices exposure target bias to zero.
-    func resetExposureSettings() {
-        primaryDevice().setExposureTargetBias(0, completionHandler: nil)
-        recordingControlsVC.cameraSettingSlider.isHidden = true
-        recordingControlsVC.cameraSettingSlider.value = 0
-    }
+}
+
+//  MARK: - WebDelegate
+
+extension MainRecordingVC: WebDelegate {
     
     // Handling Web View actions
     func goBackwardsWebPage() {
@@ -835,18 +871,28 @@ extension MainRecordingVC: ControlsDelegate {
     
 }
 
-extension MainRecordingVC: UIScrollViewDelegate {
+extension MainRecordingVC: UploadDelegate {
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0 {
-//            print("down")
-//            topWindowRecordingControlsVC.transitionWebToolBarDown()
-//            webView.wkWebView.scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//        } else {
-//            print("up")
-//            topWindowRecordingControlsVC.transitionWebToolBarUp()
-//            webView.wkWebView.scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
-//        }
+    func configurePlayerWith(url: URL) {
+        print(url)
+        uploadVC.configurePlayerWith(url: url)
     }
+    
+    func playOrPause() {
+        uploadVC.playButtonTapped()
+    }
+    
+    func toggleVideoGravity() {
+        uploadVC.toggleVideoGravity()
+    }
+    
+    func resizeVideo() {
+//        uploadVC.playButtonTapped()
+    }
+    
+    func muteVideo() {
+        uploadVC.muteButtonTapped()
+    }
+    
 }
 
