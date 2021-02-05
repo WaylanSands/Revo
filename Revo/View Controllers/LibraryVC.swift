@@ -126,6 +126,7 @@ class LibraryVC: UIViewController {
         RevoAnalytics.logScreenView(for: "Library Screen", ofClass: "LibraryVC")
     }
     
+    
     private func configureSwipeGesture() {
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(downSwipe))
         swipeGesture.direction = .down

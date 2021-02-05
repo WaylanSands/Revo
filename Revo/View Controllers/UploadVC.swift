@@ -20,7 +20,6 @@ class UploadVC: UIViewController {
         playerView.videoGravity = .resizeAspectFill
         playerView.showsPlaybackControls = false
         playerView.view.backgroundColor = .black
-        playerView.player?.volume = 1
         return playerView
     }()
     
@@ -68,6 +67,7 @@ class UploadVC: UIViewController {
     
     func configurePlayerWith(url: URL) {
         player = AVPlayer(url: url)
+        player.volume = 1
         playerVC.videoGravity = .resizeAspectFill
         playerVC.player = player
     }

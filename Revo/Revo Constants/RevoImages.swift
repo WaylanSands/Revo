@@ -28,9 +28,13 @@ struct RevoImages {
     
     // SF Symbols
     static func cameraIcon() -> UIImage? {
-        let imageSize = UIFont.systemFont(ofSize: 32, weight: .regular)
-        let configuration = UIImage.SymbolConfiguration(font: imageSize)
-        return UIImage(systemName: "camera.aperture", withConfiguration: configuration)
+        if #available(iOS 13.0, *) {
+            let imageSize = UIFont.systemFont(ofSize: 32, weight: .regular)
+            let configuration = UIImage.SymbolConfiguration(font: imageSize)
+            return UIImage(systemName: "camera.aperture", withConfiguration: configuration)
+        } else {
+            return UIImage(named: "record_button_icon")
+        }
     }
     
     // LibraryVC

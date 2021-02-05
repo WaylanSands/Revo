@@ -68,7 +68,9 @@ Dacă nu doriți să începeți o transmisie live, selectați din nou butonul pe
 
 "Switch Mode" = "Switch Mode";
 
-"switchMode_message" = "Modul de comutare vă permite să înregistrați imagini în timp ce comutați fără probleme la camera frontală și cea din spate";
+"switchMode_message" = "Modul de comutare vă permite să înregistrați imagini în timp ce comutați fără probleme la camera frontală și cea din spate.
+
+Dacă doriți să faceți videoclipuri peisaj, asigurați-vă că blocarea orientării dispozitivului este dezactivată.";
 
 "Got it" = "Am înțeles";
 

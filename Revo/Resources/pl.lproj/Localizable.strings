@@ -68,7 +68,9 @@ Jeśli nie chcesz rozpoczynać transmisji na żywo, wybierz ponownie przycisk, a
 
 "Switch Mode" = "Tryb przełączania";
 
-"switchMode_message" = "Tryb przełączania umożliwia nagrywanie materiału filmowego z płynnym przełączaniem na przedni i tylny aparat.";
+"switchMode_message" = "Tryb przełączania umożliwia nagrywanie materiału filmowego z płynnym przełączaniem na przedni i tylny aparat.
+
+Jeśli chcesz nagrywać filmy w orientacji poziomej, upewnij się, że blokada orientacji urządzenia jest wyłączona.";
 
 "Got it" = "Rozumiem";
 

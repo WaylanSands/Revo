@@ -68,7 +68,9 @@ Wenn Sie keine Live-Übertragung starten möchten, klicken Sie erneut auf die Sc
 
 "Switch Mode" = "Wechselmodus";
 
-"switchMode_message" = "Im Umschaltmodus können Sie Filmmaterial aufnehmen und gleichzeitig nahtlos zur vorderen und hinteren Kamera wechseln.";
+"switchMode_message" = "Im Umschaltmodus können Sie Filmmaterial aufnehmen und gleichzeitig nahtlos zur vorderen und hinteren Kamera wechseln.
+
+Wenn Sie Landschaftsvideos aufnehmen möchten, stellen Sie sicher, dass die Orientierungssperre Ihres Geräts deaktiviert ist.";
 
 "Got it" = "Ich habs";
 

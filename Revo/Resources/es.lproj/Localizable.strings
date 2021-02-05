@@ -68,7 +68,9 @@ Si no desea iniciar una transmisión en vivo, seleccione el botón nuevamente pa
 
 "Switch Mode" = "Modo interruptor";
 
-"switchMode_message" = "El modo de cambio le permite grabar imágenes mientras cambia sin problemas a la cámara frontal y trasera.";
+"switchMode_message" = "El modo de cambio le permite grabar imágenes mientras cambia sin problemas a la cámara frontal y trasera.
+
+Si desea tomar videos horizontales, asegúrese de que el bloqueo de orientación de su dispositivo esté desactivado.";
 
 "Got it" = "Entendido";
 

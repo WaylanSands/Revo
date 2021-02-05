@@ -89,6 +89,7 @@ class WebVC: UIViewController {
         let request = URLRequest(url: URL(string: "https://www.google.com")!)
         wkWebView.load(request)
     }
+    
 
     private func configureViews() {
         view.addSubview(timeLabel)
@@ -137,7 +138,7 @@ class WebVC: UIViewController {
         
         view.addSubview(frontFloatingPreviewView)
         frontFloatingPreviewView.frame = CGRect(x: (UIScreen.main.bounds.width / 2) - 100, y: (UIScreen.main.bounds.height / 2), width: 200, height: 200)
-        frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+        frontFloatingPreviewView.preview.videoPreviewLayer.videoGravity = .resizeAspectFill
         frontFloatingPreviewView.frameStyle = .circular
     }
     

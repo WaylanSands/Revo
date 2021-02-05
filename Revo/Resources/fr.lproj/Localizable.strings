@@ -68,7 +68,9 @@ Si vous ne souhaitez pas démarrer une diffusion en direct, sélectionnez à nou
 
 "Switch Mode" = "Mode de commutation";
 
-"switchMode_message" = "Le mode de commutation vous permet d'enregistrer des séquences tout en basculant de manière transparente vers la caméra avant et arrière.";
+"switchMode_message" = "Le mode de commutation vous permet d'enregistrer des séquences tout en basculant de manière transparente vers la caméra avant et arrière.
+
+Si vous souhaitez prendre des vidéos en mode paysage, assurez-vous que le verrouillage d'orientation de votre appareil est désactivé.";
 
 "Got it" = "Je l'ai";
 

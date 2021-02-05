@@ -67,7 +67,7 @@ class MainRecordingVC: UIViewController {
     private let uploadVC = UploadVC()
     
     // Used to alternate VideoPreviewLayers depending on Camera Mode
-    private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.videoPreviewLayer
+    private lazy var activeFrontPreviewLayerLayer: AVCaptureVideoPreviewLayer = frontFloatingPreviewView.preview.videoPreviewLayer
     private lazy var activeRearPreviewLayerLayer: AVCaptureVideoPreviewLayer = rearPreviewView.videoPreviewLayer
     
     private let appLogo: UILabel = {
@@ -203,7 +203,7 @@ class MainRecordingVC: UIViewController {
         
         // Front camera preview layer
         view.addSubview(frontFloatingPreviewView)
-        frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+        frontFloatingPreviewView.preview.videoPreviewLayer.videoGravity = .resizeAspectFill
         
         // appLogo will animate alpha during recording if remove the
         // watermark switch is off in settings.
@@ -371,9 +371,37 @@ class MainRecordingVC: UIViewController {
             
             rearPreviewView.videoPreviewLayer.session = singleCamSession
             frontFloatingPreviewView.isHidden = true
+            rearPreviewView.isHidden = false
             
             singleCamSession.commitConfiguration()
             singleCamSession.startRunning()
+        } catch {
+            Alert.showBlockingAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
+        }
+    }
+    
+    private func setupSingleCamSessionForUpload() {
+        singleCamSession.beginConfiguration()
+        let device = frontCamera()
+        currentFrontDevice = device
+        
+        do {
+            let deviceInput = try AVCaptureDeviceInput(device: device!)
+            
+            for each in singleCamSession.inputs {
+                singleCamSession.removeInput(each)
+            }
+            
+            singleCamSession.addInput(deviceInput)
+            activeFrontPreviewLayerLayer.session = nil
+            
+            frontFloatingPreviewView.preview.videoPreviewLayer.session = singleCamSession
+            frontFloatingPreviewView.isHidden = false
+            rearPreviewView.isHidden = true
+            
+            singleCamSession.commitConfiguration()
+            singleCamSession.startRunning()
+            uploadVC.clearMedia()
         } catch {
             Alert.showBlockingAlert(title: "Device Error".localized, message: error.localizedDescription, vc: self)
         }
@@ -385,6 +413,11 @@ class MainRecordingVC: UIViewController {
         
         if !AVCaptureMultiCamSession.isMultiCamSupported && presentationMode == .switchCam {
             self.setupSingleCamSessionFor(cameraPosition: .back)
+            return
+        }
+        
+        if !AVCaptureMultiCamSession.isMultiCamSupported && presentationMode == .upload {
+            self.setupSingleCamSessionForUpload()
             return
         }
         
@@ -410,9 +443,9 @@ class MainRecordingVC: UIViewController {
             uploadVC.pausePlayer()
         case .pip:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
-            frontFloatingPreviewView.videoPreviewLayer.session = multiCamSession
+            frontFloatingPreviewView.preview.videoPreviewLayer.session = multiCamSession
             activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
-            activeFrontPreviewLayerLayer = frontFloatingPreviewView.videoPreviewLayer
+            activeFrontPreviewLayerLayer = frontFloatingPreviewView.preview.videoPreviewLayer
             // cameraSelectionButton is re-enabled when switching modes incase it was left off during switchCam
             recordingControlsVC.cameraSelectionButton.isUserInteractionEnabled = true
             frontFloatingPreviewView.isHidden = false
@@ -434,10 +467,10 @@ class MainRecordingVC: UIViewController {
             uploadVC.pausePlayer()
         case .upload:
             rearPreviewView.videoPreviewLayer.session = multiCamSession
-            frontFloatingPreviewView.videoPreviewLayer.session = multiCamSession
+            frontFloatingPreviewView.preview.videoPreviewLayer.session = multiCamSession
             activeRearPreviewLayerLayer = rearPreviewView.videoPreviewLayer
-            activeFrontPreviewLayerLayer = frontFloatingPreviewView.videoPreviewLayer
-            frontFloatingPreviewView.videoPreviewLayer.videoGravity = .resizeAspectFill
+            activeFrontPreviewLayerLayer = frontFloatingPreviewView.preview.videoPreviewLayer
+            frontFloatingPreviewView.preview.videoPreviewLayer.videoGravity = .resizeAspectFill
             frontFloatingPreviewView.isHidden = false
             rearPreviewView.isHidden = true
             uploadVC.view.isHidden = false
@@ -464,8 +497,8 @@ class MainRecordingVC: UIViewController {
             }
             
             webCamSession.addInput(deviceInput)
-            webView.frontFloatingPreviewView.videoPreviewLayer.session = webCamSession
-            activeFrontPreviewLayerLayer = webView.frontFloatingPreviewView.videoPreviewLayer
+            webView.frontFloatingPreviewView.preview.videoPreviewLayer.session = webCamSession
+            activeFrontPreviewLayerLayer = webView.frontFloatingPreviewView.preview.videoPreviewLayer
             
             webCamSession.commitConfiguration()
             webCamSession.startRunning()

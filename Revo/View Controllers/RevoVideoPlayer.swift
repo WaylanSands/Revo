@@ -12,7 +12,6 @@ protocol RecordingPreviewDelegate: class {
     func removeRecordingWith(url: URL)
 }
 
-
 class RevoVideoPlayer: UIViewController {
     
     enum ControlState {
@@ -67,6 +66,12 @@ class RevoVideoPlayer: UIViewController {
         addFileCreationDate()
         configureViews()
         player.play()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        // Remove observers so self can be removed from memory
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        recordingDisplayLink.invalidate()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -129,6 +134,7 @@ class RevoVideoPlayer: UIViewController {
     
     private func deleteRecordings() {
         deletionDelegate?.removeRecordingWith(url: recordingURL!)
+        player.pause()
         dismiss(animated: true, completion: nil)
     }
     
@@ -221,7 +227,6 @@ class RevoVideoPlayer: UIViewController {
         playPauseButton.setImage(RevoImages.playIcon, for: .normal)
         recordingDisplayLink.isPaused = true
         playerLayerTap()
-        print("Finished")
     }
     
     @objc func trackPlaybackProgress() {

@@ -68,7 +68,9 @@ Pokud si nepřejete zahájit živé vysílání, přepněte jej opětovným stis
 
 "Switch Mode" = "Přepnout Režim";
 
-"switchMode_message" = "Přepínací režim umožňuje nahrávat záběry a plynule přepínat na přední a zadní kameru.";
+"switchMode_message" = "Přepínací režim umožňuje nahrávat záběry a plynule přepínat na přední a zadní kameru.
+
+Pokud chcete pořizovat videa na šířku, ujistěte se, že je zámek orientace zařízení vypnutý.";
 
 "Got it" = "Mám to";
 

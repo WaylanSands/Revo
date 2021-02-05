@@ -418,7 +418,7 @@ class RecordingControlsVC: UIViewController {
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         timeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         timeLabel.widthAnchor.constraint(equalToConstant: timeLabel.intrinsicContentSize.width + 20).isActive = true
-        timeLabel.heightAnchor.constraint(equalToConstant: timeLabel.font.lineHeight + 10).isActive = true
+        timeLabel.heightAnchor.constraint(equalToConstant: timeLabel.font.lineHeight + 8).isActive = true
 
         if UIScreen.main.nativeBounds.height > 1334 {
             timeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 45).isActive = true
@@ -553,7 +553,6 @@ class RecordingControlsVC: UIViewController {
     //MARK: - Record Screen
     
     @objc private func recordButtonTap() {
-        
         switch recordingMode {
         case .video:
             if screenRecorder.isRecording {
@@ -574,13 +573,13 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
-    private func configureAudioSession() {
+    private func configureAudioSession(start: Bool) {
         
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            if presentationMode == .upload {
+            if presentationMode == .upload && start {
                 // We set the audioSession to be aware that we are both recording and playing a video.
-                try audioSession.setCategory(.playAndRecord, mode: .videoRecording, options: [])
+                try audioSession.setCategory(.playAndRecord, mode: .default, policy: .default, options: .defaultToSpeaker)
             } else {
                 // We set the audioSession to the default.
                 try audioSession.setCategory(.soloAmbient, mode: .default, options: [])
@@ -590,6 +589,7 @@ class RecordingControlsVC: UIViewController {
         }
     }
     
+    
     private func startRecord() {
         do {
             try assetWriter.setUpWriter()
@@ -598,7 +598,7 @@ class RecordingControlsVC: UIViewController {
             return
         }
         screenRecorder.isMicrophoneEnabled = true
-        configureAudioSession()
+        configureAudioSession(start: true)
         screenRecorder.startCapture(handler: { cmSampleBuffer, rpSampleBufferType, error in
             
             if let error = error {
@@ -646,6 +646,8 @@ class RecordingControlsVC: UIViewController {
         // Log the event to Firebase Analytics
         RevoAnalytics.logRecordingEvent(in: recordingMode, using: presentationMode)
         enableControlsWhileVideoProcesses(enable: false)
+        configureAudioSession(start: false)
+        stopPlaybackIfInUploadMode()
 
         screenRecorder.stopCapture { error in
             
@@ -668,6 +670,15 @@ class RecordingControlsVC: UIViewController {
             }
         }
     }
+    
+    private func stopPlaybackIfInUploadMode() {
+        if presentationMode == .upload && playerState == .playing {
+            playButton.setImage(RevoImages.miniPlayIcon, for: .normal)
+            uploadDelegate?.playOrPause()
+            playerState = .paused
+        }
+    }
+
     
     // Do not allow users to navigate to the Library or start another
     // recording until the previous video has been written.
@@ -696,6 +707,7 @@ class RecordingControlsVC: UIViewController {
     
     
     private func startBroadcast() {
+        configureAudioSession(start: true)
         RPBroadcastActivityViewController.load { broadcastAVC, error in
             
             guard error == nil else {
@@ -711,6 +723,7 @@ class RecordingControlsVC: UIViewController {
     }
     
     private func stopBroadcast() {
+        configureAudioSession(start: false)
         broadcastVC.finishBroadcast { error in
             if error == nil {
                 // Broadcast finished
@@ -793,6 +806,7 @@ class RecordingControlsVC: UIViewController {
     private func disableSwitchAndCameraButtons() {
         cameraSelectionButton.isUserInteractionEnabled = false
         switchButton.isUserInteractionEnabled = false
+        editPreviewStyleButton.isHidden = false
         cameraSelectionButton.alpha = 0.4
         switchButton.alpha = 0.4
     }

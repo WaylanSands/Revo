@@ -68,7 +68,9 @@ Ak si neželáte spustiť živé vysielanie, znova stlačte tlačidlo a prepnite
 
 "Switch Mode" = "Prepnite Režim";
 
-"switchMode_message" = "Režim prepínania umožňuje nahrávať zábery a plynulo prepínať na predný a zadný fotoaparát.";
+"switchMode_message" = "Režim prepínania umožňuje nahrávať zábery a plynulo prepínať na predný a zadný fotoaparát.
+
+Ak chcete snímať videá na šírku, uistite sa, že je zámok orientácie zariadenia vypnutý.";
 
 "Got it" = "Mám to";
 
