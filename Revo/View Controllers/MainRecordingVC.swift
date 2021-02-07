@@ -287,7 +287,7 @@ class MainRecordingVC: UIViewController {
         
         if discoverySession.devices.isEmpty {
             // Hide cameraSelectionButton as there is only 1 camera 
-            recordingControlsVC.cameraSelectionButton.isHidden = true
+            recordingControlsVC.cameraSelectionButton.alpha = 0
             recordingControlsVC.devicesAvailable = singleCamera
         }
         

@@ -172,6 +172,13 @@ class RecordingControlsVC: UIViewController {
         return label
     }()
     
+    private let stackView: UIStackView = {
+       let view = UIStackView()
+        view.distribution = .equalSpacing
+        view.alignment = .center
+        return view
+    }()
+    
     private let libraryButton: UIButton = {
         let button = UIButton()
         button.setImage(RevoImages.libraryIcon, for: .normal)
@@ -455,45 +462,42 @@ class RecordingControlsVC: UIViewController {
             lowerDarkView.heightAnchor.constraint(equalToConstant: 140).isActive = true
         }
         
-        view.addSubview(libraryButton)
-        libraryButton.translatesAutoresizingMaskIntoConstraints = false
-        libraryButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-        libraryButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        libraryButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
+        view.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        stackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+//        stackView.heightAnchor.constraint(equalToConstant: 70).isActive = true
         if UIScreen.main.nativeBounds.height > 1334 {
-            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60).isActive = true
         } else {
             // Device is an iPhone SE, 6S, 7 , 8 or smaller
-            libraryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -35).isActive = true
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -35).isActive = true
         }
         
-        view.addSubview(switchButton)
-        switchButton.translatesAutoresizingMaskIntoConstraints = false
-        switchButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        switchButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-        switchButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
-        switchButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        stackView.addArrangedSubview(libraryButton)
+        libraryButton.translatesAutoresizingMaskIntoConstraints = false
+        libraryButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        libraryButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
-        view.addSubview(recordingModeButton)
+        stackView.addArrangedSubview(recordingModeButton)
         recordingModeButton.translatesAutoresizingMaskIntoConstraints = false
-        recordingModeButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        recordingModeButton.leftAnchor.constraint(equalTo: libraryButton.rightAnchor, constant: 25).isActive = true
+        recordingModeButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
         recordingModeButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
-        view.addSubview(cameraSelectionButton)
-        cameraSelectionButton.translatesAutoresizingMaskIntoConstraints = false
-        cameraSelectionButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
-        cameraSelectionButton.rightAnchor.constraint(equalTo: switchButton.leftAnchor, constant: -30).isActive = true
-        cameraSelectionButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        cameraSelectionButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        view.addSubview(recordingButton)
+        stackView.addArrangedSubview(recordingButton)
         recordingButton.translatesAutoresizingMaskIntoConstraints = false
-        recordingButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        recordingButton.centerYAnchor.constraint(equalTo: libraryButton.centerYAnchor).isActive = true
         recordingButton.heightAnchor.constraint(equalToConstant: 70).isActive = true
         recordingButton.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        
+        stackView.addArrangedSubview(cameraSelectionButton)
+        cameraSelectionButton.translatesAutoresizingMaskIntoConstraints = false
+        cameraSelectionButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        cameraSelectionButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        stackView.addArrangedSubview(switchButton)
+        switchButton.translatesAutoresizingMaskIntoConstraints = false
+        switchButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        switchButton.widthAnchor.constraint(equalToConstant: 48).isActive = true
         
         view.addSubview(flashButton)
         flashButton.frame = CGRect(x: 16, y:  view.center.y - 50, width: 40, height: 40)
@@ -807,15 +811,25 @@ class RecordingControlsVC: UIViewController {
         cameraSelectionButton.isUserInteractionEnabled = false
         switchButton.isUserInteractionEnabled = false
         editPreviewStyleButton.isHidden = false
-        cameraSelectionButton.alpha = 0.4
         switchButton.alpha = 0.4
+        
+        // Check that devicesAvailable is greater than one rear device otherwise
+        // there is no extra devices for cameraSelectionButton to toggle to.
+        if devicesAvailable.count > 1 {
+            cameraSelectionButton.alpha = 0.4
+        }
     }
     
     private func enableSwitchAndCameraButtons() {
-        cameraSelectionButton.isUserInteractionEnabled = true
         switchButton.isUserInteractionEnabled = true
-        cameraSelectionButton.alpha = 1
         switchButton.alpha = 1
+        
+        // Check that devicesAvailable is greater than one rear device otherwise
+        // there is no extra devices for cameraSelectionButton to toggle to.
+        if devicesAvailable.count > 1 {
+            cameraSelectionButton.isUserInteractionEnabled = true
+            cameraSelectionButton.alpha = 1
+        }
     }
         
     @objc private func recordingModePress() {
@@ -1189,7 +1203,7 @@ extension RecordingControlsVC: RPBroadcastActivityViewControllerDelegate {
         if devicesAvailable.count == 1 {
             // There is only 1 rear camera available so user is unable to toggle
             // through cameras via the cameraSelectionButton
-            cameraSelectionButton.isHidden = true
+            cameraSelectionButton.alpha = 0
         }
         
         if presentationMode == .upload {

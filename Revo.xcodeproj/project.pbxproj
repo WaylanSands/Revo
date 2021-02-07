@@ -231,8 +231,8 @@
 				48B658AC25AD18370043DEDF /* RecordingViewCell.swift */,
 				48B658A525AD18360043DEDF /* PipModeStyleView.swift */,
 				48B658A725AD18360043DEDF /* RecordButtonView.swift */,
-				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
 				48B658A825AD18360043DEDF /* SplitBarView.swift */,
+				48B658A925AD18360043DEDF /* FrontPreviewView.swift */,
 				48B658AA25AD18360043DEDF /* PreviewView.swift */,
 				48D43D9D25C1222800830988 /* WebRecordButtonView.swift */,
 				48D43D9825C1196600830988 /* WebControlsView.swift */,
@@ -893,7 +893,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -917,7 +917,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.waylansands.revo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

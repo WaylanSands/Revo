@@ -43,7 +43,7 @@ class FrontPreviewView: UIView {
                 self.layer.cornerRadius = self.frame.width / 2
             } else {
                 self.preview.layer.cornerRadius = 10
-                self.layer.cornerRadius = 14
+                self.layer.cornerRadius = 13
             }
         }
     }
@@ -62,7 +62,7 @@ class FrontPreviewView: UIView {
         self.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(pinching)))
         self.isUserInteractionEnabled = true
         self.backgroundColor = .white
-        self.layer.cornerRadius = 14
+        self.layer.cornerRadius = 13
         configurePreview()
     }
     
@@ -153,7 +153,7 @@ class FrontPreviewView: UIView {
                 self.layer.cornerRadius = self.frame.width / 2
             } else {
                 self.preview.layer.cornerRadius = 10
-                self.layer.cornerRadius = 14
+                self.layer.cornerRadius = 13
             }
         case .cancelled:
             break
