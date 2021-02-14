@@ -83,7 +83,7 @@ class SettingsVC: UIViewController {
     
     private let versionLabel: UILabel = {
         let label = UILabel()
-        label.text = "Version 1.2.3"
+        label.text = "Version 1.2.4"
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = .tertiaryLabel
         label.textAlignment = .center

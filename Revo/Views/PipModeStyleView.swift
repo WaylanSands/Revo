@@ -43,7 +43,7 @@ class PipModeStyleView: UIView {
     }()
     
     private let frameStyleControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["Square".localized, "Circle".localized])
+        let control = UISegmentedControl(items: ["Square".localized, "Circle".localized, "Rectangle"])
         control.addTarget(self, action: #selector(frameStyleChanged), for: .valueChanged)
         control.selectedSegmentIndex = 0
         return control
@@ -281,6 +281,8 @@ class PipModeStyleView: UIView {
             selectedFrameStyle = .circular
         case "Square".localized:
             selectedFrameStyle = .square
+        case "Rectangle":
+            selectedFrameStyle = .rect
         default:
             break
         }
@@ -311,6 +313,8 @@ class PipModeStyleView: UIView {
             frameStyleControl.selectedSegmentIndex = 0
         case .circular:
             frameStyleControl.selectedSegmentIndex = 1
+        case .rect:
+            frameStyleControl.selectedSegmentIndex = 2
         }
     }
     

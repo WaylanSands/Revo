@@ -12,6 +12,7 @@ import AVFoundation
 enum FrameStyle {
     case circular
     case square
+    case rect
 }
 
 class FrontPreviewView: UIView {
@@ -26,9 +27,10 @@ class FrontPreviewView: UIView {
     private lazy var lastYPosition: CGFloat = self.center.y - 100
     private lazy var lastXPosition: CGFloat = self.center.x - 100
         
+    private var lastHeightSize: CGFloat = 200
+    private var lastWidthSize: CGFloat = 200
     private var borderWidth: CGFloat = 4.0
-    private var lastSize: CGFloat = 200
-    
+
     private var previewBottomConstraint: NSLayoutConstraint!
     private var previewRightConstraint: NSLayoutConstraint!
     private var previewLeftConstraint: NSLayoutConstraint!
@@ -38,12 +40,24 @@ class FrontPreviewView: UIView {
     
     var frameStyle: FrameStyle = .square {
         didSet {
-            if frameStyle == .circular {
+            switch frameStyle {
+            case .circular:
                 self.preview.layer.cornerRadius = (self.frame.width - (borderWidth * 2)) / 2
                 self.layer.cornerRadius = self.frame.width / 2
-            } else {
+            case .square:
                 self.preview.layer.cornerRadius = 10
                 self.layer.cornerRadius = 13
+            case .rect:
+                self.lastHeightSize = lastWidthSize + (lastWidthSize / 2)
+                self.frame = CGRect(x: lastXPosition, y: lastYPosition, width: lastWidthSize, height: lastHeightSize)
+                self.preview.layer.cornerRadius = 10
+                self.layer.cornerRadius = 13
+            }
+        }
+        willSet {
+            if newValue != .rect {
+                self.frame = CGRect(x: lastXPosition, y: lastYPosition, width: lastWidthSize, height: lastWidthSize)
+                lastHeightSize = lastWidthSize
             }
         }
     }
@@ -51,11 +65,13 @@ class FrontPreviewView: UIView {
     override init(frame: CGRect) {
         if UIScreen.main.nativeBounds.height > 1334 {
             super.init(frame: CGRect(x: UIScreen.main.bounds.width - 220, y: 100, width: 200, height: 200))
-            lastSize = 200
+            lastWidthSize = 200
+            lastHeightSize = 200
         } else {
             // Device is an iPhone SE, 6S, 7 , 8 or smaller
             super.init(frame: CGRect(x: UIScreen.main.bounds.width - 200, y: 80, width: 160, height: 160))
-            lastSize = 160
+            lastWidthSize = 160
+            lastHeightSize = 160
         }
         
         self.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(trackPanning)))
@@ -142,7 +158,7 @@ class FrontPreviewView: UIView {
     @objc private func pinching(gestureRecognizer: UIPinchGestureRecognizer) {
         
         let scale = gestureRecognizer.scale
-        self.frame.size = CGSize(width: lastSize * scale, height: lastSize * scale)
+        self.frame.size = CGSize(width: lastWidthSize * scale, height: lastHeightSize * scale)
         
         switch gestureRecognizer.state {
         case .began:
@@ -158,7 +174,8 @@ class FrontPreviewView: UIView {
         case .cancelled:
             break
         case .ended:
-            lastSize = self.frame.width
+            lastHeightSize = self.frame.height
+            lastWidthSize = self.frame.width
             checkIfOutOfView()
         default:
             break
@@ -170,11 +187,15 @@ class FrontPreviewView: UIView {
 extension FrontPreviewView: PipModeStyleDelegate {
     
     func updateStyleWith(style: FrameStyle, borderWidth: CGFloat, color: UIColor) {
-        self.lastSize += borderWidth * 2
+        // Make self size larger to accomodate the new boarder size
+        // on left and right, top and bottom
+        self.lastHeightSize += borderWidth * 2
+        self.lastWidthSize += borderWidth * 2
+        
         self.borderWidth = borderWidth
         self.backgroundColor = color
 
-        self.frame = CGRect(x: lastXPosition, y: lastYPosition, width: lastSize, height: lastSize)
+        self.frame = CGRect(x: lastXPosition, y: lastYPosition, width: lastWidthSize, height: lastHeightSize)
         
         previewBottomConstraint.constant = -borderWidth
         previewRightConstraint.constant = -borderWidth

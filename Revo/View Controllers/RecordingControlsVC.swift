@@ -601,6 +601,9 @@ class RecordingControlsVC: UIViewController {
             Alert.showBasicAlert(title: "Recording Error".localized, message: error.localizedDescription, vc: self)
             return
         }
+       
+        // Disable app from going to sleep without interactions
+        UIApplication.shared.isIdleTimerDisabled = true
         screenRecorder.isMicrophoneEnabled = true
         configureAudioSession(start: true)
         screenRecorder.startCapture(handler: { cmSampleBuffer, rpSampleBufferType, error in
@@ -652,6 +655,9 @@ class RecordingControlsVC: UIViewController {
         enableControlsWhileVideoProcesses(enable: false)
         configureAudioSession(start: false)
         stopPlaybackIfInUploadMode()
+        
+        // Re-enable app to go to sleep without interactions
+        UIApplication.shared.isIdleTimerDisabled = false
 
         screenRecorder.stopCapture { error in
             
@@ -711,6 +717,9 @@ class RecordingControlsVC: UIViewController {
     
     
     private func startBroadcast() {
+        // Disable app from going to sleep without interactions
+        UIApplication.shared.isIdleTimerDisabled = true
+        
         configureAudioSession(start: true)
         RPBroadcastActivityViewController.load { broadcastAVC, error in
             
@@ -727,6 +736,9 @@ class RecordingControlsVC: UIViewController {
     }
     
     private func stopBroadcast() {
+        // Re-enable app to go to sleep without interactions
+        UIApplication.shared.isIdleTimerDisabled = false
+        
         configureAudioSession(start: false)
         broadcastVC.finishBroadcast { error in
             if error == nil {
